@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHRONO MARKET - 勉強連動型 擬似株＆ガチャゲーム</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Stock Price Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            50: '#121824',
+                            100: '#1a2234',
+                            200: '#222d42',
+                            300: '#2d3b55',
+                            400: '#3a4b6c'
+                        },
+                        accent: {
+                            green: '#10b981',
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            amber: '#f59e0b',
+                            pink: '#ec4899',
+                            teal: '#14b8a6',
+                            red: '#ef4444'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Hiragino Sans', 'Meiryo', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121824;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d3b55;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a4b6c;
+        }
+        .active-tab {
+            background-color: #222d42;
+            border-left: 4px solid #10b981;
+            color: #ffffff !important;
+        }
+        .glow-gold {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+        }
+        @keyframes gachaSpin {
+            0% { transform: rotate(0deg) scale(0.8); opacity: 0.5; }
+            50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
+            100% { transform: rotate(360deg) scale(1); opacity: 1; }
+        }
+        .animate-gacha {
+            animation: gachaSpin 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+</head>
+<body class="bg-[#0b0f17] text-gray-100 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden selection:bg-emerald-500 selection:text-white">
+
+    <!-- Navigation Sidebar -->
+    <aside class="w-full md:w-64 bg-[#121824] border-r border-gray-800/80 shrink-0 flex flex-col justify-between z-20">
+        <div>
+            <!-- Header Title -->
+            <div class="p-4 sm:p-5 border-b border-gray-800/80 flex items-center justify-between md:justify-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-amber-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-wider text-white flex items-center gap-1.5">
+                        CHRONO<span class="text-amber-400">MARKET</span>
+                    </h1>
+                    <p class="text-[11px] text-gray-400 font-medium">株トレード & ガチャ学習圏</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-3 space-y-1 sm:space-y-1.5 text-xs sm:text-sm font-medium">
+                <button onclick="switchTab('market')" id="nav-market" class="w-full text-left px-3.5 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 transition flex items-center gap-3 active-tab">
+                    <i class="fa-solid fa-arrow-trend-up text-emerald-400 w-5 text-center text-base"></i>
+                    <span>科目別 擬似株式市場</span>
+                </button>
+                <button onclick="switchTab('portfolio')" id="nav-portfolio" class="w-full text-left px-3.5 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 transition flex items-center gap-3">
+                    <i class="fa-solid fa-wallet text-amber-400 w-5 text-center text-base"></i>
+                    <span>資産 & ポートフォリオ</span>
+                </button>
+                <button onclick="switchTab('study-input')" id="nav-study-input" class="w-full text-left px-3.5 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 transition flex items-center gap-3">
+                    <i class="fa-solid fa-book-bookmark text-blue-400 w-5 text-center text-base"></i>
+                    <span>勉強データ挿入・報酬獲得</span>
+                </button>
+                <button onclick="switchTab('gacha')" id="nav-gacha" class="w-full text-left px-3.5 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 transition flex items-center gap-3">
+                    <i class="fa-solid fa-dice-d20 text-purple-400 w-5 text-center text-base"></i>
+                    <span>100種コンプ ガチャ</span>
+                </button>
+                <button onclick="switchTab('collection')" id="nav-collection" class="w-full text-left px-3.5 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 transition flex items-center gap-3">
+                    <i class="fa-solid fa-boxes-packing text-pink-400 w-5 text-center text-base"></i>
+                    <span>図鑑コレクション</span>
+                </button>
+                <button onclick="switchTab('migration')" id="nav-migration" class="w-full text-left px-3.5 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 transition flex items-center gap-3">
+                    <i class="fa-solid fa-key text-teal-400 w-5 text-center text-base"></i>
+                    <span>データ引き継ぎコード</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Wallet / Balance Quick Bar -->
+        <div class="p-3 sm:p-4 border-t border-gray-800/80 bg-gray-900/60">
+            <div class="bg-[#1a2234] rounded-xl p-3 border border-gray-800 space-y-1.5">
+                <div class="flex items-center justify-between text-xs text-gray-400">
+                    <span>所持現金 (JPY)</span>
+                    <i class="fa-solid fa-coins text-amber-400"></i>
+                </div>
+                <div id="sidebar-balance" class="text-lg font-black font-mono text-amber-400">¥0</div>
+                <div class="text-[10px] text-gray-500">時価総額: <span id="sidebar-total-asset" class="font-mono text-gray-300">¥0</span></div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto max-h-screen">
+        
+        <!-- Header Bar -->
+        <header class="bg-[#121824]/90 backdrop-blur-md border-b border-gray-800 sticky top-0 z-10 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+            <div>
+                <div class="text-xs font-bold text-gray-400 flex flex-wrap items-center gap-2">
+                    <span id="header-market-status" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px]"><i class="fa-solid fa-bolt mr-1"></i>市場動向: 1分足リアルタイム更新中</span>
+                    <span class="text-amber-400 font-mono text-[11px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20" id="header-next-tick-countdown"><i class="fa-solid fa-clock mr-1"></i>次回更新まで: 60秒</span>
+                    <span class="text-gray-500 font-mono text-[10px]" id="header-last-tick">最終: --:--</span>
+                </div>
+                <h2 id="page-title" class="text-base sm:text-xl font-black text-white tracking-wide">科目別 擬似株式市場</h2>
+            </div>
+
+            <!-- Header Quick Stats -->
+            <div class="flex items-center gap-3">
+                <div class="bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-blue-400 text-sm"></i>
+                    <div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold">参考書ボーナス</div>
+                        <div id="header-books-multiplier" class="text-xs sm:text-sm font-extrabold text-blue-300 font-mono">参考書計 0冊</div>
+                    </div>
+                </div>
+                <div class="bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400 text-sm"></i>
+                    <div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold">コンプ率</div>
+                        <div id="header-comp-rate" class="text-xs sm:text-sm font-extrabold text-amber-400 font-mono">0 / 100</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-4 sm:p-6 space-y-6 flex-1">
+            
+            <!-- TAB: MARKET -->
+            <div id="tab-market" class="space-y-6">
+                <!-- Market Overview Banner -->
+                <div class="bg-gradient-to-r from-emerald-950/40 via-teal-950/40 to-blue-950/40 border border-emerald-500/30 p-4 sm:p-5 rounded-2xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-slate-950 uppercase">STUDY REALTIME STOCK MARKET</span>
+                            <span class="text-xs font-bold text-emerald-400"><i class="fa-solid fa-clock mr-1"></i>実際の時間に連動して1分ごとに自動更新</span>
+                        </div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-white">「前日より勉強時間が多い科目」の株価は上昇確率UP！</h3>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            登録されている**参考書（教材）の数が多い科目**ほど資産価値が高くなります。実際の時間の経過（1分ごと）に合わせて各教科の株価チャートが自動で動きます！
+                        </p>
+                    </div>
+                    <div id="insider-analyzer-badge" class="hidden px-3 py-2 bg-amber-500/20 border border-amber-500/40 rounded-xl text-amber-300 text-xs font-bold flex items-center gap-1.5 shrink-0">
+                        <i class="fa-solid fa-eye text-amber-400"></i> コンプ特典: インサイダー予測アナライザー有効
+                    </div>
+                </div>
+
+                <!-- Stock Cards Grid with Dedicated Charts -->
+                <div id="stocks-grid-container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <!-- TAB: PORTFOLIO -->
+            <div id="tab-portfolio" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-900/80 border border-gray-800 p-5 rounded-2xl shadow-xl space-y-1">
+                        <div class="text-xs text-gray-400 font-bold uppercase">総資産 (現金 + 株式評価額)</div>
+                        <div id="portfolio-total-asset" class="text-2xl sm:text-3xl font-black font-mono text-amber-400">¥0</div>
+                        <p class="text-[11px] text-gray-500">勉強で稼いだお金と株式投資の合算</p>
+                    </div>
+                    <div class="bg-gray-900/80 border border-gray-800 p-5 rounded-2xl shadow-xl space-y-1">
+                        <div class="text-xs text-gray-400 font-bold uppercase">所持現金 (キャッシュ)</div>
+                        <div id="portfolio-cash" class="text-2xl sm:text-3xl font-black font-mono text-emerald-400">¥0</div>
+                        <p class="text-[11px] text-gray-500">ガチャや株の購入に利用可能</p>
+                    </div>
+                    <div class="bg-gray-900/80 border border-gray-800 p-5 rounded-2xl shadow-xl space-y-1">
+                        <div class="text-xs text-gray-400 font-bold uppercase">株式含み損益 (Total P/L)</div>
+                        <div id="portfolio-profit" class="text-2xl sm:text-3xl font-black font-mono text-gray-300">¥0</div>
+                        <p class="text-[11px] text-gray-500">保有株全体の価値変動損益</p>
+                    </div>
+                </div>
+
+                <!-- Holdings Table -->
+                <div class="bg-[#121824] border border-gray-800 rounded-2xl p-5 shadow-xl space-y-4">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2 border-b border-gray-800 pb-3">
+                        <i class="fa-solid fa-list-ul text-amber-400"></i> 保有株式銘柄一覧
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-gray-300">
+                            <thead class="bg-gray-900 text-gray-400 font-bold uppercase border-b border-gray-800">
+                                <tr>
+                                    <th class="p-3">科目銘柄</th>
+                                    <th class="p-3">参考書数 (基準額倍率)</th>
+                                    <th class="p-3">保有株数</th>
+                                    <th class="p-3">平均取得単価</th>
+                                    <th class="p-3">現在株価</th>
+                                    <th class="p-3">評価額</th>
+                                    <th class="p-3">評価損益</th>
+                                    <th class="p-3 text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolio-table-body" class="divide-y divide-gray-800">
+                                <!-- Dynamic render -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: STUDY INPUT -->
+            <div id="tab-study-input" class="space-y-6 hidden">
+                <div class="bg-[#121824] border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-6">
+                    <div class="border-b border-gray-800 pb-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-blue-400"></i> 勉強時間の挿入 & 資金（お給料）の獲得
+                            </h2>
+                            <p class="text-xs text-gray-400 mt-0.5">
+                                勉強時間を入力するたびに固定レート（1時間＝100円）で現金が加算され、各科目の前日比データが更新されます！
+                            </p>
+                        </div>
+                        <div class="bg-gray-900 border border-gray-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+                            <span class="text-xs text-gray-400 font-medium">学習手当レート:</span>
+                            <span class="text-xs font-mono font-bold text-amber-400">1時間 ＝ 100円 (固定)</span>
+                        </div>
+                    </div>
+
+                    <!-- Direct Study Insertion Form -->
+                    <form onsubmit="handleStudyDataInsert(event)" class="bg-gray-900/80 p-4 sm:p-5 rounded-2xl border border-gray-800 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 mb-1">対象科目を選択</label>
+                                <select id="insert-study-subject" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 mb-1">追加勉強時間 (分)</label>
+                                <input type="number" id="insert-study-minutes" min="1" max="1440" value="60" oninput="updateRewardPreview()" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs font-mono text-white text-center focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 mb-1">記録メモ・取り組んだ参考書</label>
+                                <input type="text" id="insert-study-memo" placeholder="例: 青チャート 例題50〜60" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-blue-950/30 border border-blue-500/30 rounded-xl flex items-center justify-between text-xs">
+                            <span class="text-gray-300">今回獲得できる手当 (現金):</span>
+                            <span id="insert-reward-preview" class="font-mono font-bold text-amber-400 text-sm">¥100</span>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-blue-900/30">
+                            <i class="fa-solid fa-plus-circle"></i> 勉強データを挿入して資金を獲得する
+                        </button>
+                    </form>
+
+                    <!-- Reference Books Count Manager -->
+                    <div class="bg-gray-900/40 border border-gray-800 p-4 rounded-2xl space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-book-open text-purple-400"></i> 各教科の参考書（教材）登録数管理
+                            </h3>
+                            <span class="text-[11px] text-gray-500">参考書が多いほど株の基準価値が高くなります</span>
+                        </div>
+                        <div id="subject-books-manager-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: GACHA -->
+            <div id="tab-gacha" class="space-y-6 hidden">
+                <div class="bg-gradient-to-b from-purple-950/40 via-gray-900 to-[#121824] border border-purple-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6 relative overflow-hidden">
+                    <div class="space-y-2 max-w-lg mx-auto">
+                        <span class="px-3 py-1 rounded-full text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase">100 TYPES GACHA</span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-wide">学業成就 & お守りガチャ</h2>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            勉強で手に入れたお金でガチャを回そう！全100種類のコンプリートを達成すると、**【インサイダー株価変動予測アナライザー】**が永久解放されます！
+                        </p>
+                    </div>
+
+                    <!-- Gacha Display Box -->
+                    <div class="py-10 bg-[#090e17] rounded-3xl border border-purple-900/50 max-w-md mx-auto relative shadow-inner flex flex-col items-center justify-center space-y-4">
+                        <div id="gacha-sphere" class="w-28 h-28 rounded-full bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 flex items-center justify-center text-white text-4xl shadow-xl shadow-purple-900/50 border-4 border-white/20">
+                            <i class="fa-solid fa-gift"></i>
+                        </div>
+                        <div id="gacha-result-text" class="text-xs text-gray-400 font-bold min-h-[20px]">
+                            ガチャを回すとここにアイテムが登場します
+                        </div>
+                    </div>
+
+                    <!-- Gacha Buttons -->
+                    <div class="flex justify-center gap-4 max-w-sm mx-auto">
+                        <button onclick="rollGacha(1)" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs sm:text-sm font-bold transition shadow-lg shadow-purple-900/40 flex flex-col items-center">
+                            <span>1回まわす</span>
+                            <span class="text-[10px] text-amber-300 font-mono">¥500</span>
+                        </button>
+                        <button onclick="rollGacha(10)" class="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl text-xs sm:text-sm font-bold transition shadow-lg shadow-pink-900/40 flex flex-col items-center">
+                            <span>10連まわす</span>
+                            <span class="text-[10px] text-amber-300 font-mono">¥5,000</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: COLLECTION -->
+            <div id="tab-collection" class="space-y-6 hidden">
+                <div class="bg-[#121824] border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-gray-800 pb-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-boxes-packing text-pink-400"></i> ガチャ図鑑コレクション (全100種)
+                            </h2>
+                            <p class="text-xs text-gray-400 mt-0.5">コンプリートで特別な「インサイダー予測」が有効化されます。</p>
+                        </div>
+                        <div class="text-xs text-amber-400 font-mono font-bold">
+                            収集状況: <span id="collection-count-text">0 / 100</span> (達成率 <span id="collection-pct-text">0%</span>)
+                        </div>
+                    </div>
+
+                    <!-- Collection Filters -->
+                    <div class="flex items-center gap-2 border-b border-gray-800 pb-2 text-xs overflow-x-auto">
+                        <button onclick="filterCollection('all')" id="col-filter-all" class="px-3 py-1.5 rounded-lg font-bold bg-pink-600 text-white shrink-0">すべて</button>
+                        <button onclick="filterCollection('N')" id="col-filter-N" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white shrink-0">N (40種)</button>
+                        <button onclick="filterCollection('R')" id="col-filter-R" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white shrink-0">R (30種)</button>
+                        <button onclick="filterCollection('SR')" id="col-filter-SR" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white shrink-0">SR (18種)</button>
+                        <button onclick="filterCollection('SSR')" id="col-filter-SSR" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white shrink-0">SSR (8種)</button>
+                        <button onclick="filterCollection('UR')" id="col-filter-UR" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white shrink-0">UR / LEGEND (4種)</button>
+                    </div>
+
+                    <!-- Items Grid -->
+                    <div id="collection-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2.5">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: MIGRATION -->
+            <div id="tab-migration" class="space-y-6 hidden">
+                <div class="bg-gradient-to-r from-emerald-950/40 via-teal-950/40 to-blue-950/40 border border-emerald-500/40 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+                    <div class="border-b border-emerald-500/20 pb-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                            <h2 class="text-lg font-bold text-emerald-300 flex items-center gap-2">
+                                <i class="fa-solid fa-key text-emerald-400"></i> 「CHRONO STUDY」完全互換 データ引き継ぎコード
+                            </h2>
+                            <p class="text-xs text-gray-300 mt-0.5">
+                                クロのスタディの引継ぎコードをそのまま読み込めます！過去の全勉強記録・教科設定が株式データに自動連携されます。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <!-- Export Card -->
+                        <div class="bg-[#121824] p-4 rounded-xl border border-gray-800 space-y-3 flex flex-col justify-between">
+                            <div>
+                                <div class="font-bold text-white mb-1 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-file-export text-emerald-400"></i> データコードを書き出し（ワンタップコピー）
+                                </div>
+                                <p class="text-gray-400 text-[11px] leading-relaxed">
+                                    全学習ログ、教科・参考書設定、所持株、現金、ガチャ100種図鑑データをまとめて出力します。
+                                </p>
+                            </div>
+                            <button onclick="exportDataCode()" class="w-full mt-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30">
+                                <i class="fa-solid fa-copy"></i> データコードをコピーする
+                            </button>
+                        </div>
+
+                        <!-- Import Card -->
+                        <div class="bg-[#121824] p-4 rounded-xl border border-gray-800 space-y-3">
+                            <div class="font-bold text-white mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-import text-blue-400"></i> データコードから復元・読み込み
+                            </div>
+                            <textarea id="data-code-import-input" rows="3" placeholder="「クロのスタディ」または「CHRONO MARKET」でコピーした暗号化データコードを貼り付け..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-mono"></textarea>
+                            <button onclick="importDataCode()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-blue-900/30">
+                                <i class="fa-solid fa-rotate-left"></i> データコードから復元・統合実行
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        const STORAGE_KEY = 'CHRONO_MARKET_DATA_V1';
+
+        // 100 Gacha Items Definitions
+        const GACHA_ITEMS = [];
+        const RARITIES = [
+            { name: 'N', count: 40, color: 'text-gray-400', border: 'border-gray-700', bg: 'bg-gray-800/40' },
+            { name: 'R', count: 30, color: 'text-blue-400', border: 'border-blue-500/40', bg: 'bg-blue-950/30' },
+            { name: 'SR', count: 18, color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-purple-950/30' },
+            { name: 'SSR', count: 8, color: 'text-amber-400', border: 'border-amber-500/40', bg: 'bg-amber-950/30' },
+            { name: 'UR', count: 4, color: 'text-pink-400', border: 'border-pink-500/40', bg: 'bg-pink-950/30' }
+        ];
+
+        // Generate 100 unique items
+        (function generate100Items() {
+            let idCounter = 1;
+            const namesN = ["合格祈願えんぴつ", "集中消しゴム", "暗記用赤シート", "タイマー付き文具", "学習ノート", "蛍光ペン5色セット", "単語カード", "付箋セット", "三角定規", "コンパス", "ルーズリーフ", "シャープペン替芯", "デスクライト", "姿勢矯正クッション", "耳せん", "ブドウ糖タブレット", "蒸気アイマスク", "応援ステッカー", "勉強用BGM集", "学習マグカップ"];
+            const namesR = ["必勝ペンダント", "集中力の輪", "知恵の知恵の輪", "天才のひらめきノート", "暗記の神様お守り", "英単語マスターバッジ", "計算高速化の鍵", "歴史年表キーホルダー", "元素周期表下敷き", "記憶力ブースター茶"];
+            const namesSR = ["学問の神様・絵馬", "過去問完璧のリング", "偏差値急上昇のお札", "睡魔退散の聖水", "徹夜突破のタリスマン", "集中力限界突破オーラ"];
+            const namesSSR = ["伝説の合格鉛筆", "叡智のゴールドクラウン", "全知全能の魔導書", "極限集中・クロノクロノス"];
+            const namesUR = ["【秘宝】志望校合格の大宝玉", "【神話】学術の絶対神像", "【神話】時空制覇の金時計", "【幻影】クロ・スタディの英知"];
+
+            RARITIES.forEach(r => {
+                for (let i = 0; i < r.count; i++) {
+                    let name = "";
+                    if (r.name === 'N') name = namesN[i % namesN.length] + ` #${i+1}`;
+                    else if (r.name === 'R') name = namesR[i % namesR.length] + ` #${i+1}`;
+                    else if (r.name === 'SR') name = namesSR[i % namesSR.length] + ` #${i+1}`;
+                    else if (r.name === 'SSR') name = namesSSR[i % namesSSR.length];
+                    else name = namesUR[i % namesUR.length];
+
+                    GACHA_ITEMS.push({
+                        id: idCounter,
+                        name: name,
+                        rarity: r.name,
+                        icon: r.name === 'UR' ? 'fa-crown' : r.name === 'SSR' ? 'fa-gem' : r.name === 'SR' ? 'fa-scroll' : r.name === 'R' ? 'fa-award' : 'fa-pen-clip'
+                    });
+                    idCounter++;
+                }
+            });
+        })();
+
+        function getInitialData() {
+            return {
+                cash: 5000,
+                hourlyRate: 100, // Fixed 100 yen / hour
+                subjects: [
+                    { id: 'subj-1', name: '英語', color: '#3b82f6', materials: ['ターゲット1900', 'NextStage'] },
+                    { id: 'subj-2', name: '数学', color: '#10b981', materials: ['青チャートIA', '青チャートIIB', '1対1対応の演習'] },
+                    { id: 'subj-3', name: '化学', color: '#f59e0b', materials: ['重要問題集'] },
+                    { id: 'subj-4', name: '物理', color: '#ec4899', materials: ['物理のエッセンス', '良問の風'] }
+                ],
+                stocks: {
+                    'subj-1': { currentPrice: 1200, history: [1000, 1050, 1100, 1150, 1200], holdings: 0, avgPrice: 0 },
+                    'subj-2': { currentPrice: 1800, history: [1500, 1600, 1700, 1750, 1800], holdings: 0, avgPrice: 0 },
+                    'subj-3': { currentPrice: 900, history: [800, 850, 880, 890, 900], holdings: 0, avgPrice: 0 },
+                    'subj-4': { currentPrice: 1400, history: [1200, 1250, 1300, 1350, 1400], holdings: 0, avgPrice: 0 }
+                },
+                studyHours: {},
+                dailyLogs: {},
+                collection: [],
+                lastTickTime: Date.now()
+            };
+        }
+
+        let appData = getInitialData();
+        let stockChartsMap = {};
+        let activeCollectionFilter = 'all';
+
+        window.onload = function() {
+            loadFromStorage();
+            ensureDataIntegrity();
+            checkRealtimeTick();
+            renderAll();
+
+            // Run real-time check every 1 second (1000ms) for countdown display and 1-minute tick check
+            setInterval(() => {
+                checkRealtimeTick();
+            }, 1000);
+        };
+
+        function loadFromStorage() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    appData = { ...appData, ...parsed };
+                } catch(e) {
+                    console.error('Storage load error:', e);
+                }
+            } else {
+                // Try importing legacy CHRONO_STUDY_DATA if present
+                const legacyKeys = ['CHRONO_STUDY_DATA_V6', 'CHRONO_STUDY_DATA_V5', 'CHRONO_STUDY_DATA'];
+                for (let k of legacyKeys) {
+                    const legacy = localStorage.getItem(k);
+                    if (legacy) {
+                        try {
+                            const parsed = JSON.parse(legacy);
+                            if (parsed.subjects && parsed.subjects.length > 0) {
+                                appData.subjects = parsed.subjects;
+                            }
+                            if (parsed.dailyLogs) {
+                                appData.dailyLogs = parsed.dailyLogs;
+                            }
+                            break;
+                        } catch(e) {}
+                    }
+                }
+            }
+            appData.hourlyRate = 100; // Enforce 100 yen per hour
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        function ensureDataIntegrity() {
+            if (!appData.stocks) appData.stocks = {};
+            if (!appData.collection) appData.collection = [];
+            if (!appData.studyHours) appData.studyHours = {};
+            if (!appData.dailyLogs) appData.dailyLogs = {};
+            appData.hourlyRate = 100;
+            if (!appData.lastTickTime) appData.lastTickTime = Date.now();
+
+            // Synchronize study time logs from CHRONO STUDY dailyLogs
+            syncStudyDataFromDailyLogs();
+
+            appData.subjects.forEach(s => {
+                const bookCount = Math.max(1, (s.materials || []).length);
+                const basePrice = bookCount * 500;
+
+                if (!appData.stocks[s.id]) {
+                    appData.stocks[s.id] = {
+                        currentPrice: basePrice,
+                        history: [basePrice, basePrice, basePrice],
+                        holdings: 0,
+                        avgPrice: 0
+                    };
+                }
+            });
+        }
+
+        // CHRONO STUDY dailyLogs -> studyHours mapping
+        function syncStudyDataFromDailyLogs() {
+            if (!appData.dailyLogs) return;
+
+            Object.keys(appData.dailyLogs).forEach(dateKey => {
+                const log = appData.dailyLogs[dateKey];
+                if (!log || !log.sessions || !Array.isArray(log.sessions)) return;
+
+                if (!appData.studyHours[dateKey]) {
+                    appData.studyHours[dateKey] = {};
+                }
+
+                log.sessions.forEach(sess => {
+                    if (!sess) return;
+                    let targetSubjId = sess.subjectId;
+                    
+                    if (!targetSubjId || !appData.subjects.some(s => s.id === targetSubjId)) {
+                        const foundSubj = appData.subjects.find(s => s.name === sess.subjectName || s.name === sess.subject);
+                        if (foundSubj) targetSubjId = foundSubj.id;
+                    }
+
+                    if (targetSubjId) {
+                        const durationMins = Math.floor((sess.durationSecs || 0) / 60) || sess.durationMinutes || sess.mins || 0;
+                        if (durationMins > 0) {
+                            appData.studyHours[dateKey][targetSubjId] = Math.max(
+                                appData.studyHours[dateKey][targetSubjId] || 0,
+                                durationMins
+                            );
+                        }
+                    }
+                });
+            });
+        }
+
+        function getYesterdayTodayStudyDiff(subjId) {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            const formatDate = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            
+            const todayKey = formatDate(today);
+            const yesterdayKey = formatDate(yesterday);
+
+            const todayMins = (appData.studyHours && appData.studyHours[todayKey] && appData.studyHours[todayKey][subjId]) || 0;
+            const yesterdayMins = (appData.studyHours && appData.studyHours[yesterdayKey] && appData.studyHours[yesterdayKey][subjId]) || 0;
+
+            return { todayMins, yesterdayMins, isUpProbabilityHigher: todayMins >= yesterdayMins };
+        }
+
+        function checkRealtimeTick() {
+            const now = Date.now();
+            const ONE_MINUTE = 60000; // 1-minute interval
+            if (!appData.lastTickTime) appData.lastTickTime = now;
+
+            const elapsedMinutes = Math.floor((now - appData.lastTickTime) / ONE_MINUTE);
+            
+            // Check if 1 or more minutes have elapsed
+            if (elapsedMinutes > 0) {
+                for (let i = 0; i < elapsedMinutes; i++) {
+                    triggerMarketTickInternal();
+                }
+                appData.lastTickTime += elapsedMinutes * ONE_MINUTE;
+                saveToStorage();
+                renderAll();
+                showToast(`実際の時間が${elapsedMinutes}分経過したため、株価が最新状態に更新されました！`, 'info');
+            }
+
+            // Update countdown timer display in header
+            const timeUntilNextTickSecs = Math.max(0, Math.ceil((ONE_MINUTE - ((now - appData.lastTickTime) % ONE_MINUTE)) / 1000));
+            const countdownElem = document.getElementById('header-next-tick-countdown');
+            if (countdownElem) {
+                countdownElem.innerHTML = `<i class="fa-solid fa-clock mr-1"></i>次回株価更新まで: ${timeUntilNextTickSecs}秒`;
+            }
+        }
+
+        function triggerMarketTickInternal() {
+            appData.subjects.forEach(s => {
+                const stock = appData.stocks[s.id];
+                if (!stock) return;
+
+                const bookCount = Math.max(1, (s.materials || []).length);
+                const diff = getYesterdayTodayStudyDiff(s.id);
+
+                // Base fluctuation: If today study >= yesterday study, 65% chance UP. Else 35% chance UP.
+                let upChance = diff.isUpProbabilityHigher ? 0.65 : 0.35;
+                const isUp = Math.random() < upChance;
+
+                // Magnitude of movement (1% to 6%)
+                const changePct = (Math.random() * 0.05 + 0.01) * (isUp ? 1 : -1);
+                
+                // Book bonus: Higher book count increases minimum price floor
+                const minFloor = bookCount * 200;
+                let newPrice = Math.round(stock.currentPrice * (1 + changePct));
+                if (newPrice < minFloor) newPrice = minFloor;
+
+                stock.currentPrice = newPrice;
+                if (!stock.history) stock.history = [newPrice];
+                stock.history.push(newPrice);
+                if (stock.history.length > 30) stock.history.shift(); // Keep last 30 minutes
+            });
+        }
+
+        function switchTab(tabId) {
+            ['market', 'portfolio', 'study-input', 'gacha', 'collection', 'migration'].forEach(t => {
+                const nav = document.getElementById(`nav-${t}`);
+                const tab = document.getElementById(`tab-${t}`);
+                if (nav && tab) {
+                    if (t === tabId) {
+                        nav.classList.add('active-tab');
+                        tab.classList.remove('hidden');
+                    } else {
+                        nav.classList.remove('active-tab');
+                        tab.classList.add('hidden');
+                    }
+                }
+            });
+
+            const titles = {
+                market: '科目別 擬似株式市場',
+                portfolio: '資産 & 保有株ポートフォリオ',
+                'study-input': '勉強時間データ挿入・報酬獲得',
+                gacha: '100種学業成就 ガチャ',
+                collection: 'ガチャ図鑑コレクション',
+                migration: 'データ引き継ぎコード'
+            };
+            document.getElementById('page-title').innerText = titles[tabId] || 'CHRONO MARKET';
+
+            if (tabId === 'portfolio') renderPortfolio();
+            if (tabId === 'collection') renderCollection();
+            if (tabId === 'market') updateAllCharts();
+        }
+
+        function renderAll() {
+            renderHeaderAndSidebar();
+            renderStocksGrid();
+            renderSubjectSelects();
+            renderBooksManager();
+            renderCollection();
+            renderPortfolio();
+        }
+
+        function renderHeaderAndSidebar() {
+            document.getElementById('sidebar-balance').innerText = `¥${appData.cash.toLocaleString()}`;
+            
+            // Total asset calculate
+            let stockValue = 0;
+            Object.keys(appData.stocks).forEach(id => {
+                const s = appData.stocks[id];
+                stockValue += (s.holdings || 0) * (s.currentPrice || 0);
+            });
+            const totalAsset = appData.cash + stockValue;
+            document.getElementById('sidebar-total-asset').innerText = `¥${totalAsset.toLocaleString()}`;
+
+            const compCount = appData.collection.length;
+            document.getElementById('header-comp-rate').innerText = `${compCount} / 100`;
+
+            const totalBooks = appData.subjects.reduce((sum, s) => sum + (s.materials ? s.materials.length : 0), 0);
+            document.getElementById('header-books-multiplier').innerText = `参考書計 ${totalBooks}冊`;
+
+            const analyzerBadge = document.getElementById('insider-analyzer-badge');
+            if (analyzerBadge) {
+                if (compCount >= 100) analyzerBadge.classList.remove('hidden');
+                else analyzerBadge.classList.add('hidden');
+            }
+
+            // Update header last tick time display
+            const lastTickDate = new Date(appData.lastTickTime);
+            const timeStr = `${String(lastTickDate.getHours()).padStart(2,'0')}:${String(lastTickDate.getMinutes()).padStart(2,'0')}:${String(lastTickDate.getSeconds()).padStart(2,'0')}`;
+            const headerTick = document.getElementById('header-last-tick');
+            if (headerTick) headerTick.innerText = `最終更新: ${timeStr}`;
+        }
+
+        function renderStocksGrid() {
+            const container = document.getElementById('stocks-grid-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const compCount = appData.collection.length;
+            const isInsiderUnlocked = compCount >= 100;
+
+            // Destroy existing Chart instances to prevent canvas reuse errors
+            Object.keys(stockChartsMap).forEach(key => {
+                if (stockChartsMap[key]) {
+                    stockChartsMap[key].destroy();
+                    delete stockChartsMap[key];
+                }
+            });
+
+            appData.subjects.forEach(s => {
+                const stock = appData.stocks[s.id] || { currentPrice: 1000, history: [1000], holdings: 0 };
+                const bookCount = (s.materials || []).length;
+                const prevPrice = stock.history[stock.history.length - 2] || stock.currentPrice;
+                const diffPrice = stock.currentPrice - prevPrice;
+                const diffPct = prevPrice > 0 ? ((diffPrice / prevPrice) * 100).toFixed(1) : 0;
+
+                const isUp = diffPrice >= 0;
+                const colorClass = isUp ? 'text-emerald-400' : 'text-red-400';
+                const iconClass = isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down';
+
+                const studyInfo = getYesterdayTodayStudyDiff(s.id);
+
+                const card = document.createElement('div');
+                card.className = `bg-[#121824] border border-gray-800 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl hover:border-gray-700 transition`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3.5 h-3.5 rounded-full" style="background-color: ${s.color}"></span>
+                            <span class="font-extrabold text-white text-base">${s.name}</span>
+                        </div>
+                        <span class="text-xs bg-gray-900 text-gray-300 px-2.5 py-1 rounded-xl font-mono border border-gray-800">
+                            <i class="fa-solid fa-book-open text-purple-400 mr-1"></i>参考書 ${bookCount}冊 (基準額 ×${bookCount})
+                        </span>
+                    </div>
+
+                    <div class="flex items-baseline justify-between">
+                        <div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">現在株価 (1分足)</div>
+                            <div class="text-2xl font-black font-mono text-white">¥${stock.currentPrice.toLocaleString()}</div>
+                        </div>
+                        <div class="text-right ${colorClass} font-mono text-sm font-bold">
+                            <i class="fa-solid ${iconClass} mr-1"></i>${isUp ? '+' : ''}${diffPrice} (${isUp ? '+' : ''}${diffPct}%)
+                        </div>
+                    </div>
+
+                    ${isInsiderUnlocked ? `
+                        <div class="p-2 bg-amber-950/30 border border-amber-500/30 rounded-xl text-xs text-amber-300 font-mono flex items-center justify-between">
+                            <span>👁️ 予測上昇確率:</span>
+                            <span class="font-bold text-amber-400">${studyInfo.isUpProbabilityHigher ? '65% (上昇優勢)' : '35% (下降警戒)'}</span>
+                        </div>
+                    ` : ''}
+
+                    <!-- Dedicated Chart Canvas for this Subject -->
+                    <div class="h-44 bg-[#090e17] rounded-xl p-2 border border-gray-800/80">
+                        <canvas id="stockChart-${s.id}"></canvas>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs text-gray-300 pt-1 border-t border-gray-800/80">
+                        <span>保有数: <strong class="text-amber-400 font-mono font-bold text-sm">${stock.holdings}株</strong></span>
+                        <div class="flex gap-2">
+                            <button onclick="tradeStock('${s.id}', 'buy')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/30 transition">買付</button>
+                            <button onclick="tradeStock('${s.id}', 'sell')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold shadow-lg shadow-red-900/30 transition">売却</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Instantiate charts after DOM elements are mounted
+            setTimeout(() => {
+                initAllSubjectCharts();
+            }, 50);
+        }
+
+        function initAllSubjectCharts() {
+            appData.subjects.forEach(s => {
+                const canvas = document.getElementById(`stockChart-${s.id}`);
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                const stock = appData.stocks[s.id] || { history: [1000] };
+
+                stockChartsMap[s.id] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: stock.history.map((_, i) => `${i + 1}分前`),
+                        datasets: [{
+                            label: `${s.name} 株価`,
+                            data: stock.history,
+                            borderColor: s.color || '#10b981',
+                            backgroundColor: `${s.color || '#10b981'}15`,
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            pointHoverRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#6b7280', font: { size: 9 } }, grid: { color: '#111827' } },
+                            y: { ticks: { color: '#6b7280', font: { size: 9 } }, grid: { color: '#111827' } }
+                        }
+                    }
+                });
+            });
+        }
+
+        function updateAllCharts() {
+            appData.subjects.forEach(s => {
+                const chart = stockChartsMap[s.id];
+                const stock = appData.stocks[s.id];
+                if (chart && stock) {
+                    chart.data.labels = stock.history.map((_, i) => `${i + 1}分前`);
+                    chart.data.datasets[0].data = stock.history;
+                    chart.update();
+                }
+            });
+        }
+
+        function tradeStock(subjId, type) {
+            const stock = appData.stocks[subjId];
+            const subj = appData.subjects.find(s => s.id === subjId);
+            if (!stock || !subj) return;
+
+            const price = stock.currentPrice;
+
+            if (type === 'buy') {
+                if (appData.cash < price) {
+                    showToast('所持現金が不足しています！', 'error');
+                    return;
+                }
+                const newTotalHoldings = stock.holdings + 1;
+                const newAvgPrice = Math.round(((stock.holdings * stock.avgPrice) + price) / newTotalHoldings);
+
+                appData.cash -= price;
+                stock.holdings = newTotalHoldings;
+                stock.avgPrice = newAvgPrice;
+
+                showToast(`${subj.name}株を1株 ¥${price.toLocaleString()} で買い付けました！`, 'success');
+            } else {
+                if (stock.holdings <= 0) {
+                    showToast('売却できる株を保有していません。', 'error');
+                    return;
+                }
+                appData.cash += price;
+                stock.holdings -= 1;
+                if (stock.holdings === 0) stock.avgPrice = 0;
+
+                showToast(`${subj.name}株を1株 ¥${price.toLocaleString()} で売却しました！`, 'success');
+            }
+
+            saveToStorage();
+            renderAll();
+            updateAllCharts();
+        }
+
+        function renderPortfolio() {
+            let totalVal = appData.cash;
+            let totalProfit = 0;
+
+            const tbody = document.getElementById('portfolio-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            appData.subjects.forEach(s => {
+                const stock = appData.stocks[s.id] || { holdings: 0, currentPrice: 0, avgPrice: 0 };
+                const currentVal = stock.holdings * stock.currentPrice;
+                const costVal = stock.holdings * stock.avgPrice;
+                const profit = currentVal - costVal;
+
+                totalVal += currentVal;
+                totalProfit += profit;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-900/50 transition font-mono";
+                tr.innerHTML = `
+                    <td class="p-3 font-sans font-bold text-white flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${s.color}"></span>
+                        ${s.name}
+                    </td>
+                    <td class="p-3 font-sans text-gray-400">${(s.materials || []).length}冊</td>
+                    <td class="p-3 font-bold text-white">${stock.holdings}株</td>
+                    <td class="p-3 text-gray-300">¥${stock.avgPrice.toLocaleString()}</td>
+                    <td class="p-3 text-white font-bold">¥${stock.currentPrice.toLocaleString()}</td>
+                    <td class="p-3 text-amber-400 font-bold">¥${currentVal.toLocaleString()}</td>
+                    <td class="p-3 font-bold ${profit >= 0 ? 'text-emerald-400' : 'text-red-400'}">
+                        ${profit >= 0 ? '+' : ''}¥${profit.toLocaleString()}
+                    </td>
+                    <td class="p-3 text-right font-sans">
+                        <button onclick="tradeStock('${s.id}', 'sell')" ${stock.holdings <= 0 ? 'disabled' : ''} class="px-2.5 py-1 bg-red-600 hover:bg-red-500 disabled:opacity-30 text-white rounded-lg text-xs font-bold">売却</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('portfolio-cash').innerText = `¥${appData.cash.toLocaleString()}`;
+            document.getElementById('portfolio-total-asset').innerText = `¥${totalVal.toLocaleString()}`;
+            
+            const profitElem = document.getElementById('portfolio-profit');
+            profitElem.className = `text-2xl sm:text-3xl font-black font-mono ${totalProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+            profitElem.innerText = `${totalProfit >= 0 ? '+' : ''}¥${totalProfit.toLocaleString()}`;
+        }
+
+        function updateRewardPreview() {
+            const minsInput = document.getElementById('insert-study-minutes');
+            const previewElem = document.getElementById('insert-reward-preview');
+            if (!minsInput || !previewElem) return;
+
+            const mins = parseInt(minsInput.value) || 0;
+            const rewardMoney = Math.round((mins / 60) * 100);
+            previewElem.innerText = `¥${rewardMoney.toLocaleString()}`;
+        }
+
+        function renderSubjectSelects() {
+            const select = document.getElementById('insert-study-subject');
+            if (!select) return;
+            select.innerHTML = '';
+            appData.subjects.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.innerText = s.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function handleStudyDataInsert(e) {
+            e.preventDefault();
+            const subjId = document.getElementById('insert-study-subject').value;
+            const mins = parseInt(document.getElementById('insert-study-minutes').value) || 0;
+
+            if (mins <= 0) return;
+
+            const today = new Date();
+            const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+            if (!appData.studyHours[todayKey]) appData.studyHours[todayKey] = {};
+            appData.studyHours[todayKey][subjId] = (appData.studyHours[todayKey][subjId] || 0) + mins;
+
+            // Fixed Money Reward calculation: 1 hour = 100 yen
+            const rewardMoney = Math.round((mins / 60) * 100);
+            appData.cash += rewardMoney;
+
+            saveToStorage();
+            renderAll();
+
+            document.getElementById('insert-study-memo').value = '';
+            showToast(`勉強データ（${mins}分）を登録し、手当 ¥${rewardMoney.toLocaleString()} を獲得しました！`, 'success');
+        }
+
+        function renderBooksManager() {
+            const grid = document.getElementById('subject-books-manager-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            appData.subjects.forEach(s => {
+                const books = s.materials || [];
+                const card = document.createElement('div');
+                card.className = "bg-gray-800/60 p-3 rounded-xl border border-gray-700/80 space-y-2";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-white">${s.name}</span>
+                        <span class="text-xs text-amber-400 font-mono font-bold">${books.length}冊登録</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <input type="text" id="add-book-${s.id}" placeholder="参考書名を追加" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-2 py-1 text-xs text-white">
+                        <button onclick="addBookToSubject('${s.id}')" class="px-2 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold">追加</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function addBookToSubject(subjId) {
+            const input = document.getElementById(`add-book-${subjId}`);
+            const title = input ? input.value.trim() : '';
+            if (!title) return;
+
+            const subj = appData.subjects.find(s => s.id === subjId);
+            if (subj) {
+                if (!subj.materials) subj.materials = [];
+                subj.materials.push(title);
+                input.value = '';
+                saveToStorage();
+                renderAll();
+                showToast(`${subj.name}に参考書「${title}」を登録しました！（1株基準価値UP）`, 'success');
+            }
+        }
+
+        function rollGacha(count) {
+            const cost = count * 500;
+            if (appData.cash < cost) {
+                showToast('ガチャを回す現金が足りません！', 'error');
+                return;
+            }
+
+            appData.cash -= cost;
+
+            const results = [];
+            for (let i = 0; i < count; i++) {
+                const rand = Math.random();
+                let selectedRarity = 'N';
+                if (rand < 0.01) selectedRarity = 'UR';
+                else if (rand < 0.05) selectedRarity = 'SSR';
+                else if (rand < 0.15) selectedRarity = 'SR';
+                else if (rand < 0.40) selectedRarity = 'R';
+
+                const pool = GACHA_ITEMS.filter(item => item.rarity === selectedRarity);
+                const item = pool[Math.floor(Math.random() * pool.length)];
+
+                if (!appData.collection.includes(item.id)) {
+                    appData.collection.push(item.id);
+                }
+                results.push(item);
+            }
+
+            saveToStorage();
+            renderAll();
+
+            // Animate Gacha Sphere
+            const sphere = document.getElementById('gacha-sphere');
+            sphere.classList.add('animate-gacha');
+            setTimeout(() => sphere.classList.remove('animate-gacha'), 1000);
+
+            const lastItem = results[results.length - 1];
+            document.getElementById('gacha-result-text').innerHTML = `
+                ${count === 1 ? '獲得:' : '10連最終獲得:'} <span class="font-bold text-amber-400">[${lastItem.rarity}] ${lastItem.name}</span>
+            `;
+
+            showToast(`${count}連ガチャを回しました！図鑑をチェックしてください。`, 'success');
+        }
+
+        function filterCollection(rarity) {
+            activeCollectionFilter = rarity;
+            ['all', 'N', 'R', 'SR', 'SSR', 'UR'].forEach(r => {
+                const btn = document.getElementById(`col-filter-${r}`);
+                if (btn) {
+                    if (r === rarity) {
+                        btn.className = "px-3 py-1.5 rounded-lg font-bold bg-pink-600 text-white shrink-0";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white shrink-0";
+                    }
+                }
+            });
+            renderCollection();
+        }
+
+        function renderCollection() {
+            const grid = document.getElementById('collection-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const compCount = appData.collection.length;
+            document.getElementById('collection-count-text').innerText = `${compCount} / 100`;
+            document.getElementById('collection-pct-text').innerText = `${Math.round((compCount/100)*100)}%`;
+
+            let displayPool = GACHA_ITEMS;
+            if (activeCollectionFilter !== 'all') {
+                if (activeCollectionFilter === 'UR') {
+                    displayPool = GACHA_ITEMS.filter(item => item.rarity === 'UR');
+                } else {
+                    displayPool = GACHA_ITEMS.filter(item => item.rarity === activeCollectionFilter);
+                }
+            }
+
+            displayPool.forEach(item => {
+                const isOwned = appData.collection.includes(item.id);
+                const rarityStyle = RARITIES.find(r => r.name === item.rarity) || RARITIES[0];
+
+                const card = document.createElement('div');
+                card.className = `p-2 rounded-xl border text-center space-y-1 ${isOwned ? `${rarityStyle.bg} ${rarityStyle.border}` : 'bg-gray-900/40 border-gray-800 opacity-40'}`;
+                card.innerHTML = `
+                    <div class="text-[9px] font-black font-mono ${rarityStyle.color}">${item.rarity}</div>
+                    <div class="w-8 h-8 rounded-lg ${isOwned ? 'bg-gray-800 text-amber-400' : 'bg-gray-950 text-gray-600'} flex items-center justify-center mx-auto text-sm">
+                        <i class="fa-solid ${isOwned ? item.icon : 'fa-lock'}"></i>
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-200 truncate ${isOwned ? '' : 'text-gray-600'}">${isOwned ? item.name : '???'}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function exportDataCode() {
+            try {
+                const jsonStr = JSON.stringify(appData);
+                const code = btoa(encodeURIComponent(jsonStr));
+
+                const tempArea = document.createElement('textarea');
+                tempArea.value = code;
+                document.body.appendChild(tempArea);
+                tempArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempArea);
+
+                showToast('暗号化データコードをクリップボードにコピーしました！', 'success');
+            } catch(e) {
+                console.error(e);
+                showToast('データコードの出力に失敗しました。', 'error');
+            }
+        }
+
+        function importDataCode() {
+            const input = document.getElementById('data-code-import-input');
+            const code = input ? input.value.trim() : '';
+
+            if (!code) {
+                showToast('データコードを入力してください。', 'error');
+                return;
+            }
+
+            try {
+                let jsonStr = '';
+                try {
+                    jsonStr = decodeURIComponent(atob(code));
+                } catch(e) {
+                    jsonStr = code;
+                }
+
+                const parsed = JSON.parse(jsonStr);
+                if (parsed) {
+                    appData = { ...getInitialData(), ...parsed };
+                    ensureDataIntegrity();
+                    saveToStorage();
+                    renderAll();
+                    if (input) input.value = '';
+                    showToast('データコードから復元・引き継ぎが完了しました！', 'success');
+                }
+            } catch(e) {
+                console.error(e);
+                showToast('無効なデータコードです。正しくコピーされているか確認してください。', 'error');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-600 text-white' : type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-800 text-white border border-gray-700';
+            toast.className = `px-4 py-2.5 rounded-xl text-xs font-bold shadow-xl transition-all duration-300 opacity-0 transform translate-y-2 pointer-events-auto flex items-center gap-2 ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info'}"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
