@@ -3,6 +3,7 @@ name: Windows build
 on:
   push:
     tags: ["v*"]
+    branches: ["claude/nifty-brown-d3w1ea"]
   workflow_dispatch:
 
 permissions:
