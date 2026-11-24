@@ -32,6 +32,7 @@ var stats := {"built": 0, "reused": 0, "released": 0, "ms_max": 0.0, "ms_total":
 var kits_info := {}
 var _t := 0.0
 var _spots := {}             # id -> Array（dry 計算のキャッシュ）
+var _surfs := {}             # id -> Array（床材 [{r, y, s}]。dry 計算のキャッシュ。足音用）
 var _barriers := {}
 var _fire_fx := {}
 var _burn_t := 0.0
@@ -183,7 +184,58 @@ func spots(id: int) -> Array:
 		for s in b.spots:
 			out.append({"pos": xf * (s["p"] as Vector3), "yaw": xf.basis.get_euler().y + float(s["yaw"]), "floor": int(s["floor"]), "role": String(s["role"])})
 		_spots[id] = out
+		_surfs[id] = b.surfaces
 	return _spots[id]
+
+
+## 屋内の床材（足音）: wp（ワールド）の真下の床仕上げ。tatami / wood / dirt / stone / concrete / carpet。不明なら建物の種類から
+func surface_at(id: int, wp: Vector3) -> String:
+	if not defs.has(id):
+		return ""
+	if not _surfs.has(id):
+		spots(id)
+	var lp: Vector3 = (defs[id]["xf"] as Transform3D).affine_inverse() * wp
+	var best := ""
+	var best_y := -INF
+	for f in _surfs.get(id, []):
+		var y := float(f["y"])
+		if y > lp.y + 0.35 or y < best_y:
+			continue
+		if (f["r"] as Rect2).grow(0.05).has_point(Vector2(lp.x, lp.z)):
+			best_y = y
+			best = String(f["s"])
+	if best == "" or lp.y - best_y > 1.2:
+		return kind_surface(String(defs[id]["type"]))
+	return finish_surface(best)
+
+
+static func finish_surface(style: String) -> String:
+	match style:
+		"tatami", "mat":
+			return "tatami"
+		"boards", "parquet":
+			return "wood"
+		"earth":
+			return "dirt"
+		"stone", "tile":
+			return "stone"
+		"concrete", "linoleum":
+			return "concrete"
+		"carpet":
+			return "carpet"
+	return "wood"
+
+
+## 内装キットの種類ごとの床（床仕上げの登録が無い場所：土間・通路など）
+static func kind_surface(type: String) -> String:
+	match type:
+		"pit":
+			return "dirt"
+		"kura", "storehouse", "factory", "warehouse", "warehouse_showa", "hangar", "station":
+			return "concrete" if type in ["factory", "warehouse_showa", "hangar", "station"] else "dirt"
+		"yokan", "office", "office_showa", "bank", "school", "diet", "showa_shop", "danchi", "tower":
+			return "wood" if type in ["school", "yokan"] else "concrete"
+	return "wood"
 
 
 func info(id: int) -> Dictionary:
@@ -253,6 +305,8 @@ func _process(dt: float) -> void:
 	CameraRig.indoor = player_inside >= 0
 	if was != player_inside and player_inside >= 0:
 		_on_enter(player_inside)
+	if was != player_inside and pl != null:
+		_door_sound(player_inside if player_inside >= 0 else was, (pl as Node3D).global_position, player_inside >= 0)
 	# 解放（遠い・上限超え）と生成（近い順に 1 棟／tick、ごく近ければ 2 棟）
 	var cand: Array = []
 	for id in ids:
@@ -559,6 +613,23 @@ func _push_out(id: int) -> void:
 	var hud = get_tree().get_first_node_in_group("hud") if is_inside_tree() else null
 	if hud and hud.has_method("toast"):
 		hud.toast("建物が崩れた！ 外へ飛び出した")
+
+
+## 出入りの戸の音：和風の建物は引き戸（障子・襖・板戸）、洋館・役所は開き戸、蔵は重い土戸、竪穴は筵
+func _door_sound(id: int, p: Vector3, entering: bool) -> void:
+	if not defs.has(id):
+		return
+	var ty := String(defs[id]["type"])
+	var key := "door_slide_open" if entering else "door_slide_close"
+	if ty in ["pit", "takayuka"]:
+		key = "cloth"
+	elif ty in ["kura", "storehouse"]:
+		key = "door_heavy_slide"
+	elif ty in ["yokan", "office", "office_showa", "bank", "station", "school", "diet", "tower", "showa_shop", "danchi"]:
+		key = "door_wood_open" if entering else "door_wood_close"
+	elif ty in ["castle", "yagura", "temple", "pagoda", "shrine", "gate", "factory", "warehouse", "warehouse_showa", "hangar"]:
+		key = "creak_wood" if entering else "door_slide_close"
+	Audio.play_at(key, p + Vector3.UP, -2.0)
 
 
 func _on_enter(id: int) -> void:

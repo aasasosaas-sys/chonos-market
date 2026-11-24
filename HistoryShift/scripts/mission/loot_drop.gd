@@ -143,7 +143,8 @@ func take() -> void:
 	if money > 0:
 		Game.profile.add_money(money)
 		lines.append(CraftDB.money_text(money, era))
-	Sfx.play(get_tree(), Sfx.pickup(), -6.0)
+	Audio.play("pickup_leather", -2.0)
+	Audio.play("pickup_weapon", -6.0)
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("toast") and not lines.is_empty():
 		hud.toast("拾った：" + "、".join(lines), 3.0)

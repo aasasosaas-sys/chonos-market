@@ -77,7 +77,7 @@ func fire_at(target: Vector3, team := 0) -> void:
 	Effects.burst(get_tree(), muzzle, v.normalized(), Color(1, 0.8, 0.4), Color(1, 0.3, 0.1), 20, 8.0, 0.4, 0.25, 0.0, true, 25)
 	Effects.burst(get_tree(), muzzle, v.normalized(), Color(0.85, 0.83, 0.8, 0.8), Color(0.7, 0.7, 0.7, 0.0), 18, 4.0, 2.2, 2.4, -0.05, false, 35)
 	Effects.flash(get_tree(), muzzle, Color(1, 0.7, 0.35), 8.0, 14.0, 0.15)
-	Sfx.play_at(get_tree(), Sfx.cannon(), muzzle, 4.0)
+	Audio.play_at("cannon_fire", muzzle, 2.0)
 	Effects.shake = maxf(Effects.shake, 0.35)
 	Wanted.report(global_position, 0.15)
 	var tw := _barrel.create_tween()

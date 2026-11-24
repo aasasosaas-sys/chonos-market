@@ -96,7 +96,7 @@ func _ready() -> void:
 	_spark.local_coords = false
 	_spark.position = Vector3(0, 0.55 if kind == "keg" else 0.2, 0)
 	add_child(_spark)
-	_hiss = Sfx.loop_player(self, Sfx.fuse(), -10.0)
+	_hiss = Audio.loop_at(self, "fuse_loop", -4.0, {"unit": 4.0, "max_dist": 50.0})
 	_hiss.play()
 
 
@@ -126,6 +126,7 @@ func detonate() -> void:
 	queue_free()
 	if dud > 0.0 and randf() < dud:
 		# 不発：煙だけ
+		Audio.play_at("gun_pan_flash", p, -4.0)
 		Effects.burst(tree, p, Vector3.UP, Color(0.8, 0.8, 0.8, 0.7), Color(0.4, 0.4, 0.4), 14, 1.5, 1.0, 1.4, -0.05, false, 40)
 		var hud = tree.get_first_node_in_group("hud")
 		if hud and hud.has_method("toast") and team == 0:

@@ -30,6 +30,8 @@ var _stream_t := 0.0
 ## 人物（生没・あなたが倒した/救った）・港の船・建物・町人の装い・合戦・国家事業・予定がこの年に合わせて変わる（scripts/core/era_timeline.gd）
 var year := 0
 var _ruins_saved := false
+## 天気（scripts/world/weather_fx.gd・scripts/core/hist_weather.gd）。その年の時点の日付（事件の日）の史実・気候値
+var weather: WeatherDirector
 
 
 static func start_mission(q: Dictionary, p_choice: int, p_method := 0) -> Session:
@@ -75,10 +77,11 @@ static func build_world(p_era: Dictionary, p_year := 0, p_hist: Dictionary = {})
 
 
 ## この世界の歴史のうち、箱庭の姿に関わるもの（あなたが同じ時代の前の年に壊した建物・沈めた船）
-static func world_history(era_id: String) -> Dictionary:
+static func world_history(era_id: String, p_year := 0) -> Dictionary:
 	if Game.state == null:
 		return {}
-	return {"ruins": Game.state.ruins.get(era_id, [])}
+	# vis = この世界の歴史が史実とどれだけ違うか（HistoryVisuals）。工場・鉄道・洋館・港の艦隊・空襲の被害・看板・町人の装いが変わる
+	return {"ruins": Game.state.ruins.get(era_id, []), "vis": HistoryVisuals.profile(Game.state, era_id, p_year)}
 
 
 static func make_vehicle(kind: String, era_id: String, seed: int) -> Node3D:
@@ -96,7 +99,9 @@ func _ready() -> void:
 	get_tree().paused = false
 	EraTimeline.set_current(era.get("eraId", ""), year)
 	Figures.age_at.clear()
-	world = build_world(era, year, world_history(era.get("eraId", "")) if mode != "backdrop" else {})
+	var wh: Dictionary = world_history(era.get("eraId", ""), year) if mode != "backdrop" else {}
+	HistoryVisuals.current = wh.get("vis", {})
+	world = build_world(era, year, wh)
 	add_child(world)
 	Game.set_world(world)
 	cam = CameraRig.new()
@@ -114,12 +119,16 @@ func _ready() -> void:
 
 	Wanted.clear()
 	Wanted.enabled = true
+	# 音：時代の BGM と環境音（scripts/audio/ambience.gd）
+	AmbienceDirector.attach(self, String(era.get("eraId", "")))
+	Audio.music(AmbienceDirector.era_music(String(era.get("eraId", ""))), 4.0, -3.0)
 	hud = Hud.new()
 	add_child(hud)
 	hud.is_free_roam = mode == "free"
 	for key in HistoryDB.LANDMARK_KEYS:
 		hud.compass_points[HistoryDB.landmark_name(era, key)] = world.landmark_pos(key)
 	hud.pause_abort.connect(_on_abort)
+	weather = WeatherDirector.attach(self, world, String(era.get("eraId", "")), year, hud)
 
 	player = Player.new()
 	add_child(player)
@@ -135,7 +144,7 @@ func _ready() -> void:
 	_spawn_vehicles()
 
 	Effects.time_warp(get_tree(), player.global_position)
-	Sfx.play(get_tree(), Sfx.warp(), -4.0)
+	Audio.play("time_arrive", -2.0)
 	Game.input_blocked = false
 	Game.lock_mouse(true)
 
@@ -444,7 +453,7 @@ func _spawn_vehicles() -> void:
 func _on_completed() -> void:
 	if _ended:
 		return
-	Sfx.play(get_tree(), Sfx.success(), -2.0)
+	Audio.play("stinger_success", 0.0)
 	hud.banner("歴史改変 成功", Color(0.37, 0.91, 1.0), 2.0)
 	Effects.time_warp(get_tree(), player.global_position)
 	var changes := Game.state.apply_change(question, choice, "%s（%s）" % [mission.get("title", "改変"), mission.get("method", "介入")], method)
@@ -459,7 +468,7 @@ func _on_completed() -> void:
 func _on_failed(reason: String) -> void:
 	if _ended:
 		return
-	Sfx.play(get_tree(), Sfx.fail(), -2.0)
+	Audio.play("stinger_fail", 0.0)
 	hud.show_death(reason)
 	Game.input_blocked = true
 	await get_tree().create_timer(2.5).timeout
@@ -581,6 +590,7 @@ func end() -> void:
 	_ended = true
 	if EraTimeline.current_era == str(era.get("eraId", "")):
 		EraTimeline.set_current("", 0)
+		HistoryVisuals.current = {}
 	Engine.time_scale = 1.0
 	if craft and is_instance_valid(craft):
 		craft.end_session()

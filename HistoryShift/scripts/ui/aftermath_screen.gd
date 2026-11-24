@@ -54,7 +54,7 @@ func _build_success() -> void:
 	var tw := create_tween().set_parallel()
 	tw.tween_property(head, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	tw.tween_property(head, "modulate:a", 1.0, 0.3)
-	UISfx.play("success")
+	UISfx.play("history")
 	if not q.is_empty():
 		v.add_child(JSUI.label("%s　%s　―　%s" % [JSUI.year_text(q["year"]), q["topic"], mission.get("title", "")], 26, JSUI.MUTED, null, true))
 	v.add_child(JSUI.hline(Color(JSUI.CYAN, 0.3), 2))
@@ -202,7 +202,7 @@ func _build_chaos() -> void:
 	var tw := create_tween().set_parallel()
 	tw.tween_property(head, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	tw.tween_property(head, "modulate:a", 1.0, 0.3)
-	UISfx.play("error" if not broken.is_empty() else "success")
+	UISfx.play("fail" if not broken.is_empty() else "history")
 	var era := Game.db.get_era(chaos_era)
 	v.add_child(JSUI.label("%s での自由探索 ― 歴史の揺らぎ %d 件" % [era.get("eraName", chaos_era), chaos_hits.size()], 26, JSUI.MUTED, null, true))
 	v.add_child(JSUI.hline(Color(JSUI.SHU, 0.35), 2))

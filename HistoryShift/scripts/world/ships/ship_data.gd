@@ -69,6 +69,45 @@ var crew_points: Array = []      # Vector3 local
 var hull_levels: Array = []      # 船体内の歩ける甲板（weather + internal）の高さ（降順）
 var _planned := false
 
+## 画面に出す部屋の名前（日本語）。データの name（英語の調査名・典拠の注）はそのまま残し、表示だけここで和名にする。
+## 和名が先頭にある名前（「機械室 Engine rooms (…)」）は和名の部分を使う。
+const ROOM_JA := {
+	"Mast and rangefinder": "檣楼・測距儀", "Flight deck": "飛行甲板", "Upper hangar": "上部格納庫", "Middle hangar": "中部格納庫",
+	"Lower hangar": "下部格納庫", "20 cm casemate guns": "20 cm 砲郭", "20 cm casemates": "20 cm 砲郭", "12 cm HA gun sponsons": "12 cm 高角砲座",
+	"Crew berthing and messes": "兵員居住区・食卓", "Aircrew ready rooms": "搭乗員待機室", "Funnel uptakes": "煙路",
+	"Boiler and turbine rooms": "罐室・機械室", "Aviation fuel tanks": "航空燃料庫", "Bomb and torpedo magazines": "爆弾・魚雷庫",
+	"Command tower": "天守（指揮所）", "Gun deck": "砲甲板", "Oar deck": "櫓床（漕ぎ手の甲板）", "Hold": "船倉",
+	"Lifeboats": "救命艇甲板", "Promenade": "遊歩甲板", "Entrance lobby": "玄関広間", "Tourist/third-class quarters": "三等客室",
+	"Cargo holds": "貨物艙", "Compass bridge": "羅針艦橋", "Long funnel trunk": "長大煙路", "Crew berthing": "兵員居住区",
+	"Magazines and aviation fuel": "弾火薬庫・航空燃料庫", "Quarterdeck and wheel": "後甲板・操舵輪", "Gun deck (open)": "砲甲板（露天）",
+	"Forecastle": "船首楼", "Captain's cabin (Katsu)": "艦長室（勝麟太郎）", "Kimura's cabin": "木村摂津守の部屋",
+	"Engine and boiler room": "機関室・罐室", "Stores": "倉庫", "Deckhouse (屋形)": "屋形", "Masts and mat sails": "帆柱・網代帆",
+	"Steering": "舵取り", "Cargo hold": "船倉", "Open compass platform": "露天羅針盤台", "8 cm gun battery": "8 cm 砲列",
+	"Upper-deck 6-inch casemates": "上甲板 15 cm 砲郭", "Funnels and boat stowage": "煙突・端艇置場", "6-inch casemate battery": "15 cm 砲郭",
+	"Torpedo flat": "水雷発射管室", "Shaft alleys and steering gear": "軸路・舵取機室",
+	"Captain's cabin and Mazu shrine (媽祖)": "船長室・媽祖の祠", "Tiller room": "舵柄室", "Deck": "甲板", "Compartments": "隔壁の船倉",
+	"Captain's great cabin": "船長の大船室", "Poop deck": "船尾楼甲板", "Waist": "中甲板（腰）", "Chapel": "礼拝室",
+	"Fighting deck": "矢倉（戦闘甲板）", "Owner/merchant cabin": "船主・商人の部屋", "Compartmented hold": "隔壁の船倉",
+	"Quarterdeck": "後甲板", "Paddle boxes and bridge between them": "外輪覆いと艦橋", "Pivot guns": "旋回砲",
+	"Commodore's cabin": "提督室（ペリー）", "Wardroom and officers' staterooms": "士官室・士官寝室", "Crew berth deck": "水兵の寝棚甲板",
+	"Galley": "烹炊所", "Engine room": "機関室", "Powder magazine": "火薬庫", "Holds": "船倉",
+	"AA gun galleries": "機銃座", "Aft catapult deck and hangar hatch": "後部射出機甲板・格納庫口",
+	"15.5 cm secondary turret(s)": "15.5 cm 副砲塔", "15 m 主砲測距儀 Main rangefinder and director": "主砲測距儀（15 m）",
+}
+
+
+static func room_label(nm: String) -> String:
+	if ROOM_JA.has(nm):
+		return String(ROOM_JA[nm])
+	# 和名が先頭: 最後の日本語の文字までを採る（「第一・第二主砲塔 No.1 …」→「第一・第二主砲塔」）
+	var last := -1
+	for i in nm.length():
+		if nm.unicode_at(i) >= 0x3000:
+			last = i
+	if last >= 0:
+		return nm.substr(0, last + 1).strip_edges()
+	return nm
+
 
 static func load_ship(sid: String) -> ShipData:
 	if _cache.has(sid):
@@ -180,7 +219,7 @@ func _setup(d: Dictionary) -> void:
 			pb = 1.8; ps = 2.2; midp = 0.25; ts = 0.45; bilge = 2.5; flare = -0.06; rake = 3.0; cutup = 1.5
 			hull_mat = "darkwood"; bulwark = 1.0
 		_:
-			hull_mat = "metal"; bulwark = 1.0
+			hull_mat = "steel"; bulwark = 1.0   # 軍艦色の塗装（空の映り込みを抑えた鋼の材質）
 	pb = float(h.get("pb", pb)); ps = float(h.get("ps", ps)); midp = float(h.get("mid", midp))
 	qexp = float(h.get("q", qexp)); tb = float(h.get("tb", tb)); ts = float(h.get("ts", ts))
 	bilge = float(h.get("bilge", bilge)); flare = float(h.get("flare", flare)); flare_bow = float(h.get("flare_bow", flare_bow))
@@ -783,7 +822,7 @@ func _plan_rooms() -> void:
 				if not is_finite(h) or h > 7.0:
 					h = 2.6 if enclosed else 3.0
 				h = maxf(h, 2.0)
-				var room := {"name": String(rd.get("name", "")), "deck": di, "y": lv, "h": h, "z0": rect["z0"], "z1": rect["z1"], "x0": rect["x0"], "x1": rect["x1"],
+				var room := {"name": String(rd.get("name", "")), "label": room_label(String(rd.get("name", ""))), "deck": di, "y": lv, "h": h, "z0": rect["z0"], "z1": rect["z1"], "x0": rect["x0"], "x1": rect["x1"],
 					"enclosed": enclosed, "words": words, "conf": String(rd.get("confidence", dk.get("conf", ""))), "src": rd, "region": reg["kind"], "open_top": reg["kind"] == "top" or kind == "weather"}
 				rooms.append(room)
 				occ.append(rect)

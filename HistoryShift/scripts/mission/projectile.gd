@@ -8,12 +8,15 @@ var damage := 10.0
 var team := 1
 var life := 4.0
 var homing := 0.0
+var kind := ""
+var _whizzed := false
 var _mesh: MeshInstance3D
 
 
 static func fire(tree: SceneTree, from: Vector3, dir: Vector3, kind: String, team := 1) -> Projectile:
 	var p := Projectile.new()
 	p.team = team
+	p.kind = kind
 	var c := Color(1, 0.8, 0.4)
 	var size := Vector3(0.05, 0.05, 0.6)
 	var spd := 160.0
@@ -65,8 +68,22 @@ func _physics_process(dt: float) -> void:
 	var q := PhysicsRayQueryParameters3D.create(from, to2, Game.COLLISION_WORLD | Game.COLLISION_PLAYER | Game.COLLISION_VEHICLE | Game.COLLISION_PROP | Game.COLLISION_CIVILIAN)
 	var hit := get_world_3d().direct_space_state.intersect_ray(q)
 	if not hit.is_empty():
-		Player.apply_hit(get_tree(), hit, vel.normalized(), damage, team)
+		var tgt: Node = Effects.find_target(hit["collider"] as Node) if hit["collider"] is Node else null
+		if kind == "bow":
+			Player.apply_hit(get_tree(), hit, vel.normalized(), damage, team, false)
+			Audio.play_at("impact_flesh" if tgt is Player else Impacts.arrow_key(hit, Game.world), hit["position"], 0.0)
+		else:
+			Player.apply_hit(get_tree(), hit, vel.normalized(), damage, team)
 		queue_free()
 		return
+	# 至近を通り過ぎた弾・矢（ひゅん）
+	if not _whizzed and team != 0 and Game.player != null and is_instance_valid(Game.player):
+		var pp: Vector3 = (Game.player as Node3D).global_position + Vector3.UP * 1.5
+		var seg := to2 - from
+		var tq := clampf((pp - from).dot(seg) / maxf(seg.length_squared(), 1e-6), 0.0, 1.0)
+		var cp := from + seg * tq
+		if cp.distance_to(pp) < 3.0 and tq > 0.0 and tq < 1.0:
+			_whizzed = true
+			Audio.play_at("arrow_whiz" if kind == "bow" else "bullet_whiz", cp, 0.0)
 	global_position = to2
 	_orient()

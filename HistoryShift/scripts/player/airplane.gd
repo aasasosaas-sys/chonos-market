@@ -75,7 +75,8 @@ func _build(seed: int) -> void:
 	seat.name = "Seat"
 	seat.position = Vector3(0, -0.35, 0.3)
 	_visual.add_child(seat)
-	_sound = Sfx.loop_player(self, Sfx.propeller(), -4.0)
+	_sound = Audio.loop_at(self, "plane_engine_loop", 0.0, {"unit": 18.0, "max_dist": 700.0})
+	_sound.doppler_tracking = AudioStreamPlayer3D.DOPPLER_TRACKING_PHYSICS_STEP
 	display_name = "飛行機"
 
 
@@ -196,7 +197,7 @@ func _physics_process(dt: float) -> void:
 		var turn_rate := 1.25 * clampf(speed / 45.0, 0.35, 1.0) * Skills.plane_turn_mult(lv)
 		if driver != null:
 			_wob_t += dt
-			var wob := Skills.plane_wobble(lv)
+			var wob := Skills.plane_wobble(lv) + HistWeather.turbulence()   # 天気：雷雨・台風の乱気流
 			if wob > 0.001:
 				var wa := (global_basis * Vector3(sin(_wob_t * 1.7), 0.0, sin(_wob_t * 2.3 + 1.0))).normalized()
 				if wa.length() > 0.5:
@@ -280,5 +281,5 @@ func _fire_guns() -> void:
 			Player.apply_hit(get_tree(), hit, dir, 16.0, 0)
 		Effects.tracer(get_tree(), from, end, Color(1, 0.85, 0.4), 0.08)
 	Effects.flash(get_tree(), global_position - global_basis.z * 2.0, Color(1, 0.8, 0.4), 2.0, 6.0, 0.05)
-	Sfx.play(get_tree(), Sfx.shot(), -14.0)
+	Audio.play("gun_lmg", -8.0, {"pitch": 1.15, "pitch_var": 0.05})
 	Wanted.report(global_position, 0.01)

@@ -64,6 +64,12 @@ var _banner_spread := 0.0
 var _shift_lines: Control         # 改変通知の上下の光の線
 var _shift_col := Color(0.37, 0.91, 1.0)
 var _shift_line_k := 1.0
+var _wx: Control                  # 天気（右上：絵・「晴」「雨」「雪」・日付・出典）
+var _wx_kind := "clear"
+var _wx_label: Label
+var _wx_sub: Label
+var _wx_date: Label
+var weather_text := ""            # 検査用（いま表示している天気の文字）
 
 
 func _ready() -> void:
@@ -669,7 +675,99 @@ func _next_shift() -> void:
 	var fx := _shift_fx.create_tween()
 	fx.tween_method(func(x: float): sm.set_shader_parameter("amount", x), 1.0, 0.0, 1.8).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	fx.tween_callback(func(): _shift_fx.visible = false)
-	Sfx.play(get_tree(), Sfx.warp(), -6.0)
+	Audio.play("stinger_fail" if broke else "stinger_history", -2.0)   # 歴史が変わった合図
+
+
+# ------------------------------------------------------------------ 天気（scripts/world/weather_fx.gd が呼ぶ）
+func _ensure_weather() -> void:
+	if _wx != null:
+		return
+	_wx = Control.new()
+	_wx.anchor_left = 1.0
+	_wx.anchor_right = 1.0
+	_wx.offset_left = -420.0
+	_wx.offset_right = -32.0
+	_wx.offset_top = 128.0
+	_wx.offset_bottom = 206.0
+	_wx.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_wx.draw.connect(_draw_weather_icon)
+	_root.add_child(_wx)
+	_wx_label = _label("", 28, Color.WHITE, _wx)
+	_wx_label.add_theme_font_override("font", _serif)
+	_wx_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_wx_label.position = Vector2(0, -2)
+	_wx_label.size = Vector2(330, 36)
+	_shadowed(_wx_label, 6)
+	_wx_sub = _label("", 14, Color(1, 1, 1, 0.78), _wx)
+	_wx_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_wx_sub.position = Vector2(-60, 34)
+	_wx_sub.size = Vector2(448, 20)
+	_shadowed(_wx_sub, 4)
+	_wx_date = _label("", 14, Color(1, 0.92, 0.7, 0.85), _wx)
+	_wx_date.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_wx_date.position = Vector2(-60, 52)
+	_wx_date.size = Vector2(448, 20)
+	_shadowed(_wx_date, 4)
+
+
+## kind: clear cloudy overcast rain heavy_rain thunder typhoon snow fog。label: 「晴」「雨」…、src: 出典の種類、detail: 地点・気温・風
+func set_weather(kind: String, label: String, src: String, detail := "") -> void:
+	_ensure_weather()
+	_wx_kind = kind
+	_wx_label.text = label
+	_wx_sub.text = "%s　［%s］" % [detail, src] if detail != "" else "［%s］" % src
+	weather_text = label
+	_wx.queue_redraw()
+
+
+func set_weather_date(t: String) -> void:
+	_ensure_weather()
+	_wx_date.text = t
+
+
+## 天気の絵（太陽・雲・雨筋・雪の結晶・稲妻・霧の線・台風の渦）を手描き風の線で
+func _draw_weather_icon() -> void:
+	var c := Vector2(370, 18)
+	var ink := Color(0.03, 0.02, 0.06, 0.55)
+	var white := Color(1, 1, 1, 0.95)
+	var cloud := func(o: Vector2, col: Color) -> void:
+		for p in [[Vector2(-9, 3), 8.0], [Vector2(0, -3), 10.0], [Vector2(10, 3), 8.0], [Vector2(0, 5), 9.0]]:
+			_wx.draw_circle(c + o + (p[0] as Vector2), float(p[1]) + 1.5, ink)
+		for p in [[Vector2(-9, 3), 8.0], [Vector2(0, -3), 10.0], [Vector2(10, 3), 8.0], [Vector2(0, 5), 9.0]]:
+			_wx.draw_circle(c + o + (p[0] as Vector2), float(p[1]), col)
+	match _wx_kind:
+		"clear":
+			_wx.draw_circle(c, 10.5, ink)
+			_wx.draw_circle(c, 9.0, Color(1.0, 0.82, 0.35))
+			for k in 8:
+				var a := TAU * k / 8.0
+				_wx.draw_line(c + Vector2(cos(a), sin(a)) * 13.0, c + Vector2(cos(a), sin(a)) * 18.0, Color(1.0, 0.86, 0.45), 2.0)
+		"cloudy", "overcast":
+			if _wx_kind == "cloudy":
+				_wx.draw_circle(c + Vector2(8, -8), 8.0, Color(1.0, 0.82, 0.35))
+			cloud.call(Vector2.ZERO, white if _wx_kind == "cloudy" else Color(0.78, 0.8, 0.86))
+		"rain", "heavy_rain", "thunder", "typhoon":
+			cloud.call(Vector2(0, -6), Color(0.7, 0.73, 0.8))
+			var n := 3 if _wx_kind == "rain" else 5
+			for k in n:
+				var x := -12.0 + 24.0 * k / maxf(1.0, n - 1.0)
+				_wx.draw_line(c + Vector2(x, 8), c + Vector2(x - 4, 20), Color(0.55, 0.75, 1.0), 2.0)
+			if _wx_kind == "thunder":
+				_wx.draw_polyline(PackedVector2Array([c + Vector2(2, 2), c + Vector2(-3, 11), c + Vector2(3, 11), c + Vector2(-2, 22)]), Color(1.0, 0.9, 0.3), 2.5)
+			if _wx_kind == "typhoon":
+				_wx.draw_arc(c + Vector2(-26, 4), 8.0, 0.0, TAU * 0.8, 16, Color(1, 1, 1, 0.9), 2.0)
+				_wx.draw_arc(c + Vector2(-26, 4), 3.5, PI, TAU * 1.3, 12, Color(1, 1, 1, 0.9), 2.0)
+		"snow":
+			cloud.call(Vector2(0, -7), Color(0.85, 0.88, 0.94))
+			for k in 3:
+				var p := c + Vector2(-10 + 10 * k, 15 + (k % 2) * 4)
+				for j in 3:
+					var a := PI * j / 3.0
+					_wx.draw_line(p - Vector2(cos(a), sin(a)) * 4.0, p + Vector2(cos(a), sin(a)) * 4.0, white, 1.5)
+		"fog":
+			for k in 4:
+				var y := -8.0 + k * 6.0
+				_wx.draw_line(c + Vector2(-16 + (k % 2) * 4, y), c + Vector2(16 - (k % 2) * 6, y), Color(0.9, 0.92, 0.96, 0.85), 2.5)
 
 
 func damage_flash(amount: float) -> void:
@@ -678,6 +776,7 @@ func damage_flash(amount: float) -> void:
 
 func hit_marker(kill: bool) -> void:
 	_hit_t = 0.25
+	Audio.play("ui_tick", -6.0 if kill else -14.0, {"pitch": 0.8 if kill else 1.3})
 	_hit.add_theme_color_override("font_color", RED if kill else Color.WHITE)
 
 

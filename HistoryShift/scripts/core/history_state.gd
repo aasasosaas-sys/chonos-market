@@ -44,6 +44,7 @@ var final_state: Dictionary = {}
 var chaos_touched: Dictionary = {}   # qid -> true（混乱がなければ史実が違っていた問題）
 var war: Dictionary = {}             # 太平洋戦争の帰趨（WarModel.evaluate の結果：tier・pillars・score…）
 var standing: Dictionary = {}        # 国際的地位の推移（WarModel.standing の結果：points[{year, score, tier, base…}]）
+var snapshots: Array = []            # 設問ごとの状態 [{e: 時代の順, y: 年, st}]（年ごとの見た目 HistoryVisuals.state_at が読む）
 
 
 func _init(p_db: HistoryDB) -> void:
@@ -126,6 +127,7 @@ func simulate(p_ivs: Dictionary, mods: Variant = null) -> Dictionary:
 	var pend: Array = (chaos_mods + _layer["mods"]) if mods == null else (mods as Array).duplicate()
 	pend.sort_custom(func(a, b): return _mod_era(a) < _mod_era(b) or (_mod_era(a) == _mod_era(b) and int(a["year"]) < int(b["year"])))
 	var mi := 0
+	var snaps: Array = []
 	for q in db.questions:
 		var era_id: String = q["era"]["eraId"]
 		var qe := HistoryDB.ERA_ORDER.find(era_id)
@@ -164,11 +166,12 @@ func simulate(p_ivs: Dictionary, mods: Variant = null) -> Dictionary:
 		if method >= 0 and fact != q["real"]:
 			var m := db.mission_for(q, fact, method)
 			apply_effects(st, m.get("effects", {}))
+		snaps.append({"e": qe, "y": int(q["year"]), "st": st.duplicate()})
 	while mi < pend.size():
 		apply_effects(st, pend[mi]["effects"]); mi += 1
 	if last_era != "":
 		eras[last_era] = st.duplicate()
-	return {"world": w, "reasons": why, "eras": eras, "final": st}
+	return {"world": w, "reasons": why, "eras": eras, "final": st, "snaps": snaps}
 
 
 ## 自由な行動の層（強制される史実）を、通し番号の新しいほうが勝つように介入へ重ねる
@@ -224,6 +227,7 @@ func recompute() -> void:
 	reasons = r["reasons"]
 	era_states = r["eras"]
 	final_state = r["final"]
+	snapshots = r.get("snaps", [])
 	# 混乱がなかった場合の世界と比べ、混乱で史実が変わった問題を記録する
 	chaos_touched.clear()
 	if has_chaos():

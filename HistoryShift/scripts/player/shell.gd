@@ -72,7 +72,7 @@ func _ready() -> void:
 	_trail.local_coords = false
 	add_child(_trail)
 	if kind == "hiya":
-		_snd = Sfx.loop_player(self, Sfx.rocket(), -4.0)
+		_snd = Audio.loop_at(self, "rocket_loop", 0.0, {"unit": 12.0, "max_dist": 300.0})
 		_snd.play()
 	_orient()
 

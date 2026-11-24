@@ -316,7 +316,7 @@ func _select(k: int) -> void:
 func _go(i: int) -> void:
 	if i < 0 or i >= _qs.size() or i == index:
 		return
-	UISfx.play("tick")
+	UISfx.play("page")   # 問題冊子をめくる
 	_show_q(i)
 
 
@@ -337,6 +337,7 @@ func _process(delta: float) -> void:
 	if time_left <= 0.0:
 		_done = true
 		JSUI.toast(self, "試験時間終了。答案を回収します。", JSUI.SHU)
+		Audio.play("bell_impact", -6.0)   # 終了のチャイム
 		get_tree().create_timer(1.2).timeout.connect(func(): submitted.emit())
 
 
@@ -390,6 +391,7 @@ func _intro() -> void:
 	go.add_theme_font_override("font", JSUI.serif_bold())
 	go.pressed.connect(func():
 		UISfx.play("confirm")
+		Audio.play("book_open", -4.0)
 		JSUI.close_modal(overlay)
 		running = true)
 	row.add_child(go)
@@ -408,6 +410,7 @@ func _ask_submit() -> void:
 		body += "全%d問に解答済みです。" % _qs.size()
 	JSUI.confirm(self, "答案を提出しますか？", body, "提出する", "見直す", func():
 		_done = true
+		Audio.play("paper_place", -2.0)   # 答案用紙を置く
 		submitted.emit())
 
 

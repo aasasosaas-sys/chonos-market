@@ -56,6 +56,7 @@ func _ready() -> void:
 	# 破壊ツール（1-5 で切替、G で焙烙玉）
 	tools = DestructionTools.new()
 	add_child(tools)
+	Footsteps.attach(self, "player")   # 床材で変わる足音・着地・泳ぎ（scripts/audio/footsteps.gd）
 	arms = PlayerArms.new()
 	add_child(arms)
 	Game.player = self
@@ -83,7 +84,10 @@ func take_hit(amount: float, from_team: int, _point := Vector3.ZERO, _dir := Vec
 		if amount <= 0.0:
 			return
 	hp = maxf(0.0, hp - amount)
-	_last_hit = Time.get_ticks_msec() / 1000.0
+	var now := Time.get_ticks_msec() / 1000.0
+	if now - _last_hit > 0.25:
+		Audio.play("hurt_player", clampf(amount / 10.0 - 6.0, -8.0, 2.0), {"pitch_var": 0.08})
+	_last_hit = now
 	rig.hurt()
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
@@ -93,6 +97,7 @@ func take_hit(amount: float, from_team: int, _point := Vector3.ZERO, _dir := Vec
 		if in_vehicle():
 			exit_vehicle()
 		rig.die()
+		Audio.play_at("body_fall", global_position, 0.0)
 		died.emit()
 
 
@@ -235,16 +240,18 @@ func _gun(_dt: float) -> void:
 		end = h2["position"]
 	Effects.muzzle(get_tree(), muzzle_pos, (end - muzzle_pos).normalized(), Effects.CYAN)
 	Effects.tracer(get_tree(), muzzle_pos, end, Effects.CYAN, 0.035)
-	Sfx.play(get_tree(), Sfx.shot(), -10.0)
+	Audio.play("gun_energy", -6.0)
 	Wanted.report(global_position, 0.025)
 	if not h2.is_empty():
 		Player.apply_hit(get_tree(), h2, (end - muzzle_pos).normalized(), damage, TEAM)
 
 
 ## 弾の命中処理（プレイヤー・敵・機銃で共用）
-static func apply_hit(tree: SceneTree, hit: Dictionary, dir: Vector3, dmg: float, team: int) -> void:
+static func apply_hit(tree: SceneTree, hit: Dictionary, dir: Vector3, dmg: float, team: int, impact_sound := true) -> void:
 	if team == 0:
 		Destruction.note_player()   # 撃った樽の誘爆などを player_indirect として数える
+	if impact_sound and Audio.enabled:
+		Audio.play_at(Impacts.bullet_key(hit, Game.world), hit["position"], -2.0)   # 当たった物の材質の音（scripts/audio/impacts.gd）
 	var col: Object = hit["collider"]
 	var pos: Vector3 = hit["position"]
 	var nrm: Vector3 = hit["normal"]
@@ -300,6 +307,7 @@ func enter_vehicle(v) -> void:
 	rotation = Vector3.ZERO
 	rig.riding = true
 	v.enter(self)
+	Audio.play_at("cloth", global_position, -4.0)
 	var kind: String = v.get("kind")
 	if kind == "boat":
 		apply_sailing(v)

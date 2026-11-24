@@ -338,7 +338,7 @@ func _swim(pl: Node3D, dt: float) -> void:
 	if swimming:
 		if not was:
 			Effects.burst(get_tree(), Vector3(p.x, wy + 0.1, p.z), Vector3.UP, Color(0.9, 0.97, 1.0, 0.9), Color(0.7, 0.85, 1.0, 0.0), 22, 5.0, 0.7, 1.0, 0.8, false, 40)
-			Sfx.play_at(get_tree(), Sfx.splash(), p, -2.0)
+			Audio.play_at("splash_big" if player.velocity.y < -6.0 else "splash_small", p, 0.0)
 		var v := player.velocity
 		var target := clampf((depth - 1.35) * 2.5, -2.0, 2.2)
 		if Input.is_action_pressed("jump") and not Game.input_blocked:
@@ -482,7 +482,8 @@ func _update_hud() -> void:
 				for rm in best.sd.rooms:
 					var r: Dictionary = rm
 					if absf(float(r["y"]) - lp.y) < 1.2 and lp.z > float(r["z0"]) and lp.z < float(r["z1"]) and lp.x > float(r["x0"]) and lp.x < float(r["x1"]):
-						txt += "\n" + String(r["name"]) + ("  [" + String(r["conf"]) + "]" if String(r["conf"]) != "" else "")
+						# 表示は和名だけ（典拠の確からしさ conf はデータに残す）
+						txt += "\n" + String(r.get("label", r["name"]))
 						break
 			pr = best.prompt_text()
 	_status.text = txt

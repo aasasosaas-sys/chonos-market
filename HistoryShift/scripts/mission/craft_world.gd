@@ -164,7 +164,8 @@ func build(type: String) -> Dictionary:
 	var f := Facility.spawn_rec(session, rec)
 	stations.append(f)
 	_industry_event(rec)
-	Sfx.play(get_tree(), Sfx.success(), -6.0)
+	Audio.play("rin", -2.0)
+	Audio.play_at("craft_hammer_wood", f.global_position, 0.0)
 	return {"ok": true, "reason": "", "facility": f}
 
 

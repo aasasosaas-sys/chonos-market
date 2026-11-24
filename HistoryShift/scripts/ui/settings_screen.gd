@@ -28,9 +28,23 @@ static func open(parent: Control, on_close: Callable = Callable()) -> Control:
 		func(x: float): GameSettings.set_value("mouse_sensitivity", x))
 	v.add_child(_row("マウス感度", "視点操作の速さ", sens))
 
-	var vol := _slider(0.0, 1.0, 0.01, float(vals["volume"]), func(x: float): return "%d%%" % roundi(x * 100),
-		func(x: float): GameSettings.set_value("volume", x))
-	v.add_child(_row("音量", "マスター音量", vol))
+	# 音量（Master と Music / SFX / Ambience / Voice バス）。画面に収まるよう 2 列にまとめる
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 28)
+	grid.add_theme_constant_override("v_separation", 6)
+	for spec in [["volume", "全体"], ["vol_music", "BGM"], ["vol_sfx", "効果音"], ["vol_ambience", "環境音"], ["vol_voice", "声"]]:
+		var key := String(spec[0])
+		var cell := JSUI.hbox(10)
+		var lb := JSUI.label(String(spec[1]), 22, Color.WHITE, JSUI.sans_bold())
+		lb.custom_minimum_size = Vector2(90, 0)
+		cell.add_child(lb)
+		var sl := _slider(0.0, 1.0, 0.01, float(vals.get(key, 1.0)), func(x: float): return "%d%%" % roundi(x * 100),
+			func(x: float): GameSettings.set_value(key, x))
+		(sl.get_child(0) as Control).custom_minimum_size = Vector2(150, 36)
+		cell.add_child(sl)
+		grid.add_child(cell)
+	v.add_child(_row("音量", "", grid))
 
 	var fs := CheckButton.new()
 	fs.button_pressed = bool(vals["fullscreen"])

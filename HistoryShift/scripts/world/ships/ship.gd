@@ -89,6 +89,9 @@ func _build() -> void:
 	xf_cur = anchor
 	var sk := ShipKit.new()
 	ShipExterior.build(sd, sk)
+	if sd.steel:
+		# 上部構造・砲塔も船体と同じ軍艦色の材質に（"metal" は空の映り込みで白く飛んでいた）
+		sk.kit.remap("metal", "steel")
 	var mi := sk.kit.commit("Hull", true)
 	body.add_child(mi)
 	for c in sk.cols:
@@ -191,6 +194,28 @@ func _update_player() -> void:
 		player_inside = lp.y < sd.top_at(lp.z) - 0.5 and absf(lp.x) < maxf(hb, 0.5)
 	if helm_node and helm_node.driver != null:
 		player_aboard = true
+
+
+## 足音の床材（scripts/audio/surface.gd）: 木造船は板。鋼船は上甲板の材（deck_mat：多くはチーク張り）、船内の甲板は鋼
+func surface_at(p: Vector3) -> String:
+	if not sd.steel:
+		return "wood"
+	var lp := xf_cur.affine_inverse() * p
+	var best := {}
+	var best_y := -INF
+	for r in sd.regions:
+		var y := float(r["y"])
+		if y > lp.y + 0.4 or y < best_y:
+			continue
+		if lp.z < float(r["z0"]) - 0.2 or lp.z > float(r["z1"]) + 0.2 or lp.x < float(r["x0"]) - 0.2 or lp.x > float(r["x1"]) + 0.2:
+			continue
+		best = r
+		best_y = y
+	if not best.is_empty() and String(best.get("kind", "")) in ["in", "top"]:
+		return "metal"      # 船内の甲板・上部構造（艦橋・砲塔の上・露天の台）は鋼
+	if lp.y < sd.top_at(lp.z) - 0.6:
+		return "metal"
+	return "wood" if String(sd.deck_mat) in ["wood", "darkwood", "teak", "boards"] else "metal"
 
 
 # ================================================================ 船内のストリーミング
@@ -501,6 +526,7 @@ func _attitude(dt: float) -> void:
 				phase = "capsizing"
 				_cap_rate = 0.02
 				_toast("cap", "%s が転覆する！" % sd.name_ja, 4.0)
+				_groan()
 				abandon_ship()
 			elif flood.flood_ratio() > 0.95 or sink > sd.sim_fb + 0.4:
 				_begin_plunge()
@@ -555,6 +581,13 @@ func _attitude(dt: float) -> void:
 				_wreck()
 
 
+## 船体のきしみ・裂ける音（転覆・沈没の始まり）
+func _groan() -> void:
+	var p := xf_cur.origin + Vector3.UP * 2.0
+	Audio.play_at("break_metal" if sd.steel else "break_wood", p, 4.0, {"max_dist": 600.0})
+	Audio.play_at("creak_structure", p, 6.0, {"max_dist": 600.0, "pitch": 0.6 if sd.steel else 0.85})
+
+
 func _begin_plunge() -> void:
 	if phase == "plunge" or phase == "settling" or phase == "wreck":
 		return
@@ -562,6 +595,8 @@ func _begin_plunge() -> void:
 	plunge_v = 0.15
 	abandon_ship()
 	_toast("sink", "%s が沈んでいく……" % sd.name_ja, 4.0)
+	_groan()
+	Audio.play_at("splash_big", xf_cur.origin, 4.0, {"max_dist": 600.0})
 	_emit_sunk()
 
 
@@ -615,10 +650,11 @@ func _apply_xf(dt: float) -> void:
 	_bob_t += dt
 	var bob := 0.0
 	var roll := 0.0
-	if phase == "afloat" and sd.L < 70.0 and player_near:
-		var amp := clampf(3.0 / sd.L, 0.03, 0.18)
+	var sea := HistWeather.sea_state()   # 天気：時化（嵐・強風）で大きく揺れる。大きな船も少し
+	if phase == "afloat" and (sd.L < 70.0 or sea > 0.2) and player_near:
+		var amp := clampf(3.0 / sd.L, 0.03, 0.18) * (1.0 + 2.0 * sea)
 		bob = sin(_bob_t * 0.9) * amp
-		roll = sin(_bob_t * 0.63) * clampf(1.2 / sd.L, 0.004, 0.04)
+		roll = sin(_bob_t * 0.63) * clampf(1.2 / sd.L, 0.004, 0.04) * (1.0 + 3.0 * sea)
 	# heel > 0: 右舷が下がる（+Z 軸まわりに -heel）。trim > 0: 艦首が下がる（+X 軸まわりに -trim）
 	var basis := Basis(Vector3.FORWARD, heel + roll) * Basis(Vector3.RIGHT, -trim)
 	var xf := anchor * Transform3D(basis, Vector3(0, -sink - plunge + bob, 0))
@@ -629,6 +665,35 @@ func _apply_xf(dt: float) -> void:
 
 
 # ================================================================ 操船
+var _drive_snd: AudioStreamPlayer3D
+var _oar_t := 0.0
+
+
+## 動いている船の音：蒸気船は機関、ディーゼル・電気は機関のうなり、人力・帆の船は艪・櫂と波切り
+func _drive_sound(dt: float) -> void:
+	if not Audio.enabled:
+		return
+	var sp := absf(nav_speed)
+	var power := String(sd.sim.get("power", "steam" if sd.steel else "manual"))
+	if power == "manual":
+		if sp > 0.4:
+			_oar_t -= dt
+			if _oar_t <= 0.0:
+				_oar_t = lerpf(1.8, 1.0, clampf(sp / 3.0, 0.0, 1.0))
+				Audio.play_at("oar_stroke", xf_cur * Vector3(sd.B * 0.5, 0.5, 0.0), 0.0)
+		return
+	if _drive_snd == null:
+		_drive_snd = Audio.loop_at(body, "ship_steam_loop" if power == "steam" else "boat_motor_loop", 2.0, {"unit": 20.0, "max_dist": 400.0})
+		_drive_snd.position = Vector3(0, 1.0, sd.L * 0.15)
+		_drive_snd.pitch_scale = 0.6 if power != "steam" else 1.0
+	if sp > 0.2:
+		if not _drive_snd.playing:
+			_drive_snd.play()
+		_drive_snd.pitch_scale = lerpf(0.75, 1.25, clampf(sp / 8.0, 0.0, 1.0)) * (0.6 if power != "steam" else 1.0)
+	elif _drive_snd.playing:
+		_drive_snd.stop()
+
+
 func _pilot(dt: float) -> void:
 	if helm_node == null:
 		return
@@ -646,6 +711,7 @@ func _pilot(dt: float) -> void:
 	nav_speed = move_toward(nav_speed, throttle * vmax * (1.0 if throttle >= 0.0 else 0.4), acc * dt)
 	if flood.flood_ratio() > 0.3:
 		nav_speed *= 0.995
+	_drive_sound(dt)
 	var turn := float(sd.pilot.get("turn", clampf(6.0 / sd.L, 0.06, 0.35)))
 	nav_turn = lerpf(nav_turn, steer * turn * clampf(absf(nav_speed) / 2.0, 0.15, 1.0) * signf(nav_speed if nav_speed != 0.0 else 1.0), 1.0 - exp(-dt * 1.5))
 	if absf(nav_speed) < 0.01 and absf(nav_turn) < 0.0005:
@@ -833,7 +899,8 @@ func _use(it: Dictionary) -> void:
 			d["open"] = open
 			flood.set_door(i, open)
 			interior.set_door(i, open)
-			Sfx.play_at(get_tree(), Sfx.hit(), xf_cur * (it["p"] as Vector3), -4.0)
+			Audio.play_at("latch" if sd.steel else "door_wood_close", xf_cur * (it["p"] as Vector3), 0.0)
+			Audio.play_at("hull_hit_steel" if sd.steel else "impact_plank", xf_cur * (it["p"] as Vector3), -10.0)
 			if open:
 				cause = "player"
 				active = true
@@ -848,15 +915,17 @@ func _use(it: Dictionary) -> void:
 				Destruction.note_player()
 				active = true
 				_toast("valve%d" % i, "%sを開いた。海水が流れ込む！" % String(v["name"]), 3.0)
-			Sfx.play_at(get_tree(), Sfx.click(), xf_cur * (it["p"] as Vector3), 0.0)
+			Audio.play_at("valve_turn", xf_cur * (it["p"] as Vector3), 0.0)
 		"pump":
 			flood.pump_on = not flood.pump_on
+			Audio.play_at("lever", xf_cur * (it["p"] as Vector3), 0.0)
 			_toast("pump", "ポンプを%s" % ("動かした" if flood.pump_on else "止めた"), 2.0)
 		"ladder_up":
 			var lz := float(sd.ladder["z"])
 			var side := float(sd.ladder["side"])
 			var hb := float(sd.ladder.get("hb", sd.B * 0.5))
 			pl.teleport(xf_cur * Vector3(side * (hb - 1.6), sd.top_at(lz) + 0.4, lz - 1.0))
+			Audio.play_at("creak_wood", (pl as Node3D).global_position, -2.0)
 		"ladder_down":
 			var lz2 := float(sd.ladder["z"])
 			var side2 := float(sd.ladder["side"])
@@ -864,6 +933,7 @@ func _use(it: Dictionary) -> void:
 			var p := xf_cur * Vector3(side2 * (hb2 + 0.9), 0.5, lz2 + float(sd.ladder.get("run", 4.0)) + 0.6)
 			p.y = maxf(p.y, 0.45)
 			pl.teleport(p)
+			Audio.play_at("creak_wood", p, -2.0)
 
 
 func _valve_visual(i: int) -> void:

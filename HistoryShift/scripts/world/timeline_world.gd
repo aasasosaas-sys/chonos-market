@@ -9,7 +9,7 @@ extends RefCounted
 
 
 static func apply(w: Node3D) -> Dictionary:
-	var stats := {"absent": 0, "ruin": 0, "player": 0}
+	var stats := {"absent": 0, "ruin": 0, "player": 0, "history": 0}
 	var era_id := str(w.get("era_id"))
 	var year := int(w.get("year"))
 	var d = w.get("destruction")
@@ -29,7 +29,7 @@ static func apply(w: Node3D) -> Dictionary:
 			vanish(w, cands[i])
 			stats["absent"] += 1
 	var salt := hash(era_id) + year
-	for r in EraTimeline.ruin_rules(era_id, year):
+	for r in HistoryDressing.ruin_rules(w, EraTimeline.ruin_rules(era_id, year)):   # 空襲の被害は戦争の帰趨しだい
 		var kinds := EraTimeline._kinds(r)
 		for id in units:
 			var u = units[id]
@@ -48,7 +48,9 @@ static func apply(w: Node3D) -> Dictionary:
 				preruin(w, u, bool(rr.get("burned", false)))
 			u.set_meta("timeline_ruin", true)
 			stats["player"] += 1
-	if stats["absent"] + stats["ruin"] + stats["player"] > 0:
+	# この世界の歴史による建て替えの元・史実より遅れてまだ無い建物（HistoryDressing）
+	stats["history"] = int(HistoryDressing.after(w).get("vanished", 0))
+	if stats["absent"] + stats["ruin"] + stats["player"] + stats["history"] > 0:
 		# 状態テクスチャをすぐ作り直して全体に渡す（組み上げ直後＝まだ木に入っていないので Destruction._process を待たない）
 		var img: Image = d.get("_img")
 		var tex: ImageTexture = d.get("_tex")

@@ -26,6 +26,8 @@ uniform float ray_strength = 0.35;
 uniform float glare_strength = 0.35;
 uniform vec3 haze_color : source_color = vec3(0.7, 0.82, 0.96);
 uniform float vignette = 0.2;
+// 天気（weather_fx.gd）: z 厚い雲（光芒・グレアを消す）, w 稲光（画面を一瞬照らす。空ほど強く）
+global uniform vec4 world_weather;
 
 void vertex() {
 	POSITION = vec4(VERTEX.xy * 2.0, 1.0, 1.0);
@@ -99,7 +101,8 @@ void fragment() {
 	// ---- 光芒: 太陽に向かって空のピクセルを集める
 	vec3 rays = vec3(0.0);
 	vec3 glare = vec3(0.0);
-	if (sun_vis > 0.001) {
+	float clear_k = 1.0 - smoothstep(0.15, 0.6, world_weather.z);
+	if (sun_vis * clear_k > 0.001) {
 		vec2 dir = (sun_uv - uv);
 		float acc = 0.0;
 		float wsum = 0.0;
@@ -118,11 +121,11 @@ void fragment() {
 		acc /= wsum;
 		vec2 asp = vec2(VIEWPORT_SIZE.x / VIEWPORT_SIZE.y, 1.0);
 		float fall = 1.0 - smoothstep(0.0, 0.85, length(dir * asp));
-		rays = ray_color * acc * fall * fall * ray_strength * sun_vis;
+		rays = ray_color * acc * fall * fall * ray_strength * sun_vis * clear_k;
 		// グレア: 太陽が遮られていない度合い（太陽のまわり 5 点が空か）
 		float open = (sky_at(sun_uv) + sky_at(sun_uv + vec2(0.01, 0.0)) + sky_at(sun_uv - vec2(0.01, 0.0))
 			+ sky_at(sun_uv + vec2(0.0, 0.015)) + sky_at(sun_uv - vec2(0.0, 0.015))) * 0.2;
-		float gk = glare_strength * sun_vis * open;
+		float gk = glare_strength * sun_vis * open * clear_k;
 		if (gk > 0.001) {
 			float r = length(dir * asp);
 			// 柔らかい光暈＋細い光条（6 本）
@@ -146,6 +149,7 @@ void fragment() {
 	vec2 vc = uv - 0.5;
 	float vig = smoothstep(0.35, 0.95, length(vc * vec2(1.0, 0.85)) * 1.25) * vignette;
 	float a = clamp(edge + vig * (1.0 - edge), 0.0, 1.0);
-	ALBEDO = lc * edge + vec3(0.06, 0.05, 0.1) * vig * (1.0 - edge) + rays + glare + ridge_add * (1.0 - edge);
+	vec3 flash = vec3(0.78, 0.84, 1.0) * world_weather.w * (0.18 + sky * 1.1);
+	ALBEDO = lc * edge + vec3(0.06, 0.05, 0.1) * vig * (1.0 - edge) + rays + glare + ridge_add * (1.0 - edge) + flash;
 	ALPHA = a;
 }

@@ -1,0 +1,100 @@
+{
+  "note": "歴史の見た目（HistoryVisuals / HistoryDressing）。箱庭とハブ（2026年）が、その世界の歴史（HistoryState の再計算結果）を史実との差として読み、建物・街灯・鉄道・港・看板・町人の装いを変える。値は『その時代のその年の状態 − 史実の同じ時点の状態』。軸（axes）＝歴史パラメータの重み付き和。lead（年）＝軸×years_per_point（±max_years）：史実より何年早く（負なら遅く）近代化が進んでいるか。features は『史実で日本に現れた年 year』『世界で可能になった年 earliest』を持ち、year − lead 以後に現れる（earliest より前には現れない）。real=true は史実の世界でもその場所に実在したもの（史実の年から出す）、false は lead が min_lead 年以上のときだけ（史実ではそこに無かった）。",
+  "axes": {
+    "industry": {"label": "工業化", "vars": {"tech": 0.5, "economy": 0.3, "commerce": 0.2}, "years_per_point": 1.6, "max_years": 90},
+    "west": {"label": "西洋文化の受容", "vars": {"open_west": 0.7, "education": 0.15, "tech": 0.15}, "years_per_point": 1.6, "max_years": 90},
+    "prosperity": {"label": "豊かさ", "vars": {"economy": 0.5, "commerce": 0.3, "unity": 0.2}, "years_per_point": 1.0, "max_years": 60},
+    "military": {"label": "軍事優先", "vars": {"militarism": 1.0}, "years_per_point": 1.0, "max_years": 60}
+  },
+  "features": [
+    {"id": "telegraph", "label": "電信線", "axis": "industry", "year": 1869, "earliest": 1844, "real": true, "eras": ["edo"],
+      "builder": "telegraph", "landmark": "roads", "basis": "1869年12月、東京－横浜間に電信が開通した。電信はモールスが1844年にワシントン－ボルティモア間で実用化（明治の箱庭は電信柱を標準で持つ）。"},
+    {"id": "gas_lamps", "label": "ガス灯", "axis": "west", "year": 1872, "earliest": 1813, "real": true, "eras": ["edo"],
+      "builder": "gas_lamps", "landmark": "port", "count": 8, "basis": "1872年、横浜の馬車道・本町通りに日本初のガス灯（高島嘉右衛門）。1874年に銀座にも。ガスの街灯はロンドンのウェストミンスター橋で1813年から。"},
+    {"id": "gas_lamps_capital", "label": "ガス灯（都）", "axis": "west", "year": 1874, "earliest": 1813, "real": true, "eras": ["edo"],
+      "builder": "gas_lamps", "landmark": "capital", "count": 8, "basis": "1874年、銀座通りにガス灯が灯った。"},
+    {"id": "railway", "label": "鉄道（都－港）", "axis": "industry", "year": 1872, "earliest": 1830, "real": true, "eras": ["edo", "meiji_taisho"],
+      "builder": "railway", "landmark": "capital", "to": "port", "basis": "1872年10月、新橋－横浜間に日本初の鉄道が開業した。蒸気機関車の旅客鉄道はイギリスのリバプール－マンチェスター間（1830年）から。"},
+    {"id": "silk_mill", "label": "器械製糸場（煉瓦造・煙突）", "axis": "industry", "year": 1872, "earliest": 1840, "real": false, "min_lead": 8, "eras": ["edo", "meiji_taisho"],
+      "builder": "factory", "landmark": "village", "count": 1, "basis": "1872年、官営の富岡製糸場（木骨煉瓦造・フランス式の繰糸器）が操業した。史実では武蔵野の村には無い：工業化が史実より進んだ世界でだけ村に建つ。"},
+    {"id": "factory_town", "label": "工場の煙突が並ぶ", "axis": "industry", "year": 1895, "earliest": 1850, "real": false, "min_lead": 15, "eras": ["edo", "meiji_taisho", "showa"],
+      "builder": "factory", "landmark": "village", "count": 2, "basis": "日清戦争後（1890年代後半）に紡績・製糸の工場が各地に広がった（産業革命）。史実より工業化が大きく進んだ世界でだけ。"},
+    {"id": "brick_town", "label": "煉瓦の町並み", "axis": "west", "year": 1872, "earliest": 1700, "real": false, "min_lead": 6, "eras": ["edo", "meiji_taisho"],
+      "builder": "brick_swap", "landmark": ["capital", "village", "port", "temple", "battlefield"], "frac_per_year": 0.012, "max_frac": 0.65,
+      "basis": "1872年の銀座大火の後、ウォートルスの設計で銀座煉瓦街（1872〜77年）が建てられた。西洋文化の受容が史実より早い世界では、町家の一部が煉瓦の洋館に建て替わっている。"},
+    {"id": "arc_lamps", "label": "電気の街灯", "axis": "industry", "year": 1882, "earliest": 1878, "real": true, "eras": ["edo", "meiji_taisho"],
+      "builder": "electric_lamps", "landmark": "capital", "count": 6, "basis": "1882年11月、銀座に日本初の電気のアーク灯がともった。1887年に東京電灯が送電を始めた。街路のアーク灯はパリで1878年から。"},
+    {"id": "steelworks", "label": "製鉄所（高炉）", "axis": "industry", "year": 1901, "earliest": 1780, "real": false, "min_lead": 10, "eras": ["edo", "meiji_taisho"],
+      "builder": "steelworks", "landmark": "port", "basis": "1901年、官営八幡製鉄所の東田第一高炉に火が入った（洋式高炉は釜石の大橋で1857年）。史実では横浜港には無い：工業化が進んだ世界でだけ港に建つ。コークス高炉は18世紀半ばのイギリスで広まった。"}
+  ],
+  "absent": [
+    {"id": "late_brick", "axis": "west", "eras": ["meiji_taisho"], "landmark": ["capital", "village", "castle", "battlefield"], "kind": ["brick"], "year": 1880, "swap": "machiya",
+      "basis": "西洋文化の受容が史実より遅れた世界では、煉瓦の洋館の代わりに町家が並ぶ（史実では1870〜80年代に官庁・銀座が煉瓦化）。"},
+    {"id": "late_lamps", "axis": "west", "eras": ["meiji_taisho"], "landmark": ["capital", "port", "roads"], "kind": ["lamp"], "year": 1874,
+      "basis": "ガス灯（1872年 横浜・1874年 銀座）が史実より遅れた世界では、まだ街灯が無い。"}
+  ],
+  "crowd": [
+    {"axis": "west", "key": "WESTERN", "per_year": 0.008, "max": 0.45, "eras": ["edo", "meiji_taisho", "showa"],
+      "basis": "洋服は明治の官吏・軍人から広まり（1872年 礼服を洋服に）、大正・昭和に町人へ。西洋化が早い世界では町に洋装が多い。"},
+    {"axis": "west", "key": "KIMONO", "per_year": -0.004, "min": 0.05, "eras": ["meiji_taisho", "showa"], "basis": "洋装が増えたぶん和装が減る。"}
+  ],
+  "default_crowd": {"edo": {"KIMONO": 0.5, "COMMONER": 0.5}, "sengoku": {"COMMONER": 0.8, "KIMONO": 0.2}},
+  "navy": {
+    "standing_delta": 8,
+    "eras": ["edo", "meiji_taisho"],
+    "variants": [
+      {"until": 1849, "kind": "galleon", "count": 2, "label": "洋式の大型帆船（軍船）", "basis": "1613年、伊達政宗が洋式帆船サン・フアン・バウティスタ号を建造し太平洋を渡らせた。海洋国家になった世界では、こうした大型帆船の軍船が港に並ぶ。"},
+      {"until": 1889, "kind": "ironclad", "count": 2, "label": "蒸気の装甲艦", "basis": "1859年フランスの装甲艦グロワール以後、蒸気の装甲艦が主力に。日本は1869年に甲鉄（ストーンウォール）を得た。列強に早く並んだ世界では装甲艦の艦隊が港にいる。"},
+      {"until": 9999, "kind": "battleship", "count": 2, "label": "鋼鉄の戦艦", "basis": "1890年代以後の前弩級戦艦（三笠 1902年）。列強に早く並んだ世界では、より多くの戦艦が港に錨泊する。"}
+    ],
+    "port_extra": {"piers": 2, "warehouses": 3, "cranes": 2}
+  },
+  "war": {
+    "applies_from": 1945,
+    "tiers": {
+      "敗戦": {"ruin_mult": 1.0, "signs": "occupation", "basis": "1945年3月10日の東京大空襲などで市街地の多くが焼けた。8月の降伏後、連合国軍（GHQ）が進駐し、英語の看板や通り名（アベニュー）が立った。"},
+      "本土決戦": {"ruin_mult": 1.45, "extra_ruin": [{"landmark": "capital", "kind": ["concrete"], "frac": 0.35, "burned": true}, {"landmark": "castle", "kind": ["concrete", "house"], "frac": 0.4, "burned": true}],
+        "late_ruin": {"until": 1970, "rules": [{"landmark": "village", "kind": ["house"], "frac": 0.18, "burned": true}]},
+        "signs": "occupation", "crowd": {"COMMONER": 0.6, "SOLDIER": 0.3, "KIMONO": 0.1},
+        "basis": "本土決戦（連合国の上陸作戦は1945年11月の九州・1946年の関東平野が計画されていた）になった世界では焼け跡が広がり、復興も遅れる。"},
+      "早期講和": {"ruin_mult": 0.15, "signs": "peace", "crowd": {"WESTERN": 0.35, "KIMONO": 0.3, "COMMONER": 0.25, "SOLDIER": 0.1},
+        "basis": "早く講和した世界では、本格的な本土空襲（1944年末から）の前に戦争が終わり、1942年4月のドーリットル空襲のような小さな被害だけ。"},
+      "有利な休戦": {"ruin_mult": 0.0, "signs": "armistice", "crowd": {"WESTERN": 0.35, "KIMONO": 0.3, "COMMONER": 0.15, "SOLDIER": 0.2},
+        "basis": "有利な休戦の世界では本土空襲は無く、戦前の町がそのまま残る。"},
+      "勝利": {"ruin_mult": 0.0, "signs": "victory", "crowd": {"WESTERN": 0.35, "KIMONO": 0.3, "COMMONER": 0.1, "SOLDIER": 0.25},
+        "basis": "勝利した世界では本土空襲は無く、戦勝の祝いの旗が町に出る。"},
+      "開戦回避": {"ruin_mult": 0.0, "signs": "", "crowd": {"WESTERN": 0.5, "KIMONO": 0.4, "COMMONER": 0.1},
+        "basis": "開戦を避けた世界では空襲も焼け跡もなく、もんぺ・国民服ではなく戦前の装いのまま。"}
+    },
+    "sign_sets": {
+      "occupation": {"until": 1952, "boards": [["OFF LIMITS", "進駐軍 立入禁止"], ["AVENUE A", "Aアベニュー"], ["MP", "憲兵 検問所"]], "flags": ["us"], "landmarks": ["capital", "village", "port"]},
+      "peace": {"until": 1947, "boards": [["講和成立", "平和克復"]], "flags": ["jp"], "landmarks": ["capital", "village"]},
+      "armistice": {"until": 1947, "boards": [["休戦協定成立", "将兵の帰還を祝ふ"]], "flags": ["jp"], "landmarks": ["capital", "village"]},
+      "victory": {"until": 1947, "boards": [["祝 戦勝", "凱旋門"]], "flags": ["jp", "jp"], "landmarks": ["capital", "village", "port"]}
+    }
+  },
+  "capital": {
+    "city": {"": "", "京都": "京都", "大坂": "大坂", "近江": "大津", "鎌倉": "鎌倉", "安土": "安土", "江戸": "江戸"},
+    "here": {"edo": "江戸", "meiji_taisho": "東京", "showa": "東京"},
+    "eras": {
+      "edo": {"style": "kosatsu", "text": "天下の御政道は{city}にて執り行はる", "sub": "江戸は関東の城下町", "basis": "史実では徳川家の幕府が江戸にあった。政権が{city}にある世界では、江戸城は関東の大名の城にすぎない。"},
+      "meiji_taisho": {"style": "board", "text": "東京府庁", "sub": "首都 {city}", "basis": "史実では1868年に江戸を東京と改め、翌1869年に天皇が東京に移った（太政官も東京）。首都が{city}の世界では、ここは府庁にとどまる。"},
+      "showa": {"style": "board", "text": "東京府庁舎", "sub": "首都 {city}", "basis": "史実では国会議事堂（1936年竣工）・首相官邸が東京にある。首都が{city}の世界では、ここは府の庁舎。"}
+    }
+  },
+  "present": {
+    "note": "ハブ（2026年の時空研究所と外の町）。最終の歴史（final_state と史実の差・太平洋戦争の帰趨・首都）で決まる。",
+    "lang": [
+      {"if": {"west": "<=-30"}, "lang": "ja_old", "label": "看板は漢字・縦書きばかり"},
+      {"if_war": ["開戦回避", "勝利", "有利な休戦"], "lang": "ja", "label": "看板は日本語だけ（占領を経ていない）"},
+      {"lang": "ja_en", "label": "看板は日本語と英語（史実：占領期と1964年の東京オリンピックで英語の表示が広まった）"}
+    ],
+    "style": [
+      {"if": {"industry": "<=-30"}, "style": "wood", "label": "木造・瓦屋根の低い町（工業化が遅れた）"},
+      {"if_war": ["本土決戦"], "style": "blocks", "label": "焼け跡から一斉に建てた同じ形のコンクリートの建物と慰霊碑"},
+      {"if_war": ["開戦回避", "勝利", "有利な休戦", "早期講和"], "style": "prewar", "label": "戦災を受けなかった煉瓦・石造りの近代建築が今も残る"},
+      {"style": "modern", "label": "戦後に建て直したガラスとコンクリートの町（史実）"}
+    ],
+    "prosperity": {"axis": "prosperity", "height_per_point": 0.02, "min": 0.55, "max": 1.8}
+  }
+}

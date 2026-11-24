@@ -13,6 +13,7 @@ signal finished(score: float)
 
 var game := "hammer"
 var lesson: Dictionary = {}
+var _bellow_t := 0.0
 var level := 0.0
 var _t := 0.0
 var _done := false
@@ -127,6 +128,11 @@ func _process(dt: float) -> void:
 				_x = 0.0; _dir = 1.0
 		"heat":
 			var up := 0.55 if _holding() else -0.38
+			# ふいご（押している間）
+			_bellow_t -= dt
+			if _holding() and _bellow_t <= 0.0:
+				_bellow_t = 1.0
+				Audio.play("craft_bellows", -4.0, {"pitch_var": 0.06})
 			_heat = clampf(_heat + (up + sin(_t * 2.7) * 0.12) * dt, 0.0, 1.0)
 			if absf(_heat - _zone_c) <= _zone_w * 0.65:
 				_inband += dt
@@ -148,7 +154,9 @@ func _strike() -> void:
 	var sc := (1.0 - 0.4 * d / half) if d <= half else maxf(0.0, 0.4 - (d - half) * 2.0)
 	_scores.append(sc)
 	_flash = 1.0
-	Sfx.play(get_tree(), Sfx.hit(), -6.0 if sc > 0.5 else -12.0)
+	var sk := String(lesson.get("skill", ""))
+	var metal := sk in ["katana_smith", "gun_smith", "machining", "powder"]
+	Audio.play("craft_hammer" if metal else ("craft_saw" if sk == "shipbuilding" and _scores.size() % 3 == 2 else "craft_hammer_wood"), -2.0 if sc > 0.5 else -8.0, {"pitch_var": 0.05})
 	if _scores.size() >= STRIKES:
 		finish(_avg())
 	else:
@@ -161,7 +169,7 @@ func _shoot() -> void:
 	var sc := (1.0 - 0.5 * d / r) if d <= r else maxf(0.0, 0.5 - (d - r) * 3.0)
 	_scores.append(sc)
 	_flash = 1.0
-	Sfx.play(get_tree(), Sfx.shot() if lesson.get("skill", "") != "kyujutsu" else Sfx.bow(), -10.0)
+	Audio.play("bow_release" if lesson.get("skill", "") == "kyujutsu" else "gun_rifle", -8.0, {"pitch_var": 0.04})
 	if _scores.size() >= STRIKES:
 		finish(_avg())
 
@@ -267,10 +275,10 @@ func _choose(ok: bool) -> void:
 		return
 	if ok:
 		_step_i += 1
-		Sfx.play(get_tree(), Sfx.click(), -6.0)
+		Audio.play("latch" if _step_i % 2 == 0 else "craft_hammer_wood", -6.0)
 	else:
 		_mistakes += 1
-		Sfx.play(get_tree(), Sfx.fail(), -12.0)
+		Audio.play("ui_error", -6.0)
 	_build_choices()
 
 
@@ -313,4 +321,9 @@ func finish(score: float) -> void:
 	if _done:
 		return
 	_done = true
+	if game == "mix":
+		Audio.play("craft_grind", -4.0)
+	elif game == "heat":
+		Audio.play("craft_quench", -4.0)
+	Audio.play("rin" if score >= 0.6 else "ui_back", -6.0)
 	finished.emit(clampf(score, 0.0, 1.0))

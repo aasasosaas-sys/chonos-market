@@ -214,6 +214,15 @@ void fragment() {
 	}
 	// 大きな明暗のムラ（雲の影のような柔らかさ）
 	col *= mix(0.92, 1.06, m1);
+	// 天気: 濡れた地面（道・広場は水たまりが空を映す）・積雪
+	if (world_weather.x + world_weather.y > 0.002) {
+		float fres = pow(1.0 - clamp(dot(normalize(CAMERA_POSITION_WORLD - v_wpos), v_wnrm), 0.0, 1.0), 3.0);
+		col = weather_wet(col, v_wnrm.y, 0.85);
+		float pn = texture(macro_tex, wp * 0.06 + vec2(0.21, 0.67)).r * 0.75 + texture(macro_tex, wp * 0.17 + vec2(0.5, 0.1)).r * 0.25;
+		col = weather_puddle(col, v_wnrm.y * mix(0.97, 1.0, max(road_w, plaza_w)), pn + max(road_w, plaza_w) * 0.12 - 0.05, fres);
+		col = weather_snow(col, v_wnrm.y, m3 * 0.7 + m2 * 0.3);
+		nrm = mix(nrm, vec3(0.5, 0.5, 1.0), weather_snow_mask(v_wnrm.y, m3));
+	}
 	ALBEDO = clamp(col, 0.0, 1.0);
 	NORMAL_MAP = nrm;
 	NORMAL_MAP_DEPTH = nd * (1.0 - smoothstep(60.0, 220.0, dist));

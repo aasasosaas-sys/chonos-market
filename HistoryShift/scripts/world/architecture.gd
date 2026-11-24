@@ -61,6 +61,8 @@ func flush(name: String) -> void:
 		bs.size = c[1]
 		cs.shape = bs
 		cs.transform = c[0]
+		if c.size() > 2:
+			cs.set_meta("surface", c[2])   # 足音の床材（scripts/audio/surface.gd）
 		w.static_body.add_child(cs)
 	cols.clear()
 
@@ -252,10 +254,12 @@ func rect_quads(mat: String, xf: Transform3D, y: float, r: Rect2, hole: Rect2, c
 
 
 ## 坂の当たり判定（階段・梯子・式台）。局所 a（下）→ b（上）。breakable=false なら壊れない静的コリジョン
-func ramp(xf: Transform3D, a: Vector3, b: Vector3, width: float, breakable := false) -> void:
+func ramp(xf: Transform3D, a: Vector3, b: Vector3, width: float, breakable := false, surf := "") -> void:
 	var e := ramp_shape(xf, a, b, width)
 	if e.is_empty():
 		return
+	if surf != "":
+		e.append(surf)
 	if breakable:
 		cols.append(e)
 	else:
@@ -301,7 +305,7 @@ func entry_steps(xf: Transform3D, x: float, z_edge: float, h: float, width: floa
 	var top := Vector3(x, h, z_edge)
 	var bot := Vector3(x, 0.0, z_edge + run)
 	steps(mat, xf, bot, top, width, colr, maxi(1, int(ceil(h / 0.2))))
-	ramp(xf, bot + Vector3(0, -0.05, 0.25), top + Vector3(0, 0, -0.05), width, breakable)
+	ramp(xf, bot + Vector3(0, -0.05, 0.25), top + Vector3(0, 0, -0.05), width, breakable, Surface.of_mat(mat))
 	return run
 
 
@@ -413,7 +417,7 @@ func foundation(xf: Transform3D, wd: float, dp: float, h: float, mat := "stonewa
 	kit.set_unit(0)
 	bx(mat, xf, Vector3(0, (h - 2.0) * 0.5, 0), Vector3(wd, h + 2.0, dp), colr)
 	kit.set_unit(prev)
-	base_cols.append([xf * Transform3D(Basis(), Vector3(0, (h - 2.0) * 0.5, 0)), Vector3(wd, h + 2.0, dp)])
+	base_cols.append([xf * Transform3D(Basis(), Vector3(0, (h - 2.0) * 0.5, 0)), Vector3(wd, h + 2.0, dp), Surface.of_mat(mat)])
 	if not _ustack.is_empty():
 		_ustack.back()["base_top"] = maxf(float(_ustack.back()["base_top"]), xf.origin.y + h)
 
@@ -435,7 +439,25 @@ func roof(xf: Transform3D, y: float, hw: float, hd: float, rise: float, style: S
 		return   # 上の層に覆われる屋根: 棟・鬼瓦は上の層の部屋の中に出るので作らない
 	if style != "pyramid":
 		var cap_mat := mat if mat != "thatch" else "thatch"
-		kit.ridge_cap(rx, hw, hd, rise, gs, cap_mat, colr * Color(0.7, 0.7, 0.7) if mat == "rooftile" else colr * Color(0.8, 0.8, 0.8), 0.55 if mat == "rooftile" else 0.9)
+		if mat != "thatch":
+			kit.ridge_cap(rx, hw, hd, rise, gs, cap_mat, colr * Color(0.7, 0.7, 0.7) if mat == "rooftile" else colr * Color(0.8, 0.8, 0.8), 0.55)
+		if mat == "thatch":
+			# 茅の棟は棟に埋め込んだ低い束（以前の 0.9m の箱は棟の上に浮いて見えた）
+			# 茅の棟: 棟押さえの竹と、棟をまたぐ X 字の烏おどし（千木風の押さえ木）を並べる
+			var thx := (hw - hd + hd * gs) if gs < 1.0 else hw
+			var ax := Vector3.RIGHT
+			if hd > hw and gs < 1.0:
+				thx = hd - hw + hw * gs
+				ax = Vector3.BACK
+			var side := Vector3.UP.cross(ax)
+			var yt := rise + 0.3
+			kit.box("thatch", rx * Transform3D(Basis(Vector3.UP, PI * 0.5 if ax == Vector3.RIGHT else 0.0), Vector3(0, rise - 0.05, 0)), Vector3(1.1, 0.6, (thx + 0.35) * 2.0), colr * Color(0.72, 0.7, 0.66))
+			kit.rod("darkwood", rx * (-ax * (thx + 0.3) + Vector3(0, yt, 0)), rx * (ax * (thx + 0.3) + Vector3(0, yt, 0)), 0.07, 5, Color(0.42, 0.34, 0.26))
+			var nx := maxi(2, int(thx * 2.0 / 1.4))
+			for k in nx + 1:
+				var u := -thx + k * thx * 2.0 / nx
+				for sg: float in [-1.0, 1.0]:
+					kit.rod("darkwood", rx * (ax * u + side * sg * 0.75 + Vector3(0, rise - 0.15, 0)), rx * (ax * u - side * sg * 0.35 + Vector3(0, yt + 0.45, 0)), 0.06, 4, Color(0.38, 0.3, 0.24))
 		if mat == "rooftile":
 			# 鬼瓦
 			var hx := (hw - hd + hd * gs) if gs < 1.0 else hw
@@ -1004,7 +1026,16 @@ func _u_machiya(xf: Transform3D, wd := 6.0, dp := 11.0, stories := 2, o := {}) -
 		for k in 2:
 			bx("darkwood", xf, Vector3(-wd * 0.22 + k * wd * 0.44, top + h2 * 0.55, dp * 0.5 - 1.28), Vector3(wd * 0.28, h2 * 0.4, 0.06), Color(0.2, 0.17, 0.15))
 		top += h2
-	roof(xf, top + 0.1, wd * 0.5 + 0.35, dp * 0.5 + 0.3, 2.0 if two else 2.3, "gable", "rooftile", TILE_DARK.lerp(TILE, rng.randf()), 0.0, Color(0.45, 0.38, 0.32), 1.15)
+	# 軒は通りへ深く出す（妻側は隣家と接するので出さない）。軒裏に垂木の木口を並べ、鼻隠しの下に影ができるように
+	var rise_m := 2.0 if two else 2.3
+	var hd_m := dp * 0.5 + 0.75
+	roof(xf, top + 0.1, wd * 0.5 + 0.35, hd_m, rise_m, "gable", "rooftile", TILE_DARK.lerp(TILE, rng.randf()), 0.0, Color(0.45, 0.38, 0.32), 1.15)
+	var z_w := dp * 0.5 - (1.3 if two else 0.4)
+	var y_w := top + 0.1 + rise_m * pow(1.0 - z_w / hd_m, 1.15) - 0.36
+	var nr := int((wd - 0.4) / 0.45)
+	for k in nr + 1:
+		var rx := -wd * 0.5 + 0.2 + k * (wd - 0.4) / nr
+		kit.rod("darkwood", xf * Vector3(rx, y_w, z_w), xf * Vector3(rx, top + 0.1 - 0.36, hd_m - 0.1), 0.045, 4, Color(0.4, 0.33, 0.28))
 	col(xf, Vector3(0, top + 0.6, -0.3), Vector3(wd, 1.0, dp - 0.6))
 	occupy(xf, wd, dp, 0.0)
 	var floors: Array = [fl(0.3, Rect2(-wd * 0.5 + 0.2, -dp * 0.5 + 0.15, wd - 0.4, dp - 1.1), h1,
@@ -1442,28 +1473,42 @@ func _u_brick_building(xf: Transform3D, wd := 24.0, dp := 14.0, floors := 3, o :
 	for f in floors + 1:
 		var bh := 0.3 if f < floors else 0.6
 		band("plaster", xf, Vector3(0, 0.8 + f * fh, 0), Vector3(wd + 0.3, bh, dp + 0.3), trim, [{"side": 0, "u": 0.0, "w": dw, "h": 1.0}] if f == 0 else [], 0.35)
-	# 窓
+	# 窓（奥まったガラス・十字の桟・窓台・要石つきのまぐさ）と、窓の間の付柱
 	var nw := int(wd / 3.2)
 	var nd := int(dp / 3.2)
 	for f in floors:
 		var wy := 0.8 + f * fh + fh * 0.5
 		for i in nw:
 			var x := -wd * 0.5 + wd * (i + 0.5) / nw
-			for sgn in [-1.0, 1.0]:
+			for sgn: float in [-1.0, 1.0]:
 				if f == 0 and sgn > 0.0 and absf(x) < 2.0:
 					continue
-				bx("plaster", xf, Vector3(x, wy, sgn * (dp * 0.5 + 0.05)), Vector3(1.4, 2.4, 0.12), trim)
-				bx("glass", xf, Vector3(x, wy - 0.05, sgn * (dp * 0.5 + 0.1)), Vector3(1.0, 2.0, 0.06))
-				bx("plaster", xf, Vector3(x, wy + 1.35, sgn * (dp * 0.5 + 0.12)), Vector3(1.7, 0.25, 0.2), trim)
+				_west_window(xf, Vector3(x, wy, sgn * dp * 0.5), Vector3(0, 0, sgn), trim, f == floors - 1)
 		for i in nd:
 			var z := -dp * 0.5 + dp * (i + 0.5) / nd
-			for sgn in [-1.0, 1.0]:
-				bx("plaster", xf, Vector3(sgn * (wd * 0.5 + 0.05), wy, z), Vector3(0.12, 2.4, 1.4), trim)
-				bx("glass", xf, Vector3(sgn * (wd * 0.5 + 0.1), wy - 0.05, z), Vector3(0.06, 2.0, 1.0))
-	# 隅石
+			for sgn: float in [-1.0, 1.0]:
+				_west_window(xf, Vector3(sgn * wd * 0.5, wy, z), Vector3(sgn, 0, 0), trim, f == floors - 1)
+	var pil := wall_col * Color(0.9, 0.88, 0.88)
+	for i in range(1, nw):
+		var x := -wd * 0.5 + wd * float(i) / nw
+		for sgn: float in [-1.0, 1.0]:
+			if sgn > 0.0 and absf(x) < 4.5:
+				continue
+			bx(wall_mat, xf, Vector3(x, 0.8 + h * 0.5, sgn * (dp * 0.5 + 0.07)), Vector3(0.42, h - 0.2, 0.14), pil)
+	# 軒蛇腹の下の歯飾り（デンティル）
+	var nd_t := int(wd / 0.55)
+	for i in nd_t:
+		var x := -wd * 0.5 + (i + 0.5) * wd / nd_t
+		for sgn: float in [-1.0, 1.0]:
+			bx("plaster", xf, Vector3(x, 0.8 + h - 0.42, sgn * (dp * 0.5 + 0.12)), Vector3(0.2, 0.2, 0.18), trim)
+	# 隅石（石を互い違いに積んだ形）
 	for cx in [-1.0, 1.0]:
 		for cz in [-1.0, 1.0]:
-			bx("plaster", xf, Vector3(cx * wd * 0.5, 0.8 + h * 0.5, cz * dp * 0.5), Vector3(0.7, h, 0.7), trim)
+			bx("plaster", xf, Vector3(cx * wd * 0.5, 0.8 + h * 0.5, cz * dp * 0.5), Vector3(0.62, h, 0.62), trim)
+			var nq := int(h / 0.7)
+			for q in nq:
+				if q % 2 == 0:
+					bx("plaster", xf, Vector3(cx * (wd * 0.5 - 0.12), 0.8 + (q + 0.5) * h / nq, cz * (dp * 0.5 + 0.03)), Vector3(1.0, h / nq - 0.06, 0.62), trim)
 	# 玄関ポーチ（柱＋破風）と石段
 	var pz := dp * 0.5 + 1.8
 	for k in 4:
@@ -1504,6 +1549,28 @@ func _u_brick_building(xf: Transform3D, wd := 24.0, dp := 14.0, floors := 3, o :
 	dd["out"] = Vector3(0, 0, dp * 0.5 + 0.2 + run + 1.6)
 	_brick_n += 1
 	reg_interior(_brick_interior(o), xf, flist, [dd], {"win_grid": {"nw": nw, "nd": nd, "fh": fh, "y0": 0.8}, "floors_total": floors, "n": _brick_n})
+
+
+## 洋館の窓: 壁面の中心 c（局所）・外向き n。枠は壁から張り出し、ガラスは奥（空を映す濃いめの色）。
+## 上下窓の桟・石の窓台・まぐさ（上の階は要石つきの半円風の額）
+func _west_window(xf: Transform3D, c: Vector3, n: Vector3, trim: Color, top_floor := false) -> void:
+	var r := Vector3.UP.cross(n).normalized()
+	var b := xf.basis * Basis(r, Vector3.UP, n)
+	var at := func(lx: float, ly: float, lz: float) -> Transform3D: return Transform3D(b, xf * (c + r * lx + Vector3.UP * ly + n * lz))
+	kit.box("glass", at.call(0.0, -0.05, 0.03), Vector3(1.0, 2.0, 0.04), Color(0.55, 0.6, 0.72))
+	kit.box("darkwood", at.call(0.0, -0.05, 0.015), Vector3(1.1, 2.1, 0.02), Color(0.2, 0.18, 0.18))
+	for sx in [-1.0, 1.0]:
+		kit.box("plaster", at.call(sx * 0.6, -0.05, 0.08), Vector3(0.2, 2.3, 0.16), trim)
+	kit.box("plaster", at.call(0.0, 1.1, 0.08), Vector3(1.4, 0.2, 0.16), trim)
+	kit.box("flat", at.call(0.0, -0.05, 0.07), Vector3(0.05, 2.0, 0.05), Color(0.95, 0.94, 0.9))
+	kit.box("flat", at.call(0.0, 0.25, 0.07), Vector3(1.0, 0.06, 0.05), Color(0.95, 0.94, 0.9))
+	kit.box("stonewall", at.call(0.0, -1.22, 0.12), Vector3(1.6, 0.14, 0.26), trim)
+	kit.box("plaster", at.call(0.0, 1.38, 0.13), Vector3(1.75, 0.24, 0.24), trim)
+	if not top_floor:
+		kit.box("plaster", at.call(0.0, 1.36, 0.2), Vector3(0.28, 0.42, 0.14), trim)
+	else:
+		kit.box("plaster", at.call(0.0, 1.62, 0.12), Vector3(1.2, 0.18, 0.2), trim)
+		kit.box("plaster", at.call(0.0, 1.78, 0.12), Vector3(0.6, 0.16, 0.2), trim)
 
 
 ## 洋館の用途: 駅舎・役所・洋館（迎賓）・銀行

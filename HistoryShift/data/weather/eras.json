@@ -1,0 +1,106 @@
+{
+ "about": "時代ごとの地点・日付・昔の気候の補正。日付は旧暦（lunar: [正月のある西暦年, 月, 日, 閏]）か西暦（date: [年, 月, 日]、1582年10月15日より前はユリウス暦）。旧暦は scripts/core/kyureki.gd で換算する。日付の分からない時点は時代の見た目（era_styles.gd の季節）に合わせた代表日（season）。",
+ "layers": [
+  "1. 観測（instrumental）: 東京は1875年6月に東京気象台が観測を始めた（気象庁『気象業務150年』）。明治・大正・昭和の有名な日は観測と当時の報道で。",
+  "2. 日記（diary）: 江戸時代中期〜明治初期は藩庁・社寺・大農の日記の天気記事（山梨大学『歴史天候データベース』、吉村(1993)が基礎）。このデータベース（hwdb.yamanashi.ac.jp）はこの作業環境から接続できなかったため、日ごとの値は取り込めていない。有名な日と、季節の傾向だけを入れた。",
+  "3. 古記録（documentary）: 平安〜室町は公家・寺社の日記と軍記（『高麗史』『信長公記』など）に書かれた特定の日の天気。",
+  "4. 代理指標（proxy）: 京都の桜の満開日（812年〜、青野靖之・小元敬男 Aono & Kazui 2008、NOAA/WDS Paleoclimatology 収録）による3月の気温の復元、中塚武らの樹木年輪セルロース酸素同位体比（約2000年分、夏の降水量・湿度）、諏訪湖の御神渡り（1443年〜、冬の寒さ）。これらは数十年〜百年単位の傾向を与えるだけで、個々の日の天気は気候値から生成する（basis: climatology+proxy）。"
+ ],
+ "eras": {
+  "jomon_kofun": {"region": "nara", "season": [6, 12], "note": "纒向（奈良盆地）の気候で代用。縄文（-3000）は三内丸山（青森）の頃だが箱庭は近畿の植生"},
+  "asuka_nara": {"region": "nara", "season": [5, 10]},
+  "heian": {"region": "kyoto", "season": [4, 8]},
+  "kamakura_muromachi": {"region": "kamakura", "season": [7, 20]},
+  "sengoku": {"region": "kyoto", "season": [10, 20]},
+  "edo": {"region": "tokyo", "season": [5, 15]},
+  "meiji_taisho": {"region": "tokyo", "season": [10, 15]},
+  "showa": {"region": "tokyo", "season": [8, 5]}
+ },
+ "points": {
+  "asuka_nara": {
+   "645": {"lunar": [645, 6, 12, false], "label": "乙巳の変（皇極4年6月12日）", "basis": "『日本書紀』皇極4年6月戊申（12日）条"},
+   "672": {"lunar": [672, 7, 22, false], "label": "瀬田橋の戦い（天武元年7月22日）", "basis": "『日本書紀』天武元年7月辛亥（22日）条"},
+   "752": {"lunar": [752, 4, 9, false], "label": "大仏開眼供養（天平勝宝4年4月9日）", "basis": "『続日本紀』天平勝宝4年4月乙酉（9日）条"},
+   "764": {"lunar": [764, 9, 11, false], "label": "恵美押勝の挙兵（天平宝字8年9月11日）", "basis": "『続日本紀』天平宝字8年9月条"}
+  },
+  "heian": {
+   "1156": {"lunar": [1156, 7, 11, false], "label": "保元の乱（保元元年7月11日未明）", "basis": "『兵範記』保元元年7月11日条"},
+   "1159": {"lunar": [1159, 12, 9, false], "label": "平治の乱（平治元年12月9日）", "basis": "『百錬抄』平治元年12月9日条"}
+  },
+  "kamakura_muromachi": {
+   "1185": {"lunar": [1185, 3, 24, false], "region": "fukuoka", "label": "壇ノ浦の戦い（元暦2年3月24日）", "basis": "『吾妻鏡』元暦2年3月24日条（関門海峡は博多の気候で代用）"},
+   "1221": {"lunar": [1221, 6, 14, false], "label": "宇治川の戦い（承久3年6月14日）", "basis": "『吾妻鏡』承久3年6月14日条（梅雨の増水した宇治川を渡った）"},
+   "1274": {"lunar": [1274, 10, 20, false], "region": "fukuoka", "label": "文永の役・博多湾の合戦（文永11年10月20日）", "basis": "『八幡愚童訓』・『高麗史』金方慶伝"},
+   "1281": {"lunar": [1281, 7, 1, true], "region": "fukuoka", "label": "弘安の役の大風（弘安4年閏7月1日）", "basis": "公家の日記・『高麗史』ほか（famous_days.json）"},
+   "1333": {"lunar": [1333, 5, 22, false], "label": "鎌倉幕府の滅亡（元弘3年5月22日）", "basis": "『太平記』巻10・『梅松論』"},
+   "1371": {"region": "fukuoka"},
+   "1441": {"lunar": [1441, 6, 24, false], "label": "嘉吉の変（嘉吉元年6月24日）", "basis": "『看聞日記』嘉吉元年6月24日条"},
+   "1467": {"lunar": [1467, 5, 26, false], "label": "上京の戦い（応仁元年5月26日）", "basis": "『応仁記』"}
+  },
+  "sengoku": {
+   "1543": {"lunar": [1543, 8, 25, false], "label": "種子島に南蛮船（天文12年8月25日）", "basis": "南浦文之『鉄炮記』"},
+   "1549": {"lunar": [1549, 7, 22, false], "label": "ザビエル鹿児島上陸（天文18年7月22日）", "basis": "イエズス会書簡（西暦1549年8月15日。旧暦の計算では8月14日と1日ずれる＝宣明暦の朔の誤差）"},
+   "1560": {"lunar": [1560, 5, 19, false], "region": "nagoya", "label": "桶狭間の戦い（永禄3年5月19日）", "basis": "太田牛一『信長公記』首巻"},
+   "1582": {"lunar": [1582, 6, 2, false], "label": "本能寺の変（天正10年6月2日）", "basis": "『言経卿記』・『兼見卿記』"},
+   "1600": {"lunar": [1600, 9, 15, false], "region": "sekigahara", "label": "関ヶ原の戦い（慶長5年9月15日）", "basis": "famous_days.json"}
+  },
+  "edo": {
+   "1615": {"lunar": [1615, 5, 7, false], "label": "大坂落城（慶長20年5月7日）", "basis": "『駿府記』（大坂の事件。天気は江戸の箱庭の気候で生成）"},
+   "1657": {"lunar": [1657, 1, 18, false], "label": "明暦の大火（明暦3年1月18日）", "basis": "famous_days.json"},
+   "1783": {"lunar": [1783, 7, 8, false], "label": "浅間山の大噴火（天明3年7月8日）", "basis": "famous_days.json"},
+   "1837": {"lunar": [1837, 2, 19, false], "label": "大塩平八郎の乱（天保8年2月19日）", "basis": "『浮世の有様』（大坂の事件。天気は江戸の気候で生成）"},
+   "1853": {"lunar": [1853, 6, 3, false], "label": "ペリー来航（嘉永6年6月3日）", "basis": "famous_days.json"},
+   "1860": {"lunar": [1860, 3, 3, false], "label": "桜田門外の変（安政7年3月3日）", "basis": "famous_days.json"},
+   "1867": {"lunar": [1867, 10, 14, false], "label": "大政奉還の上表（慶応3年10月14日）", "basis": "『徳川慶喜公伝』"}
+  },
+  "meiji_taisho": {
+   "1871": {"date": [1871, 8, 29], "label": "廃藩置県の詔（明治4年7月14日）", "basis": "『太政官日誌』"},
+   "1889": {"date": [1889, 2, 11], "label": "大日本帝国憲法発布", "basis": "国立公文書館"},
+   "1905": {"date": [1905, 9, 5], "label": "日比谷焼打ち事件", "basis": "当時の新聞"},
+   "1918": {"date": [1918, 9, 29], "label": "原敬内閣の成立", "basis": "『原敬日記』"},
+   "1923": {"date": [1923, 9, 1], "label": "関東大震災", "basis": "famous_days.json"}
+  },
+  "showa": {
+   "1927": {"date": [1927, 3, 14], "label": "片岡蔵相の失言（金融恐慌）", "basis": "衆議院予算委員会の議事録"},
+   "1931": {"date": [1931, 9, 18], "label": "柳条湖事件（満洲・東京の箱庭は東京の気候）", "basis": "—"},
+   "1936": {"date": [1936, 2, 26], "label": "二・二六事件", "basis": "famous_days.json"},
+   "1941": {"date": [1941, 12, 8], "label": "開戦の日", "basis": "—"},
+   "1945": {"date": [1945, 8, 15], "label": "終戦の詔書の放送", "basis": "famous_days.json"},
+   "1964": {"date": [1964, 10, 10], "label": "東京オリンピック開会式", "basis": "famous_days.json"}
+  }
+ },
+ "periods": [
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": -4000, "to": -1000, "dT": 0.5, "wet": 1.0,
+   "basis": "完新世の温暖期（縄文海進の頃）。花粉分析などで現在並み〜やや暖かかったとされる。現代の平年値（都市化を含む）に対して +0.5℃ と置いた（大まかな値）", "confidence": "low"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": -1000, "to": 300, "dT": -1.6, "wet": 1.1,
+   "basis": "弥生後期〜古墳初めは冷涼で、中塚武らの年輪酸素同位体比では2〜3世紀に夏の降水の数十年周期の大きな変動（洪水と干ばつ）が見られる（倭国大乱の頃）", "confidence": "low"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 300, "to": 700, "dT": -2.0, "wet": 1.05,
+   "basis": "「古墳寒冷期」（尾瀬ヶ原の花粉分析などによる呼び名）。現代の平年値より -2℃ と置いた（都市化の分を含む）", "confidence": "low"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 700, "to": 1000, "dT": -1.5, "wet": 1.0,
+   "basis": "奈良〜平安前期。京都の桜の満開日（Aono & Kazui 2008）の9〜10世紀は比較的早く、3月は中世の中では暖かい。都市化を含む現代の平年値より -1.5℃", "confidence": "medium"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 1000, "to": 1300, "dT": -1.8, "wet": 1.0,
+   "basis": "平安後期〜鎌倉。いわゆる中世温暖期だが、京都の桜の記録では11〜12世紀の3月は9〜10世紀より冷涼。養和の飢饉（1181年、干ばつ）・寛喜の飢饉（1230〜31年、冷夏）・正嘉の飢饉（1258〜60年）が起きた", "confidence": "medium"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 1300, "to": 1600, "dT": -2.2, "wet": 1.0,
+   "basis": "小氷期の始まり。諏訪湖の御神渡りの記録（1443年〜）では湖はほぼ毎冬全面結氷した。京都の桜も15世紀に遅い", "confidence": "medium"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 1600, "to": 1850, "dT": -2.6, "wet": 1.0,
+   "basis": "小氷期（江戸時代）。京都の桜の満開日は17世紀・19世紀初めに遅く、3月の気温は現代（都市化を含む）より約3℃低いと復元される（Aono & Kazui 2008）。江戸の日記には大雪の記事が多い", "confidence": "medium"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 1850, "to": 1900, "dT": -2.2, "wet": 1.0,
+   "basis": "小氷期の終わり。東京の観測（1876年〜）の年平均気温は約13.5〜14℃で、1991〜2020年の平年値15.8℃より2℃あまり低い（都市化と地球温暖化の分）", "confidence": "medium"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 1900, "to": 1940, "dT": -1.8, "wet": 1.0,
+   "basis": "東京の観測。明治末〜昭和初めの年平均気温は平年値より約1.5〜2℃低い（気象庁『ヒートアイランド監視報告』の東京の長期変化：100年あたり約3℃の上昇）", "confidence": "medium"},
+  {"regions": ["nara", "kyoto", "kamakura", "fukuoka", "nagoya", "sekigahara", "tokyo"], "from": 1940, "to": 1970, "dT": -1.2, "wet": 1.0,
+   "basis": "東京の観測（同上）", "confidence": "medium"}
+ ],
+ "fog_mult": [
+  {"from": -4000, "to": 1960, "mult": 2.0, "basis": "現代の霧日数は都市の乾燥化・高温化で大きく減ったとされる。昔の時代には霧を2倍として生成する（大まかな値）"}
+ ],
+ "anomalies": [
+  {"regions": ["kyoto", "kamakura", "nara"], "from": 1230, "to": 1231, "months": [6, 7, 8, 9], "dT": -2.5, "wet": 1.4,
+   "basis": "寛喜の飢饉（1230〜31年）。英語版Wikipedia『Kanki famine』は1230年7月の長雨・寒さ・雪が作物を損ねたとし、『吾妻鏡』寛喜2年条に夏の寒さの記事がある。ただし『明月記』には同年6月の暑さの記事もあり、史料ごとに食い違う", "confidence": "medium",
+   "sources": ["https://en.wikipedia.org/wiki/Kanki_famine", "南山大学『アカデミア』論文（『明月記』と『吾妻鏡』の寛喜2〜3年条の検討） https://nsu.repo.nii.ac.jp/record/2000003/files/63%2061_81.pdf"]},
+  {"regions": ["tokyo"], "from": 1783, "to": 1787, "months": [6, 7, 8, 9], "dT": -2.0, "wet": 1.3,
+   "basis": "天明の飢饉（1782〜88年）。浅間山（1783年）・アイスランドのラキ火山（1783年）の噴火の後の冷夏・長雨", "confidence": "medium"},
+  {"regions": ["tokyo", "kyoto"], "from": 1833, "to": 1838, "months": [6, 7, 8, 9], "dT": -1.5, "wet": 1.3,
+   "basis": "天保の飢饉（1833〜39年）の冷夏・長雨", "confidence": "medium"}
+ ]
+}

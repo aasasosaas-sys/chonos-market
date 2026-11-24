@@ -92,6 +92,10 @@ void fragment() {
 	// カメラが樹冠に入った時は手前 2.5m の葉を抜く（巨大な葉カードで視界が塞がれないように）
 	a *= step(2.5, length(VERTEX));
 	vec3 col = v_col * shade;
+	// 天気: 濡れた葉は深く、雪は樹冠の上に（ワールドの上向きの面ほど）
+	vec3 wn = (INV_VIEW_MATRIX * vec4(NORMAL, 0.0)).xyz;
+	col = weather_wet(col, wn.y, 0.45);
+	col = weather_snow(col, wn.y * 1.15, v_seed * 0.5 + shade * 0.5 - 0.2);
 	ALBEDO = col;
 	ALPHA = a;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;

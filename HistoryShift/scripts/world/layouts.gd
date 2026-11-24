@@ -258,6 +258,7 @@ func build_all() -> void:
 	_road_decor()
 	a.flush("Arch_roads")
 	a.landmark = ""
+	HistoryDressing.build(w, a)   # この世界の歴史による追加・建て替え（data/visuals/history_visuals.json。元の建物の後ろに付くので ID は変わらない）
 	_process_ponds()
 	_lamp_lights()
 	# 後から建った建物・池の上の歩行点を除く

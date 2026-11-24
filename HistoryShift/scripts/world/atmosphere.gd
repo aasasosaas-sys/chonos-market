@@ -94,6 +94,7 @@ static func build_environment(world: Node3D, style: Dictionary) -> Dictionary:
 	sun.name = "Sun"
 	sun.light_color = style["sun_color"]
 	sun.light_energy = float(style["sun_energy"]) * 0.85
+	sun.set_meta("base_e", sun.light_energy)
 	sun.shadow_enabled = true
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS if q >= 1 else DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 	sun.directional_shadow_max_distance = 220.0 if q >= 2 else (160.0 if q == 1 else 100.0)
@@ -165,12 +166,13 @@ static func set_indoor(nodes: Dictionary, style: Dictionary, k: float) -> void:
 	var warm := Color(1.0, 0.86, 0.68).lerp(Color(0.55, 0.5, 0.6), night)
 	env.ambient_light_color = (o[0] as Color).lerp(warm, k)
 	env.ambient_light_sky_contribution = lerpf(o[1], 0.1, k)
-	env.ambient_light_energy = lerpf(o[2], float(o[2]) * lerpf(1.5, 0.9, night), k)
-	env.tonemap_exposure = lerpf(o[3], float(o[3]) * 1.04, k)
+	# 屋内は少しだけ露出を下げる（白い面・戸口の外が白く飛ばないように。暖かい環境光で室内の明るさは保つ）
+	env.ambient_light_energy = lerpf(o[2], float(o[2]) * lerpf(1.35, 0.9, night), k)
+	env.tonemap_exposure = lerpf(o[3], float(o[3]) * 0.92, k)
 	# 屋内は環境光が主なので SSAO が効きすぎ、家具の後ろの壁が黒く櫛状に潰れる。半径・強さを絞る
 	env.ssao_intensity = lerpf(o[4], 0.45, k)
 	env.ssao_radius = lerpf(1.6, 0.45, k)
-	env.glow_hdr_threshold = lerpf(o[5], 0.9, k)
+	env.glow_hdr_threshold = lerpf(o[5], 1.25, k)
 	RenderingServer.global_shader_parameter_set("world_indoor", k)
 	# 屋内では日の光が薄い壁を抜けて家具の影が壁に伸びる（法線バイアスが大きいため）。
 	# 中にいる間は影の範囲を狭めて解像度を上げ、バイアスを小さくして外殻の影を正しく落とす
@@ -186,11 +188,18 @@ static func set_indoor(nodes: Dictionary, style: Dictionary, k: float) -> void:
 		# それでも低い太陽の影は薄い外殻を抜けて家具の影が壁に黒く伸びる（ソフトシャドウのディザで櫛状）。
 		# 屋内では日の影を切り、日の光そのものを弱めて、暖かい環境光と行灯で照らす
 		sun.shadow_enabled = not inside
-		if not sun.has_meta("out_e"):
-			sun.set_meta("out_e", sun.light_energy)
-		sun.light_energy = float(sun.get_meta("out_e")) * lerpf(1.0, 0.4, k)
-		if k <= 0.0:
-			sun.remove_meta("out_e")
+		sun.set_meta("in_k", k)
+		refresh_sun(sun)
+
+
+## 日の光の強さ = 時刻（meta base_e：build_environment・EraWorld.set_time_of_day）× 天気（wx_e：WeatherDirector）× 屋内（in_k）
+static func refresh_sun(sun: DirectionalLight3D) -> void:
+	if sun == null:
+		return
+	if not sun.has_meta("base_e"):
+		sun.set_meta("base_e", sun.light_energy)
+	var k := float(sun.get_meta("in_k", 0.0))
+	sun.light_energy = float(sun.get_meta("base_e")) * float(sun.get_meta("wx_e", 1.0)) * lerpf(1.0, 0.4, k)
 
 
 # ---------------------------------------------------------------- カラーグレーディング（3D LUT）

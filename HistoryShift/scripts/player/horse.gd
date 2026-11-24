@@ -12,7 +12,7 @@ var _gait := 0.0
 var _legs: Array[Node3D] = []
 var _neck: Node3D
 var _tail: Node3D
-var _sound: AudioStreamPlayer3D
+var _snort_t := 6.0
 var _rear := 0.0
 var _air := false
 var _dist_acc := 0.0
@@ -46,7 +46,7 @@ func _build(seed: int) -> void:
 	seat = Node3D.new()
 	seat.name = "Seat"
 	add_child(seat)
-	_sound = Sfx.loop_player(self, Sfx.hooves(), -8.0)
+	Footsteps.attach(self, "horse")   # 歩様（常歩・速歩・駈歩・襲歩）と地面で変わる蹄の音（scripts/audio/footsteps.gd）
 	if ResourceLoader.exists(MODEL):
 		_build_model(rng, coat)
 		return
@@ -170,12 +170,11 @@ func get_velocity_vec() -> Vector3: return velocity
 
 func enter(p) -> void:
 	driver = p
+	Audio.play_at("horse_snort", global_position + Vector3.UP * 1.6 - global_basis.z, 0.0)
 
 
 func exit() -> void:
 	driver = null
-	if _sound.playing:
-		_sound.stop()
 
 
 func exit_point() -> Vector3:
@@ -183,6 +182,8 @@ func exit_point() -> Vector3:
 
 
 func take_hit(_amount: float, _team: int, _point := Vector3.ZERO, _dir := Vector3.ZERO) -> void:
+	if _rear < 0.5:
+		Audio.play_at("horse_neigh", global_position + Vector3.UP * 1.8 - global_basis.z, 0.0)
 	_rear = 1.0  # 驚いて竿立ち（馬は傷つかない）
 
 
@@ -202,7 +203,7 @@ func _physics_process(dt: float) -> void:
 			rotation.y = lerp_angle(rotation.y, CameraRig.I.yaw, dt * 4.0)
 	# 乗馬の技能：速さ・小回り（Skills.horse_*）
 	var lv := _skill()
-	var top := (18.0 if gallop else 9.0) * Skills.horse_speed_mult(lv)
+	var top := (18.0 if gallop else 9.0) * Skills.horse_speed_mult(lv) * _ground_mult(dt)
 	var target := throttle * (top if throttle > 0 else 3.5)
 	speed = move_toward(speed, target, (7.0 if absf(target) > absf(speed) else 10.0) * dt)
 	_turn = lerpf(_turn, steer * lerpf(2.4, 1.3, clampf(absf(speed) / 18.0, 0, 1)) * Skills.horse_turn_mult(lv), dt * 6.0)
@@ -258,9 +259,29 @@ func _physics_process(dt: float) -> void:
 	_rear = move_toward(_rear, 0.0, dt * 1.2)
 	if _neck: _neck.rotation_degrees.x = sin(_gait * 2.0) * 4.0 * clampf(absf(speed) / 10.0, 0, 1) - _rear * 40.0
 	if _tail: _tail.rotation_degrees.x = 20.0 + sin(Time.get_ticks_msec() * 0.003) * 8.0 + absf(speed) * 2.0
-	if driver != null and absf(speed) > 1.0:
-		if not _sound.playing:
-			_sound.play()
-		_sound.pitch_scale = lerpf(0.7, 1.5, clampf(absf(speed) / 18.0, 0, 1))
-	elif _sound.playing:
-		_sound.stop()
+	# ときどき鼻を鳴らす（止まっている時・乗っている時）
+	_snort_t -= dt
+	if _snort_t <= 0.0:
+		_snort_t = randf_range(9.0, 20.0)
+		if Audio.enabled and Audio.listener_pos().distance_to(global_position) < 25.0 and (driver != null or absf(speed) < 0.5):
+			Audio.play_at("horse_snort", global_position + Vector3.UP * 1.6 - global_basis.z, -4.0)
+
+
+## 天気：雨の後のぬかるみ・雪道で少し遅くなる（舗装の道は泥にならない）。足元の床材は 0.5 秒ごとに調べる
+var _gm := 1.0
+var _gm_t := 0.0
+
+
+func _ground_mult(dt: float) -> float:
+	_gm_t -= dt
+	if _gm_t <= 0.0:
+		_gm_t = 0.5
+		var wet := HistWeather.cur("wet")
+		var cover := HistWeather.cur("snow_cover")
+		if wet + cover < 0.05:
+			_gm = 1.0
+		else:
+			var surf := Surface.terrain_at(Game.world, global_position)
+			_gm = HistWeather.ground_speed_mult(wet, cover, surf in ["stone", "concrete"])
+	return _gm
+

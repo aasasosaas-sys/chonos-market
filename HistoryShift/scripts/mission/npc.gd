@@ -53,6 +53,7 @@ func is_actor() -> bool:
 
 
 func _ready() -> void:
+	Footsteps.attach(self, "npc", -2.0)
 	if is_actor():
 		var an := str(actor.get("name", ""))
 		for qid in Game.db.q_actors:

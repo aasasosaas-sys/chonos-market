@@ -32,6 +32,7 @@ static func spawn(parent: Node, pos: Vector3, p_era: String, pts: Array) -> Civi
 
 func _ready() -> void:
 	add_to_group("civilian")
+	Footsteps.attach(self, "npc", -2.0)
 	collision_layer = Game.COLLISION_CIVILIAN
 	collision_mask = Game.COLLISION_WORLD | Game.COLLISION_PROP
 	var cs := CollisionShape3D.new()

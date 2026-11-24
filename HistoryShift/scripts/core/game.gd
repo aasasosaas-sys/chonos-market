@@ -28,6 +28,7 @@ const COLLISION_DEBRIS := 64     # 建物の破片（プレイヤー・町人と
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_setup_input()
+	Audio.setup()   # 音のバス（Music/SFX/Ambience/Voice）と再生ハブ（scripts/audio/audio.gd）
 	# 破壊状態テクスチャの既定値（黒＝無傷）。ワールド生成時に Destruction が差し替える
 	var blank := Image.create(4, 2, false, Image.FORMAT_RGBAF)
 	blank.fill(Color(0, 0, 0, 0))

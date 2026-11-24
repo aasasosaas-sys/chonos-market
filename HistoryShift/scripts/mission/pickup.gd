@@ -63,7 +63,8 @@ func _process(dt: float) -> void:
 		var pp: Vector3 = p.vehicle.global_position if p.in_vehicle() else p.global_position
 		if pp.distance_to(global_position) < (2.0 if not p.in_vehicle() else 4.0):
 			_taken = true
-			Sfx.play(get_tree(), Sfx.pickup(), -4.0)
+			Audio.play("pickup_item", 0.0)
+			Audio.play("ui_toast", -4.0)
 			Effects.burst(get_tree(), global_position + Vector3.UP, Vector3.UP, Color(1, 0.85, 0.4), Color.WHITE, 24, 5.0, 0.15, 0.6, 0.3, true, 180)
 			collected.emit(self)
 			queue_free()

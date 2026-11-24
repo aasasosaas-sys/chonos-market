@@ -67,8 +67,11 @@ func _ready() -> void:
 	_tag.modulate = Effects.GUARD if is_guardian else Color(1, 0.45, 0.4)
 	_tag.position = Vector3(0, 4, 0)
 	add_child(_tag)
-	_sound = Sfx.loop_player(self, Sfx.propeller(), -2.0)
-	_sound.play()
+	_sound = Audio.loop_at(self, "plane_engine_loop", 2.0, {"unit": 22.0, "max_dist": 900.0})
+	_sound.doppler_tracking = AudioStreamPlayer3D.DOPPLER_TRACKING_PHYSICS_STEP
+	_sound.pitch_scale = randf_range(0.9, 1.1)
+	if Audio.enabled:
+		_sound.play(randf() * 1.5)
 
 
 func take_hit(amount: float, from_team: int, _point := Vector3.ZERO, _dir := Vector3.ZERO) -> void:
@@ -141,6 +144,6 @@ func _physics_process(dt: float) -> void:
 		if to.length() < 320.0 and (-global_basis.z).angle_to(to.normalized()) < deg_to_rad(10.0):
 			var dir := (to.normalized() + Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * 0.03).normalized()
 			Projectile.fire(get_tree(), global_position - global_basis.z * 4.0, dir, "energy" if is_guardian else "air", 1)
-			Sfx.play_at(get_tree(), Sfx.shot(), global_position, -6.0)
+			Audio.play_at("gun_lmg", global_position, -2.0, {"pitch": 1.15})
 			_burst += 1
 			_cool = 0.1 if _burst % 6 != 0 else randf_range(1.5, 3.0)

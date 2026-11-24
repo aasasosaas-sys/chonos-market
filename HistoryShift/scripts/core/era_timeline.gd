@@ -147,9 +147,12 @@ static func crowd_outfit(era_id: String, role: String, r: float = -1.0) -> int:
 	var p := point_for(era_id, current_year)
 	if role == "enemy" and p.has("enemy_outfit"):
 		return OUTFIT_KEYS.find(str(p["enemy_outfit"]))
-	if role != "civilian" or not p.has("crowd"):
+	if role != "civilian":
 		return -1
-	var mix: Dictionary = p["crowd"]
+	var mix: Dictionary = p.get("crowd", {})
+	mix = HistoryVisuals.adjust_crowd(mix, era_id, current_year)   # この世界の歴史（西洋化の早さ・戦争の帰趨）で装いが変わる
+	if mix.is_empty():
+		return -1
 	var total := 0.0
 	for k in mix:
 		total += float(mix[k])

@@ -94,8 +94,8 @@ func _stairs() -> void:
 func _bulkheads() -> void:
 	if sd.comps.size() < 2:
 		return
-	var wc := Color(0.86, 0.85, 0.8) if sd.steel else Color(0.6, 0.47, 0.33)
-	var mat := "plaster" if sd.steel else "wood"
+	var wc := Color(0.62, 0.64, 0.64) if sd.steel else Color(0.6, 0.47, 0.33)
+	var mat := "steel" if sd.steel else "wood"
 	var levels: Array = []
 	for y in sd.hull_levels:
 		if float(y) < sd.sim_fb - 0.5:
@@ -154,11 +154,12 @@ func _room(rm: Dictionary, idx: int) -> void:
 	var enclosed := bool(rm.get("enclosed", false))
 	var region := String(rm.get("region", "hull"))
 	var on_weather := absf(y - sd.top_m) < 0.3 and region == "hull"
-	var wc := sd.c("wall_in", Color(0.92, 0.9, 0.84) if sd.steel else Color(0.72, 0.56, 0.38))
+	# 鋼の船内は明るい鼠色の塗装（白い漆喰に見えないよう、時代の漆喰の色味が乗らない steel 材質）
+	var wc := sd.c("wall_in", Color(0.72, 0.74, 0.73) if sd.steel else Color(0.72, 0.56, 0.38))
 	var words := String(rm.get("words", ""))
 	if words.find("art deco") >= 0 or words.find("panel") >= 0 or words.find("carved") >= 0:
 		wc = Color(0.72, 0.52, 0.34)
-	var mat := "plaster" if sd.steel else "wood"
+	var mat := "steel" if sd.steel else "wood"
 	# 扉: 中心線（通路）側。中心の部屋は後ろ側
 	var door := {}
 	if enclosed:

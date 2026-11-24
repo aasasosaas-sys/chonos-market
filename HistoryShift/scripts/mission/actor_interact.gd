@@ -215,6 +215,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # ------------------------------------------------------------------ メニュー
 func open(f: Node3D) -> void:
+	Audio.play("ui_open", -4.0)
 	_menu_fig = f
 	_menu_fig.talking = true
 	_panel.visible = true

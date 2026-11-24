@@ -40,7 +40,8 @@ func smash(p: Vector3) -> void:
 	var wood := Color(0.62, 0.45, 0.3) if kind != "pot" else Color(0.7, 0.45, 0.32)
 	Effects.burst(get_tree(), p, Vector3.UP, wood, wood.darkened(0.4), 22, 6.0, 0.16, 1.0, 1.6, false, 110)
 	Effects.burst(get_tree(), p, Vector3.UP, Color(0.7, 0.64, 0.55, 0.7), Color(0.6, 0.58, 0.55, 0.0), 6, 1.5, 1.0, 1.2, -0.05, false, 80)
-	Sfx.play_at(get_tree(), Sfx.wood_break(), p, -6.0)
+	Audio.play_at("break_tiles" if kind == "pot" else "impact_plank", p, -4.0 if kind == "pot" else -2.0)
+	Audio.play_at("debris", p, -8.0)
 	Wanted.report(p, 0.02)
 	var d = Destruction.current
 	if d != null and is_instance_valid(d):

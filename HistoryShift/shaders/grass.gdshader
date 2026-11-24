@@ -107,7 +107,9 @@ void vertex() {
 	local.y *= 1.0 - gust * t * 0.18;
 	local *= keep;
 	VERTEX = vec3(pos.x, hgt - 0.03, pos.y) + local;
-	NORMAL = normalize(mix(n, NORMAL, 0.08));
+	// 手前の草は葉の向きも少し照明に効かせる（一枚ずつ明暗が付いて立体に見える）。遠くは地面の法線で滑らかに
+	vec3 bn = vec3(ca * NORMAL.x - sa * NORMAL.z, NORMAL.y, sa * NORMAL.x + ca * NORMAL.z);
+	NORMAL = normalize(mix(n, bn, mix(0.32, 0.06, smoothstep(4.0, 16.0, camd))));
 	v_t = t;
 	v_gust = gust;
 	// 花: 草むらの所々に白・桃・黄の花（先端だけ色を変える）
@@ -126,10 +128,15 @@ void vertex() {
 		float m2 = textureLod(noise_tex, pos * 0.011 + vec2(0.3, 0.6), 0.0).r;
 		vec3 g = mix(grass_a, grass_b, smoothstep(0.32, 0.68, m1));
 		g = mix(g, grass_c, smoothstep(0.52, 0.78, m2) * 0.65) * mix(0.92, 1.06, m1);
-		v_base = g * 0.92;
-		vec3 tc = mix(g * 1.12, tip_light, 0.4 + 0.25 * r2);
-		tc = mix(tc, dry_color, smoothstep(0.6, 0.9, patch2) * 0.35);
-		v_col = mix(tc, rice_color, field) * mix(0.92, 1.08, r1);
+		// 株ごとの濃淡（手前の草むらが一様な明るい黄緑の板にならないよう、株の塊で深い緑と明るい緑を描き分ける）
+		float clump = textureLod(noise_tex, pos * 0.21 + vec2(0.17, 0.53), 0.0).r;
+		float ck = smoothstep(0.3, 0.72, clump);
+		vec3 deep = g * vec3(0.62, 0.78, 0.66);
+		v_base = mix(deep * 0.78, g * 0.9, ck * 0.6);
+		vec3 tc = mix(g * 1.08, tip_light, (0.16 + 0.22 * r2) * mix(0.55, 1.0, ck));
+		tc = mix(tc, dry_color, smoothstep(0.6, 0.9, patch2) * 0.3);
+		tc = mix(deep * 1.05, tc, mix(0.55, 1.0, ck));
+		v_col = mix(tc, rice_color, field) * mix(0.9, 1.08, r1);
 	} else if (use_ground > 0.5) {
 		vec3 g = textureLod(alb_arr, vec3(pos * 0.24, L_GRASS), 3.0).rgb;
 		g = mix(g, g * vec3(0.72, 1.0, 0.5) * 1.15, 0.8) * ground_tint;
@@ -146,10 +153,16 @@ void fragment() {
 	c = mix(c, tip_light * 1.08 + 0.03, v_gust * smoothstep(0.45, 1.0, v_t) * 0.3);
 	// 花（先端の 30%）
 	c = mix(c, v_fcol, v_flower * smoothstep(0.68, 0.74, v_t));
+	// 根元ほど草むらの中の暗がり（株の奥は日が届かない）
+	c *= mix(0.72, 1.0, smoothstep(0.0, 0.55, v_t));
+	// 天気: 濡れた草は深い緑、雪は先端に積もる（積雪が深いほど根元まで白く）
+	c = weather_wet(c, 0.6, 0.5);
+	float sn = world_weather.y * smoothstep(min(1.0 - world_weather.y * 1.3, 0.97), 1.0, v_t + 0.25);
+	c = mix(c, vec3(0.9, 0.93, 1.0), clamp(sn, 0.0, 1.0));
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
 	SPECULAR = 0.1;
-	AO = mix(0.8, 1.0, v_t);
+	AO = mix(0.65, 1.0, v_t);
 }
 
 void light() {

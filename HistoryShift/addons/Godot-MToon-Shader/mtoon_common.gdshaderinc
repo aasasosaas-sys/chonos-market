@@ -378,9 +378,22 @@ void light() {
 			lightAttenuation = mix(1.0, lightAttenuation, 0.7);
 		}
 		vec4 hsShade = shade;
+		float hsWhite = 0.0;
+		if (_HsKind < 0.5) {
+			// 服: 白・淡色の布は影色も白いままでのっぺりする（パーカーが白い板に見えた）。
+			// 淡い布ほど影を寒色の灰紫に下げ、布のしわ（UV 上の縦長の揺らぎ）で明暗の境目を波打たせる
+			float litL = dot(lit.rgb, vec3(0.3, 0.59, 0.11));
+			hsWhite = smoothstep(0.55, 0.85, litL);
+			float shadeL = dot(shade.rgb, vec3(0.3, 0.59, 0.11));
+			vec3 coolShade = lit.rgb * vec3(0.64, 0.66, 0.8);
+			hsShade.rgb = mix(hsShade.rgb, min(hsShade.rgb, coolShade), hsWhite * smoothstep(0.45, 0.8, shadeL));
+			vec2 fuv = mainUv * vec2(26.0, 7.0);
+			float fold = sin(fuv.x + sin(fuv.y * 1.7) * 1.6) * 0.5 + sin(fuv.x * 2.3 - fuv.y * 0.9 + 1.3) * 0.3 + sin(fuv.y * 3.1 + fuv.x * 0.4) * 0.2;
+			hsDotNL += fold * 0.22 * mix(0.35, 1.0, hsWhite);
+		}
 		if (_HsKind < 1.5 || _HsKind > 3.5) {
 			// 服・髪の影: 背景の影と同じく空の色を少し帯びる
-			hsShade.rgb = mix(shade.rgb, shade.rgb * (world_sky_color.rgb * 0.6 + 0.55), 0.35);
+			hsShade.rgb = mix(hsShade.rgb, hsShade.rgb * (world_sky_color.rgb * 0.6 + 0.55), 0.35);
 		}
 		// shade
 		lighting = calculateLighting(mainUv, hsDotNL, lightAttenuation, hsShade, lit, LIGHT_COLOR, col, lightIntensity);
@@ -391,6 +404,8 @@ void light() {
 		} else if (_HsKind < 1.5) {
 			// 服・髪: 深い影の 3 段目（光の反対側だけ一段沈む）
 			col *= mix(0.86, 1.0, smoothstep(-0.65, -0.3, addDotNL));
+			// 淡い布: 日なたの中にも柔らかい中間調（丸みの階調）。日の正面ほど明るく、横を向くほど少し沈む
+			col *= mix(1.0, mix(0.9, 1.0, smoothstep(0.05, 0.75, hsDotNL)), hsWhite);
 		}
 
 		// base light does not darken.

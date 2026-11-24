@@ -89,7 +89,7 @@ func _consume(id: String) -> Array:
 		var hud = get_tree().get_first_node_in_group("hud")
 		if hud and hud.has_method("toast"):
 			hud.toast("%sを持っていない（店・蔵・倒した兵から、または工房で作れる）" % CraftDB.item_name(id), 2.2)
-		Sfx.play(get_tree(), Sfx.click(), -6.0)
+		Audio.play("ui_error", -4.0)
 		return [false, 0.0]
 	var q := Game.profile.stack_quality(id)
 	Game.profile.take(id, 1)
@@ -154,7 +154,7 @@ func select(i: int) -> void:
 			arms.cycle()   # もう一度 1 で持ち替え
 		return
 	current = i
-	Sfx.play(get_tree(), Sfx.click(), -8.0)
+	Audio.play("ui_switch", -2.0)
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("toast"):
 		hud.toast("%s を構えた　%s" % [tool_name(i), hint(i)], 2.0)
@@ -253,7 +253,7 @@ func throw_bomb(kind: String) -> ThrownBomb:
 	var rig = _player.get("rig")
 	if rig:
 		rig.set("aiming", true)
-	Sfx.play_at(get_tree(), Sfx.whoosh(), from, -4.0)
+	Audio.play_at("swing_spear", from, -2.0)
 	return ThrownBomb.spawn(get_tree(), kind, from, vel, 0)
 
 
@@ -265,6 +265,7 @@ func drop_keg() -> ThrownBomb:
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("toast"):
 		hud.toast("火薬樽を置いた！ 離れろ！", 2.0)
+	Audio.play_at("impact_plank", p, -2.0)
 	return ThrownBomb.spawn(get_tree(), "keg", p, Vector3.ZERO, 0)
 
 
@@ -279,7 +280,7 @@ func place_cannon() -> FieldCannon:
 	if w and w.has_method("height_at"):
 		p.y = w.height_at(p.x, p.z)
 	cannon = FieldCannon.place(get_tree(), p, atan2(-fwd.x, -fwd.z), modern())
-	Sfx.play_at(get_tree(), Sfx.hit(), p, -2.0)
+	Audio.play_at("break_metal" if modern() else "hull_hit_wood", p, -10.0)
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("toast"):
 		hud.toast("%sを据えた。照準して左クリックで砲撃！" % tool_name(3), 2.5)
@@ -302,6 +303,7 @@ func fire_hiya() -> Shell:
 	if cam and from.distance_to(target) < 2.0:
 		dir = cam.aim_dir()
 	Effects.burst(get_tree(), from, -dir, Color(1, 0.8, 0.4), Color(1, 0.3, 0.1), 16, 4.0, 0.3, 0.3, 0.0, true, 30)
-	Sfx.play_at(get_tree(), Sfx.whoosh(), from, 0.0)
+	Audio.play_at("gun_pan_flash", from, 0.0)
+	Audio.play_at("swing_heavy", from, -2.0)
 	Wanted.report(from, 0.05)
 	return Shell.fire(get_tree(), "hiya", from + dir * 0.8, dir * 48.0, 0)

@@ -49,6 +49,8 @@ godot --headless --path . -s tests/test_history.gd          # 因果エンジン
 godot --headless --path . res://tests/test_missions.tscn    # 全136ミッション（34問×4択）を自動プレイして完了できるか
 godot --headless --path . -s tests/test_flow.gd             # 画面遷移とセッションの一連の流れ
 godot --headless --path . -s tests/parse_all.gd             # 全スクリプトの構文チェック
+godot --headless --path . res://tests/test_audio.tscn       # 音：全 key の素材・足音の床材判定・再生経路
+godot --headless --path . res://tests/test_weather.tscn     # 天気：旧暦の換算・史実の天気の日・気候値・火縄銃の不発・濡れた足音・演出がヘッドレスで動くか
 ```
 
 ## クレジット
@@ -57,4 +59,5 @@ godot --headless --path . -s tests/parse_all.gd             # 全スクリプト
 - 人物モデル：MakeHuman / MPFB2 で自動生成（CC0）。再生成は `tools/make_humans.py`（Blender bpy + MPFB2）→ `tools/setup_retarget.gd`
 - アニメーション：KayKit Character Animations — Kay Lousberg（CC0、取り込み時に人型プロファイルへリターゲット）
 - フォント：Noto Sans JP / Noto Serif JP（SIL OFL 1.1）
+- 音：[Kenney](https://kenney.nl) の Impact / RPG / Interface / UI / Sci-fi Sounds（CC0）と、`tools/audio/` で合成した効果音・環境音・BGM（CC0）。一覧は `assets/audio/ASSET_CREDITS.txt`
 - エンジン：Godot Engine（MIT）

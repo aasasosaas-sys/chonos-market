@@ -14,6 +14,7 @@ var _turn := 0.0
 var _t := 0.0
 var _dead := false
 var _sound: AudioStreamPlayer3D
+var _oar_t := 0.0
 var modern := false
 
 
@@ -62,7 +63,7 @@ func _build(_seed: int) -> void:
 	seat.name = "Seat"
 	seat.position = Vector3(0, 0.55, 1.4)
 	add_child(seat)
-	_sound = Sfx.loop_player(self, Sfx.engine() if modern else Sfx.wind(), -10.0)
+	_sound = Audio.loop_at(self, "boat_motor_loop" if modern else "amb_lapping", -4.0 if modern else -6.0, {"unit": 8.0, "max_dist": 150.0})
 
 
 func get_speed() -> float: return absf(speed)
@@ -175,5 +176,11 @@ func _physics_process(dt: float) -> void:
 	global_position.z = clampf(global_position.z, -900.0, 900.0)
 	if driver != null and modern:
 		_sound.pitch_scale = lerpf(0.7, 1.6, clampf(absf(speed) / 12.0, 0.0, 1.0))
+	elif driver != null and absf(speed) > 0.6:
+		# 櫓・櫂を漕ぐ音
+		_oar_t -= dt
+		if _oar_t <= 0.0:
+			_oar_t = lerpf(1.6, 0.9, clampf(absf(speed) / 6.0, 0.0, 1.0))
+			Audio.play_at("oar_stroke", global_position + global_basis.z * 2.0, -2.0)
 	if absf(speed) > 1.5 and int(_t * 6.0) % 2 == 0:
 		Effects.burst(get_tree(), global_position + global_basis.z * 3.2 + Vector3(0, 0.1, 0), Vector3.UP, Color(0.95, 0.98, 1.0, 0.8), Color(0.8, 0.9, 1.0, 0.0), 2, 1.5, 0.5, 0.8, 0.3, false, 16)

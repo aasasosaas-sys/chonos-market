@@ -23,6 +23,10 @@ uniform float sunset_amount = 1.0;   // 低い太陽での夕焼けの強さ
 uniform float exposure = 1.0;
 uniform float sun_size = 1.0;
 uniform float night = 0.0;           // 1: 夜（月明かり時は太陽ライトを月として使うため明示）
+// 天気（scripts/world/weather_fx.gd）: 空一面の雲の層（曇天・雨・雪・嵐）。太陽・月・星を隠す
+uniform float overcast = 0.0;
+uniform vec3 storm_color : source_color = vec3(0.58, 0.61, 0.68);
+uniform float storm_dark = 0.0;      // 0..1 雲底の暗さ（雷雨・台風）
 
 float n2(vec2 p) {
 	return texture(noise_tex, p).r;
@@ -131,12 +135,26 @@ void sky() {
 		}
 	}
 	// 雲全体の明るさは昼夜と夕焼けで変化
+	// ---- 天気: 空一面の雲（雲底の濃淡は大きな筆ムラ、地平に近いほど明るい霞）
+	if (overcast > 0.001 && y > -0.06) {
+		vec2 p2 = d.xz / (max(y, 0.0) + 0.1) * 0.06 + vec2(cloud_seed * 0.7, 0.31);
+		float den3 = fbm(p2);
+		float den4 = fbm(p2 * 2.9 + vec2(0.37, 0.11));
+		float ridge = smoothstep(0.45, 0.62, den3 * 0.65 + den4 * 0.35);
+		vec3 base_c = mix(storm_color, storm_color * vec3(0.55, 0.57, 0.66), storm_dark);
+		vec3 deck = mix(base_c * 0.82, base_c * 1.12 + 0.04, ridge);
+		// 雲の切れ目の縁がほんのり明るい（アニメの雨雲の塗り）
+		deck += vec3(0.08, 0.08, 0.09) * smoothstep(0.62, 0.7, den4) * (1.0 - storm_dark);
+		deck = mix(deck, mix(haze, base_c, 0.55) * 1.05, (1.0 - smoothstep(0.0, 0.22, yu)) * 0.7);
+		deck = mix(deck * vec3(0.16, 0.18, 0.26), deck, day);
+		col = mix(col, deck, clamp(overcast, 0.0, 1.0));
+	}
 	// ---- 太陽本体
 	float disk = smoothstep(0.99955 - 0.0004 * sun_size, 0.99975 - 0.0004 * sun_size, mu);
-	col += sglow * disk * 2.5 * day;
+	col += sglow * disk * 2.5 * day * (1.0 - smoothstep(0.4, 0.8, overcast));
 	// ---- 夜の星（大小・色違い）・天の川・月（夜は太陽ライトを月として使う）
 	if (day < 0.99 && y > 0.0) {
-		float nk = (1.0 - day) * smoothstep(0.03, 0.25, y);
+		float nk = (1.0 - day) * smoothstep(0.03, 0.25, y) * (1.0 - overcast);
 		vec3 sd = floor(d * 380.0);
 		float h = fract(sin(dot(sd, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
 		float h2 = fract(h * 91.7);
@@ -157,7 +175,7 @@ void sky() {
 		if (night > 0.5) {
 			float md = smoothstep(0.99935, 0.99955, mu);
 			float mglow = pow(max(mu, 0.0), 300.0) * 0.5 + pow(max(mu, 0.0), 20.0) * 0.08;
-			col += vec3(1.0, 0.97, 0.88) * md * 2.2 + vec3(0.55, 0.65, 1.0) * mglow;
+			col += (vec3(1.0, 0.97, 0.88) * md * 2.2 + vec3(0.55, 0.65, 1.0) * mglow) * (1.0 - overcast * 0.9);
 		}
 	}
 	// 地平線より下: 霞〜地面色

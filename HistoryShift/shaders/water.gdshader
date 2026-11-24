@@ -4,6 +4,7 @@ shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley;
 
 #include "res://shaders/toon.gdshaderinc"
+global uniform vec4 world_wind;      // w = 雨の強さ（weather_fx.gd）：水面の雨の輪
 
 uniform sampler2D depth_tex : hint_depth_texture, filter_linear_mipmap;
 uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap;
@@ -128,7 +129,22 @@ void fragment() {
 	float cl = texture(noise_tex, rdir.xz / max(rdir.y + 0.15, 0.1) * 0.06 + vec2(t * 0.002, 0.0)).r;
 	refl = mix(refl, vec3(1.0, 1.0, 1.02) * (1.0 - world_night * 0.8), smoothstep(0.58, 0.7, cl) * 0.45);
 	refl *= 1.0 - world_night * 0.75;
+	// 天気: 厚い雲の日は映り込みも灰色、雨は水面に輪を描く
+	refl = mix(refl, vec3(0.52, 0.55, 0.6) * (1.0 - world_night * 0.75), world_weather.z * 0.75);
 	col = mix(col, refl, clamp(fres * 0.7 + far_k * 0.4, 0.0, 0.8));
+	if (world_wind.w > 0.02) {
+		float rings = 0.0;
+		for (int k = 0; k < 2; k++) {
+			vec2 g = v_wpos.xz * (1.1 + float(k) * 0.7) + vec2(float(k) * 7.3, 3.1);
+			vec2 id = floor(g);
+			float h = fract(sin(dot(id, vec2(127.1, 311.7))) * 43758.5453);
+			float h2 = fract(h * 17.31);
+			float tl = fract(t * (0.7 + h2 * 0.6) + h);
+			float r = length(fract(g) - 0.5 - (vec2(h, h2) - 0.5) * 0.5);
+			rings += smoothstep(0.035, 0.0, abs(r - tl * 0.45)) * (1.0 - tl) * step(h2, world_wind.w * 1.2);
+		}
+		col = mix(col, mix(refl, vec3(1.0), 0.4), clamp(rings, 0.0, 1.0) * 0.55 * (1.0 - smoothstep(25.0, 70.0, water_dist)));
+	}
 
 	// 岸の泡: 岸沿いのベタ帯＋少し沖の細い線（寄せては返す）
 	float fn = texture(noise_tex, v_wpos.xz * 0.12 + vec2(t * 0.03, 0.0)).r;
@@ -146,7 +162,7 @@ void fragment() {
 	// きらめき（細かいノイズのピーク）
 	float s1 = texture(noise_tex, v_wpos.xz * 0.9 + vec2(t * 0.11, -t * 0.07)).r;
 	float s2 = texture(noise_tex, v_wpos.xz * 1.3 - vec2(t * 0.09, t * 0.05)).r;
-	v_spark = step(0.84, s1 * s2 * 1.7) * sparkle * (1.0 - foam);
+	v_spark = step(0.84, s1 * s2 * 1.7) * sparkle * (1.0 - foam) * (1.0 - world_weather.z);
 
 	ALBEDO = mix(col, foam_color, foam);
 	ROUGHNESS = 0.4;

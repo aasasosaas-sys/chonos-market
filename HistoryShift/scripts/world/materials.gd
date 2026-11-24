@@ -172,9 +172,31 @@ static func get_mat(key: String) -> Material:
 				# 塗装/鋳鉄: ベタ塗り＋帯ハイライト
 				var sh := _building_mat("concrete", 0.5, 0.55, 0.75)
 				sh.set_shader_parameter("albedo_tex", null)
-				sh.set_shader_parameter("shine", 0.35)
-				sh.set_shader_parameter("sheen", 0.35)
+				sh.set_shader_parameter("shine", 0.3)
+				# 空の映り込みが強いと灰色の塗装が白く飛ぶ（軍艦が白く見えた）。映り込みは控えめに
+				sh.set_shader_parameter("sheen", 0.16)
+				sh.set_shader_parameter("albedo_mul", 0.9)
 				sh.set_shader_parameter("grime", 0.3)
+				m = sh
+			"steel":
+				# 鋼の船体・隔壁の軍艦色（鼠色）: 塗りムラ（漆喰の写真をごく薄く）・控えめの艶。時代の漆喰の色味は乗せない
+				var sh := _building_mat("plaster", 0.35, 0.6, 0.0)
+				sh.set_shader_parameter("detail", 0.18)
+				sh.set_shader_parameter("desat", 1.0)
+				sh.set_shader_parameter("albedo_mul", 0.78)
+				sh.set_shader_parameter("sat_boost", 1.0)
+				sh.set_shader_parameter("posterize", 0.0)
+				sh.set_shader_parameter("shine", 0.18)
+				sh.set_shader_parameter("sheen", 0.1)
+				sh.set_shader_parameter("grime", 0.45)
+				m = sh
+			"boards":
+				# 屋内の板の間: 板の継ぎ目は細い溝としてシェーダで描く（mat_kind 8。浮いた細板は稜線のハイライトで白い線になる）
+				var sh := _building_mat("wood", 0.5, 1.0, 0.0)
+				sh.set_shader_parameter("detail", 0.55)
+				sh.set_shader_parameter("posterize", 3.0)
+				sh.set_shader_parameter("mat_kind", 8.0)
+				sh.set_shader_parameter("sat_boost", 1.12)
 				m = sh
 			"gold":
 				var sh := _building_mat("plaster", 0.6, 0.35, 1.0)
@@ -268,6 +290,7 @@ static func set_era_look(style: Dictionary) -> void:
 		"concrete": style.get("plaster_tint", Color(0.97, 0.95, 0.91)),
 		"wood": style.get("wood_tint", Color(1, 1, 1)),
 		"darkwood": style.get("wood_tint", Color(1, 1, 1)),
+		"boards": style.get("wood_tint", Color(1, 1, 1)),
 		"rooftile": style.get("roof_tint", Color(1, 1, 1)),
 	}
 	for k in _era_look:

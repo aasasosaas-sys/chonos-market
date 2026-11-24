@@ -194,7 +194,7 @@ func _on_kill(_e) -> void:
 	hud.set_counter("撃破 %d / %d" % [_kills, _need])
 	if _kills >= _need:
 		hud.toast("撃破完了！")
-		Sfx.play(get_tree(), Sfx.pickup(), -2.0)
+		Audio.play("ui_confirm", -2.0)
 		_begin(idx + 1)
 
 

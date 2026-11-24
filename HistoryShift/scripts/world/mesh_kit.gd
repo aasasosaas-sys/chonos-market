@@ -420,6 +420,21 @@ func ridge_cap(xf: Transform3D, hw: float, hd: float, rise: float, gable_s: floa
 	box(mat, xf * Transform3D(Basis(), Vector3(0, rise + size * 0.35, 0)), Vector3(hx * 2.0 + size, size, size * 0.9), col)
 
 
+## 材質 from の面をすべて材質 to へ移す（鋼の船の上部構造の "metal" を軍艦色の "steel" にまとめるなど）
+func remap(from: String, to: String) -> void:
+	if not surf.has(from) or from == to:
+		return
+	sync_units()
+	var a: Array = surf[from]
+	var b := _s(to)
+	var base: int = b[0].size()
+	b[0].append_array(a[0]); b[1].append_array(a[1]); b[2].append_array(a[2]); b[3].append_array(a[3])
+	for i in (a[4] as PackedInt32Array):
+		b[4].append(i + base)
+	b[5].append_array(a[5])
+	surf.erase(from)
+
+
 ## 確定: ArrayMesh を作って MeshInstance3D を返す
 func commit(name := "Mesh", shadows := true) -> MeshInstance3D:
 	sync_units()

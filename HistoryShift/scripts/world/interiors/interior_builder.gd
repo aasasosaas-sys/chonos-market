@@ -17,6 +17,7 @@ var rng := RandomNumberGenerator.new()    # 配置用（dry でも同じ順に�
 var vrng := RandomNumberGenerator.new()   # 見た目の揺らぎ用（dry では使わない）
 var floors: Array = []
 var shell_floors := false   # 外殻が上階の床面・天井面を持つ（町家・天守）
+var surfaces: Array = []    # 足音の床材 [{r: Rect2(局所 xz), y, s: 仕上げ名}]（dry でも記録する。scripts/audio/surface.gd）
 
 
 func _init(d: Dictionary, p_dry := false) -> void:
@@ -319,6 +320,7 @@ func stairs(st: Dictionary, style := "wood", colr := Color(0.62, 0.46, 0.34)) ->
 # ================================================================ 床仕上げ
 ## style: tatami / boards / earth / stone / parquet / carpet / concrete / linoleum / tile / mat
 func finish(r: Rect2, y: float, style: String, colr := Color.WHITE, hole := Rect2(), kyo := false) -> void:
+	surfaces.append({"r": r, "y": y, "s": style})
 	if dry:
 		return
 	var yy := y + 0.012
@@ -326,13 +328,8 @@ func finish(r: Rect2, y: float, style: String, colr := Color.WHITE, hole := Rect
 		"tatami":
 			tatami(r, y, hole, kyo)
 		"boards":
-			hrect("wood", r, yy, colr if colr != Color.WHITE else Color(0.86, 0.72, 0.56), true, hole)
-			# 板目の筋
-			var n := int(r.size.x / 0.3)
-			for k in range(1, n):
-				var x := r.position.x + k * r.size.x / n
-				for q in rect_split(Rect2(x - 0.008, r.position.y, 0.016, r.size.y), hole):
-					hrect("flat", q, yy + 0.003, Color(0.42, 0.32, 0.24), true)
+			# 板の継ぎ目は "boards" のシェーダが描く（以前の浮いた細板は輪郭処理で白い線に光っていた）
+			hrect("boards", r, yy, colr if colr != Color.WHITE else Color(0.86, 0.72, 0.56), true, hole)
 		"earth":
 			hrect("earth", r, yy, colr if colr != Color.WHITE else Color(0.72, 0.6, 0.48), true, hole)
 		"stone":
@@ -363,6 +360,7 @@ func finish(r: Rect2, y: float, style: String, colr := Color.WHITE, hole := Rect
 
 ## 畳敷き（京間 0.955×1.91 / 江戸間 0.88×1.76）。縁（へり）付き。行ごとに向きを変える
 func tatami(r: Rect2, y: float, hole := Rect2(), kyo := false, heri := Color(0.16, 0.14, 0.12)) -> void:
+	surfaces.append({"r": r, "y": y, "s": "tatami"})
 	if dry:
 		return
 	var s := 0.955 if kyo else 0.88

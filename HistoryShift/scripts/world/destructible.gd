@@ -92,6 +92,8 @@ func setup(p_mgr: Destruction, p_def: Dictionary) -> void:
 		bs.size = sh[1]
 		cs.shape = bs
 		cs.transform = sh[0]
+		if (sh as Array).size() > 2:
+			cs.set_meta("surface", sh[2])   # 足音の床材
 		add_child(cs)
 		_shape_nodes.append(cs)
 	_compute_bounds()
@@ -200,7 +202,9 @@ func ram(speed: float, vel: Vector3, mass_k: float) -> void:
 			and (pl.vehicle as Node3D).global_position.distance_to(center()) < aabb.size.length() + 25.0:
 		cause = "player"
 		Destruction.note_player()
-	damage(dmg, center() - vel.normalized() * aabb.size.length() * 0.3, vel.normalized(), 0.0, cause)
+	var hp_pt := center() - vel.normalized() * aabb.size.length() * 0.3
+	Audio.play_at(Destruction.break_key(String(cfg["mat"])), hp_pt, clampf((speed - 10.0) * 0.4, -8.0, 2.0))
+	damage(dmg, hp_pt, vel.normalized(), 0.0, cause)
 
 
 ## 爆発（Destruction.blast から）

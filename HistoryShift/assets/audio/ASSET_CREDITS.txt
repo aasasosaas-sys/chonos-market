@@ -1,0 +1,598 @@
+JIDAI SHIFT - audio asset credits and licences
+============================================================
+
+Every file under assets/audio/ is either:
+  (a) derived from a Kenney audio pack - Creative Commons Zero (CC0 1.0)
+      https://creativecommons.org/publicdomain/zero/1.0/  (credit 'Kenney / www.kenney.nl' is optional),
+      decoded, trimmed, normalised, re-encoded and in some cases processed (e.g. running-footstep variants);
+  (b) synthesised procedurally by tools/audio/*.py (numpy/scipy, no recorded samples) for this project.
+      These synthesised sounds and the music are released under CC0 1.0 as well.
+
+Regenerate: python3 tools/audio/build.py --kenney <dir with the extracted Kenney packs>
+No freesound.org / OpenGameArt / Sonniss material is included.
+
+Kenney packs used:
+  - Kenney - Impact Sounds 1.0  <https://kenney.nl/assets/impact-sounds>  licence: CC0 1.0
+  - Kenney - RPG Audio 1.0  <https://kenney.nl/assets/rpg-audio>  licence: CC0 1.0
+  - Kenney - Interface Sounds 1.0  <https://kenney.nl/assets/interface-sounds>  licence: CC0 1.0
+  - Kenney - UI Audio 1.0  <https://kenney.nl/assets/ui-audio>  licence: CC0 1.0
+  - Kenney - Sci-fi Sounds 1.0  <https://kenney.nl/assets/sci-fi-sounds>  licence: CC0 1.0
+  - Kenney - Music Jingles 1.0  <https://kenney.nl/assets/music-jingles>  licence: CC0 1.0
+
+Per-file list (key: file <- source | licence | note)
+------------------------------------------------------------
+amb_battle_distant: assets/audio/ambience/amb_battle_distant.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Distant battle: war cries, drums, conch and scattered gunfire (sengoku field).
+amb_birds_day: assets/audio/ambience/amb_birds_day.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Distant forest birds bed (sparse, loopable).
+amb_cicada_summer: assets/audio/ambience/amb_cicada_summer.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Summer daytime cicadas (minmin + abura-zemi) in the trees.
+amb_city_traffic: assets/audio/ambience/amb_city_traffic.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | 2026 city street: road rumble, cars passing, distant crossing signal.
+amb_crowd_town: assets/audio/ambience/amb_crowd_town.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Town / market murmur: many distant voices, footsteps and wares (loop).
+amb_factory: assets/audio/ambience/amb_factory.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Meiji silk mill / ironworks: rhythmic machinery and belts.
+amb_frogs: assets/audio/ambience/amb_frogs.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Rice-paddy frogs chorus (kero kero).
+amb_higurashi: assets/audio/ambience/amb_higurashi.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Evening higurashi cicadas, distant and echoing.
+amb_lab: assets/audio/ambience/amb_lab.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | 2026 time lab: server fans, 50 Hz hum, the machine's slow pulsing drone.
+amb_lapping: assets/audio/ambience/amb_lapping.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Water lapping against a pier / hull (gentle).
+amb_night_insects: assets/audio/ambience/amb_night_insects.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Autumn night: suzumushi, korogi and a soft breeze.
+amb_rain_heavy: assets/audio/ambience/amb_rain_heavy.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Heavy downpour outdoors: dense roar, splashing, gutters overflowing (loop).
+amb_rain_light: assets/audio/ambience/amb_rain_light.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Light rain outdoors: soft hiss and sparse drops on leaves and earth (loop).
+amb_rain_roof_tin: assets/audio/ambience/amb_rain_roof_tin.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Rain on a corrugated tin / sheet-metal roof (Meiji-Showa sheds, steel ship decks): bright metallic pings.
+amb_rain_roof_wood: assets/audio/ambience/amb_rain_roof_wood.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Rain heard indoors under a tiled / board / thatched roof: muffled patter + drips from the eaves into puddles.
+amb_river: assets/audio/ambience/amb_river.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | River / stream babbling over stones (loop).
+amb_room_modern: assets/audio/ambience/amb_room_modern.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Brick / concrete building: soft ventilation and electrical hum.
+amb_room_wood: assets/audio/ambience/amb_room_wood.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Quiet wooden room tone with distant outdoor bleed and the odd creak.
+amb_sea_waves: assets/audio/ambience/amb_sea_waves.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Waves breaking on the shore with foam hiss (loop).
+amb_ship_steel: assets/audio/ambience/amb_ship_steel.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Steel warship interior: turbines, blowers, 60 Hz hum, distant machinery.
+amb_ship_wood: assets/audio/ambience/amb_ship_wood.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Wooden ship: hull and rigging creaks, water against the planks (loop).
+amb_snow_hush: assets/audio/ambience/amb_snow_hush.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Snowfall: an almost silent, muffled air with the soft hiss of flakes and an occasional clump falling from a branch.
+amb_storm_wind: assets/audio/ambience/amb_storm_wind.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Typhoon: howling wind with whistling through gaps, roaring gusts and lashing rain (loop).
+amb_wind_light: assets/audio/ambience/amb_wind_light.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Light breeze bed.
+amb_wind_strong: assets/audio/ambience/amb_wind_strong.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Strong gusting wind (mountain, open sea, heights).
+arrow_hit_wood: assets/audio/sfx/arrow_hit_wood_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Arrow thunks into wood and the shaft vibrates.
+arrow_hit_wood: assets/audio/sfx/arrow_hit_wood_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+arrow_hit_wood: assets/audio/sfx/arrow_hit_wood_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+arrow_whiz: assets/audio/sfx/arrow_whiz_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Arrow passing by.
+arrow_whiz: assets/audio/sfx/arrow_whiz_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+bell_impact: assets/audio/sfx/bell_impact_00.ogg <- Kenney - Impact Sounds 1.0: impactBell_heavy_000.ogg | CC0 1.0 (Kenney) | ship's bell / alarm bell strike
+bell_impact: assets/audio/sfx/bell_impact_01.ogg <- Kenney - Impact Sounds 1.0: impactBell_heavy_001.ogg | CC0 1.0 (Kenney)
+bell_impact: assets/audio/sfx/bell_impact_02.ogg <- Kenney - Impact Sounds 1.0: impactBell_heavy_002.ogg | CC0 1.0 (Kenney)
+bird_chirp: assets/audio/ambience/bird_chirp_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Small songbird phrases (sparrow / white-eye).
+bird_chirp: assets/audio/ambience/bird_chirp_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_chirp: assets/audio/ambience/bird_chirp_02.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_chirp: assets/audio/ambience/bird_chirp_03.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_chirp: assets/audio/ambience/bird_chirp_04.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_chirp: assets/audio/ambience/bird_chirp_05.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_crow: assets/audio/ambience/bird_crow_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Large-billed crow 'kaa kaa'.
+bird_crow: assets/audio/ambience/bird_crow_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_crow: assets/audio/ambience/bird_crow_02.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_gull: assets/audio/ambience/bird_gull_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Black-tailed gull (umineko) mewing near the sea.
+bird_gull: assets/audio/ambience/bird_gull_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_hiyodori: assets/audio/ambience/bird_hiyodori_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Brown-eared bulbul 'piii-yo' (harsh).
+bird_hiyodori: assets/audio/ambience/bird_hiyodori_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_kite: assets/audio/ambience/bird_kite_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Black kite (tobi) 'pii-hyororo' high above.
+bird_kite: assets/audio/ambience/bird_kite_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_owl: assets/audio/ambience/bird_owl_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Ural owl hoots at night.
+bird_owl: assets/audio/ambience/bird_owl_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_uguisu: assets/audio/ambience/bird_uguisu_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Japanese bush warbler 'hoo-hokekyo'.
+bird_uguisu: assets/audio/ambience/bird_uguisu_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+bird_uguisu: assets/audio/ambience/bird_uguisu_02.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+boat_motor_loop: assets/audio/sfx/boat_motor_loop.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Small launch / hot-bulb engine putt-putt (loop).
+body_fall: assets/audio/sfx/body_fall_00.ogg <- Kenney - Impact Sounds 1.0: impactSoft_heavy_000.ogg | CC0 1.0 (Kenney) | body falls
+body_fall: assets/audio/sfx/body_fall_01.ogg <- Kenney - Impact Sounds 1.0: impactSoft_heavy_001.ogg | CC0 1.0 (Kenney)
+body_fall: assets/audio/sfx/body_fall_02.ogg <- Kenney - Impact Sounds 1.0: impactSoft_heavy_002.ogg | CC0 1.0 (Kenney)
+body_fall: assets/audio/sfx/body_fall_03.ogg <- Kenney - Impact Sounds 1.0: impactSoft_heavy_003.ogg | CC0 1.0 (Kenney)
+book_close: assets/audio/sfx/book_close.ogg <- Kenney - RPG Audio 1.0: bookClose.ogg | CC0 1.0 (Kenney)
+book_open: assets/audio/sfx/book_open.ogg <- Kenney - RPG Audio 1.0: bookOpen.ogg | CC0 1.0 (Kenney)
+book_page: assets/audio/sfx/book_page_00.ogg <- Kenney - RPG Audio 1.0: bookFlip1.ogg | CC0 1.0 (Kenney) | page turn (exam / notes)
+book_page: assets/audio/sfx/book_page_01.ogg <- Kenney - RPG Audio 1.0: bookFlip2.ogg | CC0 1.0 (Kenney)
+book_page: assets/audio/sfx/book_page_02.ogg <- Kenney - RPG Audio 1.0: bookFlip3.ogg | CC0 1.0 (Kenney)
+bow_draw: assets/audio/sfx/bow_draw_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Bamboo bow creak while drawing.
+bow_draw: assets/audio/sfx/bow_draw_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+bow_release: assets/audio/sfx/bow_release_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Yumi string release: low twang + string slap + arrow whoosh.
+bow_release: assets/audio/sfx/bow_release_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+bow_release: assets/audio/sfx/bow_release_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_glass: assets/audio/sfx/break_glass_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Window glass shattering with tinkling shards.
+break_glass: assets/audio/sfx/break_glass_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_glass: assets/audio/sfx/break_glass_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_metal: assets/audio/sfx/break_metal_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Sheet metal / iron fitting smash and groan.
+break_metal: assets/audio/sfx/break_metal_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_metal: assets/audio/sfx/break_metal_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_plaster: assets/audio/sfx/break_plaster_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Plaster / mud-wall (shikkui, tsuchikabe) crumbling.
+break_plaster: assets/audio/sfx/break_plaster_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_plaster: assets/audio/sfx/break_plaster_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_stone: assets/audio/sfx/break_stone_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Stone blocks cracking and tumbling.
+break_stone: assets/audio/sfx/break_stone_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_stone: assets/audio/sfx/break_stone_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_tiles: assets/audio/sfx/break_tiles_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Kawara roof tiles sliding and clattering down.
+break_tiles: assets/audio/sfx/break_tiles_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_tiles: assets/audio/sfx/break_tiles_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_wood: assets/audio/sfx/break_wood_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Timber snapping and splintering.
+break_wood: assets/audio/sfx/break_wood_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_wood: assets/audio/sfx/break_wood_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+break_wood: assets/audio/sfx/break_wood_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+bullet_whiz: assets/audio/sfx/bullet_whiz_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Bullet passing close by.
+bullet_whiz: assets/audio/sfx/bullet_whiz_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+bullet_whiz: assets/audio/sfx/bullet_whiz_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+cannon_fire: assets/audio/sfx/cannon_fire_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Ozutsu / field gun / naval gun report: deep boom and rolling echo.
+cannon_fire: assets/audio/sfx/cannon_fire_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+cannon_fire: assets/audio/sfx/cannon_fire_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+car_crash: assets/audio/sfx/car_crash_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Vehicle collision: crunch of metal and glass.
+car_crash: assets/audio/sfx/car_crash_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+car_engine_loop: assets/audio/sfx/car_engine_loop.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Four-cylinder petrol engine at ~1500 rpm (pitch scaled in game).
+car_horn_modern: assets/audio/sfx/car_horn_modern.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Modern dual-tone car horn (2026 hub).
+car_horn_old: assets/audio/sfx/car_horn_old.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Bulb horn 'honk' (Meiji/Taisho/early Showa car).
+car_start: assets/audio/sfx/car_start.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Starter crank and the engine catching.
+chop: assets/audio/sfx/chop.ogg <- Kenney - RPG Audio 1.0: chop.ogg | CC0 1.0 (Kenney) | axe / chisel chop
+cloth: assets/audio/sfx/cloth_00.ogg <- Kenney - RPG Audio 1.0: cloth1.ogg | CC0 1.0 (Kenney) | clothes rustle
+cloth: assets/audio/sfx/cloth_01.ogg <- Kenney - RPG Audio 1.0: cloth2.ogg | CC0 1.0 (Kenney)
+cloth: assets/audio/sfx/cloth_02.ogg <- Kenney - RPG Audio 1.0: cloth3.ogg | CC0 1.0 (Kenney)
+cloth: assets/audio/sfx/cloth_03.ogg <- Kenney - RPG Audio 1.0: cloth4.ogg | CC0 1.0 (Kenney)
+collapse_building: assets/audio/sfx/collapse_building_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Whole building collapse: rumble, beams snapping, tiles, debris rain.
+collapse_building: assets/audio/sfx/collapse_building_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+collapse_small: assets/audio/sfx/collapse_small_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Wall section / shed collapse.
+collapse_small: assets/audio/sfx/collapse_small_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_bellows: assets/audio/sfx/craft_bellows_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Fuigo bellows pumping air into the forge.
+craft_bellows: assets/audio/sfx/craft_bellows_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_grind: assets/audio/sfx/craft_grind_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Grinding / mixing (yagen drug grinder, mortar).
+craft_grind: assets/audio/sfx/craft_grind_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_hammer: assets/audio/sfx/craft_hammer_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | hammer on hot steel / anvil (smithy)
+craft_hammer: assets/audio/sfx/craft_hammer_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_hammer: assets/audio/sfx/craft_hammer_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_hammer: assets/audio/sfx/craft_hammer_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_hammer_wood: assets/audio/sfx/craft_hammer_wood_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | mallet on wood / chisel (carpentry)
+craft_hammer_wood: assets/audio/sfx/craft_hammer_wood_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_hammer_wood: assets/audio/sfx/craft_hammer_wood_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_loom: assets/audio/sfx/craft_loom_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Loom batten beat and shuttle.
+craft_loom: assets/audio/sfx/craft_loom_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_plane: assets/audio/sfx/craft_plane_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Kanna (hand plane) shaving.
+craft_plane: assets/audio/sfx/craft_plane_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_quench: assets/audio/sfx/craft_quench.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Quenching hot steel in water (yaki-ire).
+craft_saw: assets/audio/sfx/craft_saw_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Japanese pull saw (nokogiri) strokes.
+craft_saw: assets/audio/sfx/craft_saw_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+craft_saw: assets/audio/sfx/craft_saw_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+creak_structure: assets/audio/sfx/creak_structure_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Damaged timber frame creaking.
+creak_structure: assets/audio/sfx/creak_structure_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+creak_structure: assets/audio/sfx/creak_structure_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+creak_wood: assets/audio/sfx/creak_wood_00.ogg <- Kenney - RPG Audio 1.0: creak1.ogg | CC0 1.0 (Kenney) | floorboard / hull creak
+creak_wood: assets/audio/sfx/creak_wood_01.ogg <- Kenney - RPG Audio 1.0: creak2.ogg | CC0 1.0 (Kenney)
+creak_wood: assets/audio/sfx/creak_wood_02.ogg <- Kenney - RPG Audio 1.0: creak3.ogg | CC0 1.0 (Kenney)
+debris: assets/audio/sfx/debris_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Small debris pieces falling.
+debris: assets/audio/sfx/debris_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+debris: assets/audio/sfx/debris_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+dog_bark: assets/audio/ambience/dog_bark_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Distant village dog barking.
+dog_bark: assets/audio/ambience/dog_bark_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+door_heavy_slide: assets/audio/sfx/door_heavy_slide.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | kura / warehouse heavy door
+door_modern_close: assets/audio/sfx/door_modern_close_00.ogg <- Kenney - Sci-fi Sounds 1.0: doorClose_000.ogg | CC0 1.0 (Kenney)
+door_modern_close: assets/audio/sfx/door_modern_close_01.ogg <- Kenney - Sci-fi Sounds 1.0: doorClose_001.ogg | CC0 1.0 (Kenney)
+door_modern_open: assets/audio/sfx/door_modern_open_00.ogg <- Kenney - Sci-fi Sounds 1.0: doorOpen_000.ogg | CC0 1.0 (Kenney) | lab sliding door
+door_modern_open: assets/audio/sfx/door_modern_open_01.ogg <- Kenney - Sci-fi Sounds 1.0: doorOpen_001.ogg | CC0 1.0 (Kenney)
+door_slide_close: assets/audio/sfx/door_slide_close_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | fusuma / shoji sliding shut with a soft knock
+door_slide_close: assets/audio/sfx/door_slide_close_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+door_slide_open: assets/audio/sfx/door_slide_open_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | fusuma / shoji sliding open
+door_slide_open: assets/audio/sfx/door_slide_open_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+door_wood_close: assets/audio/sfx/door_wood_close_00.ogg <- Kenney - RPG Audio 1.0: doorClose_1.ogg | CC0 1.0 (Kenney)
+door_wood_close: assets/audio/sfx/door_wood_close_01.ogg <- Kenney - RPG Audio 1.0: doorClose_2.ogg | CC0 1.0 (Kenney)
+door_wood_close: assets/audio/sfx/door_wood_close_02.ogg <- Kenney - RPG Audio 1.0: doorClose_3.ogg | CC0 1.0 (Kenney)
+door_wood_close: assets/audio/sfx/door_wood_close_03.ogg <- Kenney - RPG Audio 1.0: doorClose_4.ogg | CC0 1.0 (Kenney)
+door_wood_open: assets/audio/sfx/door_wood_open_00.ogg <- Kenney - RPG Audio 1.0: doorOpen_1.ogg | CC0 1.0 (Kenney) | hinged wooden door
+door_wood_open: assets/audio/sfx/door_wood_open_01.ogg <- Kenney - RPG Audio 1.0: doorOpen_2.ogg | CC0 1.0 (Kenney)
+explosion_large: assets/audio/sfx/explosion_large_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | barrel / dynamite / shell explosion
+explosion_large: assets/audio/sfx/explosion_large_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+explosion_large: assets/audio/sfx/explosion_large_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+explosion_small: assets/audio/sfx/explosion_small_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | horoku-dama / grenade
+explosion_small: assets/audio/sfx/explosion_small_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+explosion_small: assets/audio/sfx/explosion_small_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+fire_ignite: assets/audio/sfx/fire_ignite_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Fire catching: whoomp.
+fire_ignite: assets/audio/sfx/fire_ignite_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+fire_loop: assets/audio/sfx/fire_loop.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Burning wooden building: roar + crackle + pops (loop).
+fuse_loop: assets/audio/sfx/fuse_loop.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Burning fuse: fizzing sparkle (loop).
+gun_blackpowder_rifle: assets/audio/sfx/gun_blackpowder_rifle_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Murata rifle (black powder cartridge)
+gun_blackpowder_rifle: assets/audio/sfx/gun_blackpowder_rifle_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_blackpowder_rifle: assets/audio/sfx/gun_blackpowder_rifle_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_empty: assets/audio/sfx/gun_empty_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Dry click of an empty / failed gun.
+gun_empty: assets/audio/sfx/gun_empty_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_energy: assets/audio/sfx/gun_energy_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Time-gun (sci-fi) shot: pitch-falling FM zap with bright tail.
+gun_energy: assets/audio/sfx/gun_energy_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_energy: assets/audio/sfx/gun_energy_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_lmg: assets/audio/sfx/gun_lmg_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | light machine gun single round (short tail for bursts)
+gun_lmg: assets/audio/sfx/gun_lmg_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_lmg: assets/audio/sfx/gun_lmg_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_lmg: assets/audio/sfx/gun_lmg_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_matchlock: assets/audio/sfx/gun_matchlock_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | hinawaju matchlock: black powder boom with long rolling tail
+gun_matchlock: assets/audio/sfx/gun_matchlock_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_matchlock: assets/audio/sfx/gun_matchlock_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_pan_flash: assets/audio/sfx/gun_pan_flash_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Matchlock priming pan ignition fizz (the beat before the shot).
+gun_pan_flash: assets/audio/sfx/gun_pan_flash_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_pistol: assets/audio/sfx/gun_pistol_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | pistol
+gun_pistol: assets/audio/sfx/gun_pistol_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_pistol: assets/audio/sfx/gun_pistol_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_rifle: assets/audio/sfx/gun_rifle_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Type 38 rifle (smokeless): sharp crack
+gun_rifle: assets/audio/sfx/gun_rifle_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+gun_rifle: assets/audio/sfx/gun_rifle_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hansho: assets/audio/sfx/hansho.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Fire-watch alarm bell (hanshō) rapid strikes.
+hit_blade: assets/audio/sfx/hit_blade_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Blade strike on a body (armour/cloth): thud + slice.
+hit_blade: assets/audio/sfx/hit_blade_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hit_blade: assets/audio/sfx/hit_blade_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hit_blade: assets/audio/sfx/hit_blade_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hit_kick: assets/audio/sfx/hit_kick_00.ogg <- Kenney - Impact Sounds 1.0: impactPunch_heavy_000.ogg | CC0 1.0 (Kenney) | kick / heavy hit
+hit_kick: assets/audio/sfx/hit_kick_01.ogg <- Kenney - Impact Sounds 1.0: impactPunch_heavy_001.ogg | CC0 1.0 (Kenney)
+hit_kick: assets/audio/sfx/hit_kick_02.ogg <- Kenney - Impact Sounds 1.0: impactPunch_heavy_002.ogg | CC0 1.0 (Kenney)
+hit_kick: assets/audio/sfx/hit_kick_03.ogg <- Kenney - Impact Sounds 1.0: impactPunch_heavy_003.ogg | CC0 1.0 (Kenney)
+hit_kick: assets/audio/sfx/hit_kick_04.ogg <- Kenney - Impact Sounds 1.0: impactPunch_heavy_004.ogg | CC0 1.0 (Kenney)
+hit_punch: assets/audio/sfx/hit_punch_00.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_000.ogg | CC0 1.0 (Kenney) | fist hit
+hit_punch: assets/audio/sfx/hit_punch_01.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_001.ogg | CC0 1.0 (Kenney)
+hit_punch: assets/audio/sfx/hit_punch_02.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_002.ogg | CC0 1.0 (Kenney)
+hit_punch: assets/audio/sfx/hit_punch_03.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_003.ogg | CC0 1.0 (Kenney)
+hit_punch: assets/audio/sfx/hit_punch_04.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_004.ogg | CC0 1.0 (Kenney)
+hoof_dirt: assets/audio/footsteps/hoof_dirt_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | horse hoof on dirt
+hoof_dirt: assets/audio/footsteps/hoof_dirt_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_dirt: assets/audio/footsteps/hoof_dirt_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_dirt: assets/audio/footsteps/hoof_dirt_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_dirt: assets/audio/footsteps/hoof_dirt_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_grass: assets/audio/footsteps/hoof_grass_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | horse hoof on grass
+hoof_grass: assets/audio/footsteps/hoof_grass_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_grass: assets/audio/footsteps/hoof_grass_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_grass: assets/audio/footsteps/hoof_grass_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_grass: assets/audio/footsteps/hoof_grass_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_stone: assets/audio/footsteps/hoof_stone_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | horse hoof on stone
+hoof_stone: assets/audio/footsteps/hoof_stone_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_stone: assets/audio/footsteps/hoof_stone_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_stone: assets/audio/footsteps/hoof_stone_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_stone: assets/audio/footsteps/hoof_stone_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_wood: assets/audio/footsteps/hoof_wood_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | horse hoof on wood
+hoof_wood: assets/audio/footsteps/hoof_wood_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_wood: assets/audio/footsteps/hoof_wood_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_wood: assets/audio/footsteps/hoof_wood_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hoof_wood: assets/audio/footsteps/hoof_wood_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+horse_neigh: assets/audio/sfx/horse_neigh_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Horse whinny: vibrato harmonic source through nasal formants.
+horse_neigh: assets/audio/sfx/horse_neigh_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+horse_snort: assets/audio/sfx/horse_snort_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Horse snort / lip flutter.
+horse_snort: assets/audio/sfx/horse_snort_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+horse_snort: assets/audio/sfx/horse_snort_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hull_hit_steel: assets/audio/sfx/hull_hit_steel_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Shot / ram hitting a steel hull (deep clang).
+hull_hit_steel: assets/audio/sfx/hull_hit_steel_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hull_hit_steel: assets/audio/sfx/hull_hit_steel_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hull_hit_wood: assets/audio/sfx/hull_hit_wood_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Shot / ram hitting a wooden hull.
+hull_hit_wood: assets/audio/sfx/hull_hit_wood_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hull_hit_wood: assets/audio/sfx/hull_hit_wood_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+hurt_player: assets/audio/sfx/hurt_player_00.ogg <- Kenney - Impact Sounds 1.0: impactSoft_medium_000.ogg | CC0 1.0 (Kenney) | player takes damage
+hurt_player: assets/audio/sfx/hurt_player_01.ogg <- Kenney - Impact Sounds 1.0: impactSoft_medium_001.ogg | CC0 1.0 (Kenney)
+hurt_player: assets/audio/sfx/hurt_player_02.ogg <- Kenney - Impact Sounds 1.0: impactSoft_medium_002.ogg | CC0 1.0 (Kenney)
+hurt_player: assets/audio/sfx/hurt_player_03.ogg <- Kenney - Impact Sounds 1.0: impactSoft_medium_003.ogg | CC0 1.0 (Kenney)
+hyoshigi: assets/audio/sfx/hyoshigi.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Wooden clappers (Edo night watch / alert).
+impact_dirt: assets/audio/sfx/impact_dirt_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Bullet into earth: puff + grit.
+impact_dirt: assets/audio/sfx/impact_dirt_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+impact_dirt: assets/audio/sfx/impact_dirt_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+impact_dirt: assets/audio/sfx/impact_dirt_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+impact_flesh: assets/audio/sfx/impact_flesh_00.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_000.ogg | CC0 1.0 (Kenney) | hit on a body (muffled)
+impact_flesh: assets/audio/sfx/impact_flesh_01.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_001.ogg | CC0 1.0 (Kenney)
+impact_flesh: assets/audio/sfx/impact_flesh_02.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_002.ogg | CC0 1.0 (Kenney)
+impact_flesh: assets/audio/sfx/impact_flesh_03.ogg <- Kenney - Impact Sounds 1.0: impactPunch_medium_003.ogg | CC0 1.0 (Kenney)
+impact_glass: assets/audio/sfx/impact_glass_00.ogg <- Kenney - Impact Sounds 1.0: impactGlass_light_000.ogg | CC0 1.0 (Kenney) | glass hit
+impact_glass: assets/audio/sfx/impact_glass_01.ogg <- Kenney - Impact Sounds 1.0: impactGlass_light_001.ogg | CC0 1.0 (Kenney)
+impact_glass: assets/audio/sfx/impact_glass_02.ogg <- Kenney - Impact Sounds 1.0: impactGlass_light_002.ogg | CC0 1.0 (Kenney)
+impact_glass: assets/audio/sfx/impact_glass_03.ogg <- Kenney - Impact Sounds 1.0: impactGlass_light_003.ogg | CC0 1.0 (Kenney)
+impact_metal: assets/audio/sfx/impact_metal_00.ogg <- Kenney - Impact Sounds 1.0: impactMetal_light_000.ogg | CC0 1.0 (Kenney) | bullet on metal
+impact_metal: assets/audio/sfx/impact_metal_01.ogg <- Kenney - Impact Sounds 1.0: impactMetal_light_001.ogg | CC0 1.0 (Kenney)
+impact_metal: assets/audio/sfx/impact_metal_02.ogg <- Kenney - Impact Sounds 1.0: impactMetal_light_002.ogg | CC0 1.0 (Kenney)
+impact_metal: assets/audio/sfx/impact_metal_03.ogg <- Kenney - Impact Sounds 1.0: impactMetal_light_003.ogg | CC0 1.0 (Kenney)
+impact_metal: assets/audio/sfx/impact_metal_04.ogg <- Kenney - Impact Sounds 1.0: impactMetal_light_004.ogg | CC0 1.0 (Kenney)
+impact_plank: assets/audio/sfx/impact_plank_00.ogg <- Kenney - Impact Sounds 1.0: impactPlank_medium_000.ogg | CC0 1.0 (Kenney) | plank / wooden prop hit
+impact_plank: assets/audio/sfx/impact_plank_01.ogg <- Kenney - Impact Sounds 1.0: impactPlank_medium_001.ogg | CC0 1.0 (Kenney)
+impact_plank: assets/audio/sfx/impact_plank_02.ogg <- Kenney - Impact Sounds 1.0: impactPlank_medium_002.ogg | CC0 1.0 (Kenney)
+impact_plank: assets/audio/sfx/impact_plank_03.ogg <- Kenney - Impact Sounds 1.0: impactPlank_medium_003.ogg | CC0 1.0 (Kenney)
+impact_plank: assets/audio/sfx/impact_plank_04.ogg <- Kenney - Impact Sounds 1.0: impactPlank_medium_004.ogg | CC0 1.0 (Kenney)
+impact_stone: assets/audio/sfx/impact_stone_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Bullet on stone, some with a ricochet whine.
+impact_stone: assets/audio/sfx/impact_stone_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+impact_stone: assets/audio/sfx/impact_stone_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+impact_stone: assets/audio/sfx/impact_stone_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+impact_wood: assets/audio/sfx/impact_wood_00.ogg <- Kenney - Impact Sounds 1.0: impactWood_light_000.ogg | CC0 1.0 (Kenney) | bullet / blow on wood
+impact_wood: assets/audio/sfx/impact_wood_01.ogg <- Kenney - Impact Sounds 1.0: impactWood_light_001.ogg | CC0 1.0 (Kenney)
+impact_wood: assets/audio/sfx/impact_wood_02.ogg <- Kenney - Impact Sounds 1.0: impactWood_light_002.ogg | CC0 1.0 (Kenney)
+impact_wood: assets/audio/sfx/impact_wood_03.ogg <- Kenney - Impact Sounds 1.0: impactWood_light_003.ogg | CC0 1.0 (Kenney)
+impact_wood: assets/audio/sfx/impact_wood_04.ogg <- Kenney - Impact Sounds 1.0: impactWood_light_004.ogg | CC0 1.0 (Kenney)
+lab_beep: assets/audio/ambience/lab_beep_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Instrument beeps in the lab.
+lab_beep: assets/audio/ambience/lab_beep_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+lab_beep: assets/audio/ambience/lab_beep_02.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+land_hard: assets/audio/footsteps/land_hard_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | landing on stone/concrete
+land_hard: assets/audio/footsteps/land_hard_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_hard: assets/audio/footsteps/land_hard_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_metal: assets/audio/footsteps/land_metal_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | landing on steel deck
+land_metal: assets/audio/footsteps/land_metal_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_metal: assets/audio/footsteps/land_metal_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_soft: assets/audio/footsteps/land_soft_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | landing on earth/grass/sand
+land_soft: assets/audio/footsteps/land_soft_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_soft: assets/audio/footsteps/land_soft_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_tatami: assets/audio/footsteps/land_tatami_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | landing on tatami
+land_tatami: assets/audio/footsteps/land_tatami_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_tatami: assets/audio/footsteps/land_tatami_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_water: assets/audio/footsteps/land_water_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | landing in shallow water
+land_water: assets/audio/footsteps/land_water_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_water: assets/audio/footsteps/land_water_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_wood: assets/audio/footsteps/land_wood_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | landing on wooden floor
+land_wood: assets/audio/footsteps/land_wood_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+land_wood: assets/audio/footsteps/land_wood_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+latch: assets/audio/sfx/latch_00.ogg <- Kenney - RPG Audio 1.0: metalLatch.ogg | CC0 1.0 (Kenney) | latch / bolt / lock
+latch: assets/audio/sfx/latch_01.ogg <- Kenney - RPG Audio 1.0: metalClick.ogg | CC0 1.0 (Kenney)
+lever: assets/audio/sfx/lever_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Mechanical lever / switch clunk.
+lever: assets/audio/sfx/lever_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+music_edo: assets/audio/music/music_edo.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Edo: lively shamisen tune with tsuzumi and hyoshigi accents.
+music_heian: assets/audio/music/music_heian.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Heian: courtly koto arpeggios, biwa phrases and a soft sho pad (spring).
+music_hub: assets/audio/music/music_hub.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | 2026 time lab: lo-fi electric piano chords, soft beat and a koto motif.
+music_jomon: assets/audio/music/music_jomon.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Jomon/Kofun: frame drum, clay-flute phrases, wind drone.
+music_kamakura: assets/audio/music/music_kamakura.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Kamakura/Muromachi: zen shakuhachi over a sparse koto ostinato.
+music_meiji: assets/audio/music/music_meiji.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Meiji/Taisho: gentle piano waltz with music-box melody (yonanuki major).
+music_nara: assets/audio/music/music_nara.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Asuka/Nara: gagaku-like sho clusters, hichiriki line, kakko and taiko.
+music_sengoku: assets/audio/music/music_sengoku.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Sengoku: taiko ensemble groove, shime-daiko, shinobue melody.
+music_showa: assets/audio/music/music_showa.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Showa: nostalgic reed organ and piano, yonanuki minor (ryukoka feel).
+oar_stroke: assets/audio/sfx/oar_stroke_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Oar / scull (ro) stroke: wooden creak + water swirl.
+oar_stroke: assets/audio/sfx/oar_stroke_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+oar_stroke: assets/audio/sfx/oar_stroke_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+paper_place: assets/audio/sfx/paper_place_00.ogg <- Kenney - RPG Audio 1.0: bookPlace1.ogg | CC0 1.0 (Kenney)
+paper_place: assets/audio/sfx/paper_place_01.ogg <- Kenney - RPG Audio 1.0: bookPlace2.ogg | CC0 1.0 (Kenney)
+paper_place: assets/audio/sfx/paper_place_02.ogg <- Kenney - RPG Audio 1.0: bookPlace3.ogg | CC0 1.0 (Kenney)
+pickup_coins: assets/audio/sfx/pickup_coins_00.ogg <- Kenney - RPG Audio 1.0: handleCoins.ogg | CC0 1.0 (Kenney) | mon / coins picked up
+pickup_coins: assets/audio/sfx/pickup_coins_01.ogg <- Kenney - RPG Audio 1.0: handleCoins2.ogg | CC0 1.0 (Kenney)
+pickup_item: assets/audio/sfx/pickup_item_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Generic item picked up: cloth + soft knock.
+pickup_item: assets/audio/sfx/pickup_item_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+pickup_leather: assets/audio/sfx/pickup_leather_00.ogg <- Kenney - RPG Audio 1.0: handleSmallLeather.ogg | CC0 1.0 (Kenney) | bag / leather loot
+pickup_leather: assets/audio/sfx/pickup_leather_01.ogg <- Kenney - RPG Audio 1.0: handleSmallLeather2.ogg | CC0 1.0 (Kenney)
+pickup_leather: assets/audio/sfx/pickup_leather_02.ogg <- Kenney - RPG Audio 1.0: dropLeather.ogg | CC0 1.0 (Kenney)
+pickup_weapon: assets/audio/sfx/pickup_weapon_00.ogg <- Kenney - RPG Audio 1.0: beltHandle1.ogg | CC0 1.0 (Kenney) | weapon picked up
+pickup_weapon: assets/audio/sfx/pickup_weapon_01.ogg <- Kenney - RPG Audio 1.0: beltHandle2.ogg | CC0 1.0 (Kenney)
+pickup_weapon: assets/audio/sfx/pickup_weapon_02.ogg <- Kenney - RPG Audio 1.0: clothBelt.ogg | CC0 1.0 (Kenney)
+plane_engine_loop: assets/audio/sfx/plane_engine_loop.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Radial piston engine + three-blade propeller (loop).
+pot_metal: assets/audio/sfx/pot_metal_00.ogg <- Kenney - RPG Audio 1.0: metalPot1.ogg | CC0 1.0 (Kenney) | kettle / pot
+pot_metal: assets/audio/sfx/pot_metal_01.ogg <- Kenney - RPG Audio 1.0: metalPot2.ogg | CC0 1.0 (Kenney)
+pot_metal: assets/audio/sfx/pot_metal_02.ogg <- Kenney - RPG Audio 1.0: metalPot3.ogg | CC0 1.0 (Kenney)
+reload_bolt: assets/audio/sfx/reload_bolt_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Bolt action: up, back, (cartridge), forward, down.
+reload_bolt: assets/audio/sfx/reload_bolt_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+reload_energy: assets/audio/sfx/reload_energy.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Time-gun recharge whine.
+reload_matchlock: assets/audio/sfx/reload_matchlock_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Matchlock: powder pour, ball drop, ramrod strokes (karuka).
+reload_matchlock: assets/audio/sfx/reload_matchlock_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+reload_pistol: assets/audio/sfx/reload_pistol_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Pistol magazine out / in / slide.
+reload_pistol: assets/audio/sfx/reload_pistol_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+ricochet: assets/audio/sfx/ricochet_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Ricochet whine.
+ricochet: assets/audio/sfx/ricochet_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+ricochet: assets/audio/sfx/ricochet_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+rin: assets/audio/sfx/rin.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Small Buddhist rin bowl (craft finished / lesson passed).
+rocket_loop: assets/audio/sfx/rocket_loop.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Bo-hiya fire arrow rocket hiss/roar (loop).
+shell_whistle: assets/audio/sfx/shell_whistle_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Incoming shell / rocket whistle (pitch falling).
+shell_whistle: assets/audio/sfx/shell_whistle_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+ship_steam_loop: assets/audio/sfx/ship_steam_loop.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Reciprocating steam engine: chuffs and rod clanks (loop).
+ship_whistle: assets/audio/sfx/ship_whistle.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Steam whistle of a steamship (chord of organ-pipe tones).
+splash_big: assets/audio/sfx/splash_big_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Large splash (debris, person, shell).
+splash_big: assets/audio/sfx/splash_big_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+splash_small: assets/audio/sfx/splash_small_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Small object into water.
+splash_small: assets/audio/sfx/splash_small_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+splash_small: assets/audio/sfx/splash_small_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_carpet: assets/audio/footsteps/step_carpet_00.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_000.ogg | CC0 1.0 (Kenney) | footstep on carpet
+step_carpet: assets/audio/footsteps/step_carpet_01.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_001.ogg | CC0 1.0 (Kenney)
+step_carpet: assets/audio/footsteps/step_carpet_02.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_002.ogg | CC0 1.0 (Kenney)
+step_carpet: assets/audio/footsteps/step_carpet_03.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_003.ogg | CC0 1.0 (Kenney)
+step_carpet: assets/audio/footsteps/step_carpet_04.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_004.ogg | CC0 1.0 (Kenney)
+step_carpet_run: assets/audio/footsteps/step_carpet_run_00.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_000.ogg | CC0 1.0 (Kenney)
+step_carpet_run: assets/audio/footsteps/step_carpet_run_01.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_001.ogg | CC0 1.0 (Kenney)
+step_carpet_run: assets/audio/footsteps/step_carpet_run_02.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_002.ogg | CC0 1.0 (Kenney)
+step_carpet_run: assets/audio/footsteps/step_carpet_run_03.ogg <- Kenney - Impact Sounds 1.0: footstep_carpet_003.ogg | CC0 1.0 (Kenney)
+step_concrete: assets/audio/footsteps/step_concrete_00.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_000.ogg | CC0 1.0 (Kenney) | footstep on concrete
+step_concrete: assets/audio/footsteps/step_concrete_01.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_001.ogg | CC0 1.0 (Kenney)
+step_concrete: assets/audio/footsteps/step_concrete_02.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_002.ogg | CC0 1.0 (Kenney)
+step_concrete: assets/audio/footsteps/step_concrete_03.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_003.ogg | CC0 1.0 (Kenney)
+step_concrete: assets/audio/footsteps/step_concrete_04.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_004.ogg | CC0 1.0 (Kenney)
+step_concrete_run: assets/audio/footsteps/step_concrete_run_00.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_000.ogg | CC0 1.0 (Kenney)
+step_concrete_run: assets/audio/footsteps/step_concrete_run_01.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_001.ogg | CC0 1.0 (Kenney)
+step_concrete_run: assets/audio/footsteps/step_concrete_run_02.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_002.ogg | CC0 1.0 (Kenney)
+step_concrete_run: assets/audio/footsteps/step_concrete_run_03.ogg <- Kenney - Impact Sounds 1.0: footstep_concrete_003.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_00.ogg <- Kenney - RPG Audio 1.0: footstep00.ogg | CC0 1.0 (Kenney) | footstep on dirt/earth road
+step_dirt: assets/audio/footsteps/step_dirt_01.ogg <- Kenney - RPG Audio 1.0: footstep01.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_02.ogg <- Kenney - RPG Audio 1.0: footstep02.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_03.ogg <- Kenney - RPG Audio 1.0: footstep03.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_04.ogg <- Kenney - RPG Audio 1.0: footstep04.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_05.ogg <- Kenney - RPG Audio 1.0: footstep05.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_06.ogg <- Kenney - RPG Audio 1.0: footstep06.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_07.ogg <- Kenney - RPG Audio 1.0: footstep07.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_08.ogg <- Kenney - RPG Audio 1.0: footstep08.ogg | CC0 1.0 (Kenney)
+step_dirt: assets/audio/footsteps/step_dirt_09.ogg <- Kenney - RPG Audio 1.0: footstep09.ogg | CC0 1.0 (Kenney)
+step_dirt_run: assets/audio/footsteps/step_dirt_run_00.ogg <- Kenney - RPG Audio 1.0: footstep01.ogg | CC0 1.0 (Kenney)
+step_dirt_run: assets/audio/footsteps/step_dirt_run_01.ogg <- Kenney - RPG Audio 1.0: footstep03.ogg | CC0 1.0 (Kenney)
+step_dirt_run: assets/audio/footsteps/step_dirt_run_02.ogg <- Kenney - RPG Audio 1.0: footstep05.ogg | CC0 1.0 (Kenney)
+step_dirt_run: assets/audio/footsteps/step_dirt_run_03.ogg <- Kenney - RPG Audio 1.0: footstep07.ogg | CC0 1.0 (Kenney)
+step_grass: assets/audio/footsteps/step_grass_00.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_000.ogg | CC0 1.0 (Kenney) | footstep on grass
+step_grass: assets/audio/footsteps/step_grass_01.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_001.ogg | CC0 1.0 (Kenney)
+step_grass: assets/audio/footsteps/step_grass_02.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_002.ogg | CC0 1.0 (Kenney)
+step_grass: assets/audio/footsteps/step_grass_03.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_003.ogg | CC0 1.0 (Kenney)
+step_grass: assets/audio/footsteps/step_grass_04.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_004.ogg | CC0 1.0 (Kenney)
+step_grass_run: assets/audio/footsteps/step_grass_run_00.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_000.ogg | CC0 1.0 (Kenney)
+step_grass_run: assets/audio/footsteps/step_grass_run_01.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_001.ogg | CC0 1.0 (Kenney)
+step_grass_run: assets/audio/footsteps/step_grass_run_02.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_002.ogg | CC0 1.0 (Kenney)
+step_grass_run: assets/audio/footsteps/step_grass_run_03.ogg <- Kenney - Impact Sounds 1.0: footstep_grass_003.ogg | CC0 1.0 (Kenney)
+step_gravel: assets/audio/footsteps/step_gravel_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on gravel (walk), heel+toe synthesis
+step_gravel: assets/audio/footsteps/step_gravel_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_gravel: assets/audio/footsteps/step_gravel_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_gravel: assets/audio/footsteps/step_gravel_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_gravel: assets/audio/footsteps/step_gravel_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_gravel: assets/audio/footsteps/step_gravel_05.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_gravel_run: assets/audio/footsteps/step_gravel_run_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on gravel (run)
+step_gravel_run: assets/audio/footsteps/step_gravel_run_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_gravel_run: assets/audio/footsteps/step_gravel_run_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_gravel_run: assets/audio/footsteps/step_gravel_run_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal: assets/audio/footsteps/step_metal_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on metal (walk), heel+toe synthesis
+step_metal: assets/audio/footsteps/step_metal_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal: assets/audio/footsteps/step_metal_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal: assets/audio/footsteps/step_metal_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal: assets/audio/footsteps/step_metal_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal: assets/audio/footsteps/step_metal_05.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal_run: assets/audio/footsteps/step_metal_run_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on metal (run)
+step_metal_run: assets/audio/footsteps/step_metal_run_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal_run: assets/audio/footsteps/step_metal_run_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_metal_run: assets/audio/footsteps/step_metal_run_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud: assets/audio/footsteps/step_mud_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on mud (walk), heel+toe synthesis
+step_mud: assets/audio/footsteps/step_mud_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud: assets/audio/footsteps/step_mud_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud: assets/audio/footsteps/step_mud_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud: assets/audio/footsteps/step_mud_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud: assets/audio/footsteps/step_mud_05.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud_run: assets/audio/footsteps/step_mud_run_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on mud (run)
+step_mud_run: assets/audio/footsteps/step_mud_run_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud_run: assets/audio/footsteps/step_mud_run_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_mud_run: assets/audio/footsteps/step_mud_run_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand: assets/audio/footsteps/step_sand_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on sand (walk), heel+toe synthesis
+step_sand: assets/audio/footsteps/step_sand_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand: assets/audio/footsteps/step_sand_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand: assets/audio/footsteps/step_sand_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand: assets/audio/footsteps/step_sand_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand: assets/audio/footsteps/step_sand_05.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand_run: assets/audio/footsteps/step_sand_run_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on sand (run)
+step_sand_run: assets/audio/footsteps/step_sand_run_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand_run: assets/audio/footsteps/step_sand_run_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_sand_run: assets/audio/footsteps/step_sand_run_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_snow: assets/audio/footsteps/step_snow_00.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_000.ogg | CC0 1.0 (Kenney) | footstep on snow
+step_snow: assets/audio/footsteps/step_snow_01.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_001.ogg | CC0 1.0 (Kenney)
+step_snow: assets/audio/footsteps/step_snow_02.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_002.ogg | CC0 1.0 (Kenney)
+step_snow: assets/audio/footsteps/step_snow_03.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_003.ogg | CC0 1.0 (Kenney)
+step_snow: assets/audio/footsteps/step_snow_04.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_004.ogg | CC0 1.0 (Kenney)
+step_snow_run: assets/audio/footsteps/step_snow_run_00.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_000.ogg | CC0 1.0 (Kenney)
+step_snow_run: assets/audio/footsteps/step_snow_run_01.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_001.ogg | CC0 1.0 (Kenney)
+step_snow_run: assets/audio/footsteps/step_snow_run_02.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_002.ogg | CC0 1.0 (Kenney)
+step_snow_run: assets/audio/footsteps/step_snow_run_03.ogg <- Kenney - Impact Sounds 1.0: footstep_snow_003.ogg | CC0 1.0 (Kenney)
+step_stone: assets/audio/footsteps/step_stone_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on stone (walk), heel+toe synthesis
+step_stone: assets/audio/footsteps/step_stone_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_stone: assets/audio/footsteps/step_stone_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_stone: assets/audio/footsteps/step_stone_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_stone: assets/audio/footsteps/step_stone_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_stone: assets/audio/footsteps/step_stone_05.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_stone_run: assets/audio/footsteps/step_stone_run_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on stone (run)
+step_stone_run: assets/audio/footsteps/step_stone_run_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_stone_run: assets/audio/footsteps/step_stone_run_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_stone_run: assets/audio/footsteps/step_stone_run_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami: assets/audio/footsteps/step_tatami_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on tatami (walk), heel+toe synthesis
+step_tatami: assets/audio/footsteps/step_tatami_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami: assets/audio/footsteps/step_tatami_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami: assets/audio/footsteps/step_tatami_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami: assets/audio/footsteps/step_tatami_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami: assets/audio/footsteps/step_tatami_05.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami_run: assets/audio/footsteps/step_tatami_run_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on tatami (run)
+step_tatami_run: assets/audio/footsteps/step_tatami_run_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami_run: assets/audio/footsteps/step_tatami_run_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_tatami_run: assets/audio/footsteps/step_tatami_run_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water: assets/audio/footsteps/step_water_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on water (walk), heel+toe synthesis
+step_water: assets/audio/footsteps/step_water_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water: assets/audio/footsteps/step_water_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water: assets/audio/footsteps/step_water_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water: assets/audio/footsteps/step_water_04.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water: assets/audio/footsteps/step_water_05.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water_run: assets/audio/footsteps/step_water_run_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | footstep on water (run)
+step_water_run: assets/audio/footsteps/step_water_run_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water_run: assets/audio/footsteps/step_water_run_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_water_run: assets/audio/footsteps/step_water_run_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+step_wet: assets/audio/footsteps/step_wet_00.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | footstep on rain-wet stone / boards / paving (walk)
+step_wet: assets/audio/footsteps/step_wet_01.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet: assets/audio/footsteps/step_wet_02.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet: assets/audio/footsteps/step_wet_03.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet: assets/audio/footsteps/step_wet_04.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet: assets/audio/footsteps/step_wet_05.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass: assets/audio/footsteps/step_wet_grass_00.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | footstep in rain-soaked grass (walk)
+step_wet_grass: assets/audio/footsteps/step_wet_grass_01.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass: assets/audio/footsteps/step_wet_grass_02.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass: assets/audio/footsteps/step_wet_grass_03.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass: assets/audio/footsteps/step_wet_grass_04.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass: assets/audio/footsteps/step_wet_grass_05.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass_run: assets/audio/footsteps/step_wet_grass_run_00.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | footstep in rain-soaked grass (run)
+step_wet_grass_run: assets/audio/footsteps/step_wet_grass_run_01.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass_run: assets/audio/footsteps/step_wet_grass_run_02.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_grass_run: assets/audio/footsteps/step_wet_grass_run_03.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_run: assets/audio/footsteps/step_wet_run_00.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | footstep on rain-wet hard ground (run)
+step_wet_run: assets/audio/footsteps/step_wet_run_01.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_run: assets/audio/footsteps/step_wet_run_02.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wet_run: assets/audio/footsteps/step_wet_run_03.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+step_wood: assets/audio/footsteps/step_wood_00.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_000.ogg | CC0 1.0 (Kenney) | footstep on wood
+step_wood: assets/audio/footsteps/step_wood_01.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_001.ogg | CC0 1.0 (Kenney)
+step_wood: assets/audio/footsteps/step_wood_02.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_002.ogg | CC0 1.0 (Kenney)
+step_wood: assets/audio/footsteps/step_wood_03.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_003.ogg | CC0 1.0 (Kenney)
+step_wood: assets/audio/footsteps/step_wood_04.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_004.ogg | CC0 1.0 (Kenney)
+step_wood_run: assets/audio/footsteps/step_wood_run_00.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_000.ogg | CC0 1.0 (Kenney)
+step_wood_run: assets/audio/footsteps/step_wood_run_01.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_001.ogg | CC0 1.0 (Kenney)
+step_wood_run: assets/audio/footsteps/step_wood_run_02.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_002.ogg | CC0 1.0 (Kenney)
+step_wood_run: assets/audio/footsteps/step_wood_run_03.ogg <- Kenney - Impact Sounds 1.0: footstep_wood_003.ogg | CC0 1.0 (Kenney)
+stinger_fail: assets/audio/music/stinger_fail.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Mission failed: falling in-scale shamisen phrase + taiko.
+stinger_history: assets/audio/music/stinger_history.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | History changed: deep gong + shimmering bell cascade.
+stinger_success: assets/audio/music/stinger_success.ogg <- procedural synthesis (tools/audio/gen_music.py) | CC0 1.0 (original work for this project) | Mission success: rising koto arpeggio in yo scale + rin bell + low taiko.
+swim_stroke: assets/audio/sfx/swim_stroke_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Swimming stroke.
+swim_stroke: assets/audio/sfx/swim_stroke_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swim_stroke: assets/audio/sfx/swim_stroke_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_blade: assets/audio/sfx/swing_blade_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | katana / tachi swing
+swing_blade: assets/audio/sfx/swing_blade_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_blade: assets/audio/sfx/swing_blade_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_blade: assets/audio/sfx/swing_blade_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_fist: assets/audio/sfx/swing_fist_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | punch swing
+swing_fist: assets/audio/sfx/swing_fist_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_fist: assets/audio/sfx/swing_fist_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_heavy: assets/audio/sfx/swing_heavy_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | heavy two-handed swing
+swing_heavy: assets/audio/sfx/swing_heavy_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_spear: assets/audio/sfx/swing_spear_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | spear / naginata thrust
+swing_spear: assets/audio/sfx/swing_spear_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+swing_spear: assets/audio/sfx/swing_spear_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+sword_block: assets/audio/sfx/sword_block_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | blocked blow: dull
+sword_block: assets/audio/sfx/sword_block_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+sword_block: assets/audio/sfx/sword_block_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+sword_clash: assets/audio/sfx/sword_clash_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | blade on blade
+sword_clash: assets/audio/sfx/sword_clash_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+sword_clash: assets/audio/sfx/sword_clash_02.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+sword_clash: assets/audio/sfx/sword_clash_03.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+sword_draw: assets/audio/sfx/sword_draw_00.ogg <- Kenney - RPG Audio 1.0: drawKnife1.ogg | CC0 1.0 (Kenney) | drawing a blade from the saya
+sword_draw: assets/audio/sfx/sword_draw_01.ogg <- Kenney - RPG Audio 1.0: drawKnife2.ogg | CC0 1.0 (Kenney)
+sword_draw: assets/audio/sfx/sword_draw_02.ogg <- Kenney - RPG Audio 1.0: drawKnife3.ogg | CC0 1.0 (Kenney)
+sword_parry: assets/audio/sfx/sword_parry_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | successful parry: bright long ring
+sword_parry: assets/audio/sfx/sword_parry_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+temple_bell: assets/audio/ambience/temple_bell.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Bonshō temple bell: beam strike, deep hum with beating partials, long decay.
+thunder_far: assets/audio/sfx/thunder_far_00.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Distant thunder: low, soft rolling rumble without the crack.
+thunder_far: assets/audio/sfx/thunder_far_01.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+thunder_far: assets/audio/sfx/thunder_far_02.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+thunder_near: assets/audio/sfx/thunder_near_00.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | Close lightning strike: sharp crack then long rolling rumble.
+thunder_near: assets/audio/sfx/thunder_near_01.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+thunder_near: assets/audio/sfx/thunder_near_02.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+time_arrive: assets/audio/sfx/time_arrive.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Arrival in the past: reversed swell into a soft impact and chime.
+time_warp: assets/audio/sfx/time_warp.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Time-travel jump: long riser, swirling shimmer, final whoomp.
+tire_skid: assets/audio/sfx/tire_skid.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Tyre squeal on a dirt / paved road (loop).
+train_whistle: assets/audio/ambience/train_whistle.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Distant steam locomotive whistle (Meiji/Taisho/Showa railway).
+tree_fall: assets/audio/sfx/tree_fall_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Tree trunk breaks, crown swishes down, heavy thud.
+tree_fall: assets/audio/sfx/tree_fall_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+ui_back: assets/audio/ui/ui_back_00.ogg <- Kenney - Interface Sounds 1.0: back_001.ogg | CC0 1.0 (Kenney)
+ui_back: assets/audio/ui/ui_back_01.ogg <- Kenney - Interface Sounds 1.0: back_002.ogg | CC0 1.0 (Kenney)
+ui_click: assets/audio/ui/ui_click_00.ogg <- Kenney - Interface Sounds 1.0: click_001.ogg | CC0 1.0 (Kenney)
+ui_click: assets/audio/ui/ui_click_01.ogg <- Kenney - Interface Sounds 1.0: click_002.ogg | CC0 1.0 (Kenney)
+ui_click: assets/audio/ui/ui_click_02.ogg <- Kenney - Interface Sounds 1.0: click_003.ogg | CC0 1.0 (Kenney)
+ui_close: assets/audio/ui/ui_close_00.ogg <- Kenney - Interface Sounds 1.0: minimize_006.ogg | CC0 1.0 (Kenney)
+ui_close: assets/audio/ui/ui_close_01.ogg <- Kenney - Interface Sounds 1.0: close_002.ogg | CC0 1.0 (Kenney)
+ui_confirm: assets/audio/ui/ui_confirm_00.ogg <- Kenney - Interface Sounds 1.0: confirmation_001.ogg | CC0 1.0 (Kenney)
+ui_confirm: assets/audio/ui/ui_confirm_01.ogg <- Kenney - Interface Sounds 1.0: confirmation_002.ogg | CC0 1.0 (Kenney)
+ui_error: assets/audio/ui/ui_error_00.ogg <- Kenney - Interface Sounds 1.0: error_004.ogg | CC0 1.0 (Kenney)
+ui_error: assets/audio/ui/ui_error_01.ogg <- Kenney - Interface Sounds 1.0: error_006.ogg | CC0 1.0 (Kenney)
+ui_hover: assets/audio/ui/ui_hover_00.ogg <- Kenney - UI Audio 1.0: rollover1.ogg | CC0 1.0 (Kenney) | menu hover
+ui_hover: assets/audio/ui/ui_hover_01.ogg <- Kenney - UI Audio 1.0: rollover2.ogg | CC0 1.0 (Kenney)
+ui_hover: assets/audio/ui/ui_hover_02.ogg <- Kenney - UI Audio 1.0: rollover3.ogg | CC0 1.0 (Kenney)
+ui_mark: assets/audio/ui/ui_mark_00.ogg <- Kenney - Interface Sounds 1.0: scratch_001.ogg | CC0 1.0 (Kenney) | pencil mark on the answer sheet
+ui_mark: assets/audio/ui/ui_mark_01.ogg <- Kenney - Interface Sounds 1.0: scratch_002.ogg | CC0 1.0 (Kenney)
+ui_mark: assets/audio/ui/ui_mark_02.ogg <- Kenney - Interface Sounds 1.0: scratch_003.ogg | CC0 1.0 (Kenney)
+ui_mark: assets/audio/ui/ui_mark_03.ogg <- Kenney - Interface Sounds 1.0: scratch_004.ogg | CC0 1.0 (Kenney)
+ui_open: assets/audio/ui/ui_open_00.ogg <- Kenney - Interface Sounds 1.0: maximize_006.ogg | CC0 1.0 (Kenney)
+ui_open: assets/audio/ui/ui_open_01.ogg <- Kenney - Interface Sounds 1.0: open_002.ogg | CC0 1.0 (Kenney)
+ui_select: assets/audio/ui/ui_select_00.ogg <- Kenney - Interface Sounds 1.0: select_001.ogg | CC0 1.0 (Kenney)
+ui_select: assets/audio/ui/ui_select_01.ogg <- Kenney - Interface Sounds 1.0: select_002.ogg | CC0 1.0 (Kenney)
+ui_select: assets/audio/ui/ui_select_02.ogg <- Kenney - Interface Sounds 1.0: select_003.ogg | CC0 1.0 (Kenney)
+ui_switch: assets/audio/ui/ui_switch_00.ogg <- Kenney - UI Audio 1.0: switch2.ogg | CC0 1.0 (Kenney) | weapon / tool switch
+ui_switch: assets/audio/ui/ui_switch_01.ogg <- Kenney - UI Audio 1.0: switch3.ogg | CC0 1.0 (Kenney)
+ui_switch: assets/audio/ui/ui_switch_02.ogg <- Kenney - UI Audio 1.0: switch4.ogg | CC0 1.0 (Kenney)
+ui_tick: assets/audio/ui/ui_tick_00.ogg <- Kenney - Interface Sounds 1.0: tick_001.ogg | CC0 1.0 (Kenney)
+ui_tick: assets/audio/ui/ui_tick_01.ogg <- Kenney - Interface Sounds 1.0: tick_002.ogg | CC0 1.0 (Kenney)
+ui_toast: assets/audio/ui/ui_toast_00.ogg <- Kenney - Interface Sounds 1.0: pluck_001.ogg | CC0 1.0 (Kenney) | HUD notification
+ui_toast: assets/audio/ui/ui_toast_01.ogg <- Kenney - Interface Sounds 1.0: pluck_002.ogg | CC0 1.0 (Kenney)
+ui_toggle: assets/audio/ui/ui_toggle_00.ogg <- Kenney - Interface Sounds 1.0: toggle_001.ogg | CC0 1.0 (Kenney)
+ui_toggle: assets/audio/ui/ui_toggle_01.ogg <- Kenney - Interface Sounds 1.0: toggle_002.ogg | CC0 1.0 (Kenney)
+valve_turn: assets/audio/sfx/valve_turn_00.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project) | Steel valve wheel turning (ships).
+valve_turn: assets/audio/sfx/valve_turn_01.ogg <- procedural synthesis (tools/audio/gen_sfx.py) | CC0 1.0 (original work for this project)
+wind_chime: assets/audio/ambience/wind_chime_00.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project) | Furin glass wind chime (summer).
+wind_chime: assets/audio/ambience/wind_chime_01.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+wind_chime: assets/audio/ambience/wind_chime_02.ogg <- procedural synthesis (tools/audio/gen_amb.py) | CC0 1.0 (original work for this project)
+wind_gust: assets/audio/sfx/wind_gust_00.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project) | A single strong gust sweeping past (rising and falling roar with leaf rustle).
+wind_gust: assets/audio/sfx/wind_gust_01.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)
+wind_gust: assets/audio/sfx/wind_gust_02.ogg <- procedural synthesis (tools/audio/gen_weather.py) | CC0 1.0 (original work for this project)

@@ -179,6 +179,41 @@ EraWorld.interior_at(pos) -> int
 - 検査：`tests/test_timeline.tscn`（生没の外に出ない・船・ミッションの年・前の年に壊した建物・**手作りの道（揺らぎのルール・人物の動詞・予定・合戦・事業・各問題の「未来を語る」相手）が
   どこかの時点で必ず起こせる**）。写真：`tests/shot_timeline.gd -- edo 1615,1657,1853`。
 
+## 歴史の見た目（担当: world/ui）— `data/visuals/history_visuals.json`・`scripts/core/history_visuals.gd`・`scripts/world/history_dressing.gd`
+箱庭とハブは「その世界の歴史が、その時代のその年に史実とどれだけ違うか」で姿が変わる（ミッションごとの手作りはしない）。
+- 状態：`HistoryState.snapshots`（設問ごとの状態）から `HistoryVisuals.state_at(era, year)`、史実は `_simulate_war({}, [], [])` を一度だけ計算して比べる。
+- 軸（axes）：industry（tech・economy・commerce）/ west（open_west・education・tech）/ prosperity / military。軸×years_per_point = lead（史実より何年早いか。負は遅い）。
+- 規則（JSON）：features（史実で日本に現れた年 year・世界で可能になった年 earliest・史実でそこに実在したか real／min_lead）、absent（遅れた世界でまだ無いもの・swap で町家に）、
+  crowd（町人の装いの比率：`EraTimeline.crowd_outfit` → `HistoryVisuals.adjust_crowd`）、navy（国際的地位が史実より上 → 港に帆船の軍船／装甲艦／戦艦）、
+  war（昭和 1945 年以後：空襲の被害の倍率・本土決戦の追加の焼け跡・占領／講和／休戦／戦勝の看板と旗・装い）、capital（首都が別の町 → 都に高札・庁舎の看板）、present（2026 年の町）。
+- 生成：`Session.world_history(era, year)` が `{"ruins", "vis": HistoryVisuals.profile(...)}` を EraWorld に渡す。`WorldLayouts.build_all` の最後で `HistoryDressing.build(w, a)`
+  （製糸場・製鉄所・鉄道（狭軌の線路・停車場・機関車）・電信・ガス灯・アーク灯・港の艦隊・看板、町家⇔煉瓦の建て替え）。普通の破壊ユニットなので壊せる・燃える・入れる。
+  追加は元の建物の後ろの ID なので、元の ID は歴史によらず同じ。`TimelineWorld.apply` が `HistoryDressing.after`（建て替えの元・遅れてまだ無い建物を消す）と
+  `HistoryDressing.ruin_rules`（空襲の被害を戦争の帰趨で）を呼ぶ。hist に vis が無ければ従来どおり。煙は最大 4 本、看板は Label3D。
+- ハブ（2026年）：`Flow.show_hub` は `HubSession`（`scripts/mission/hub_session.gd`：`PresentWorld`＋Player）を出す。研究所の操作卓で E（または Esc）→ 採点ハブの画面
+  （問題の一覧・ブリーフィング・時代選択・自由探索）。画面右上「研究所を歩く」で戻る。採点直後（reveal）は一覧を先に出す。`Flow.use_hub_3d = false` で従来の 2D だけ。
+  `PresentWorld`（`scripts/world/present_world.gd`）：style modern / prewar / blocks / wood、lang ja_en / ja / ja_old（縦書き）、首都の名（駅・看板）、豊かさ（建物の高さ）、記念碑。
+- 検査：`godot --headless --path . res://tests/test_history_visuals.tscn`（状態を切り替えて箱庭・町人・ハブ・Flow が変わる）。
+  写真：`xvfb-run -a godot --rendering-driver vulkan --path . --resolution 1280x720 res://tests/shot_history_vis.tscn -- meiji showa edo hub`。
+
+## 音（担当: gameplay）— `scripts/audio/`・`assets/audio/`・`tools/audio/`
+- 素材: `assets/audio/{footsteps,sfx,ambience,music,ui}/*.ogg`（540 ファイル・203 key）。Kenney の CC0 パックを加工したもの＋`tools/audio/*.py`（numpy/scipy）で合成したもの。
+  一覧と出典は `assets/audio/ASSET_CREDITS.txt`。key の表は `scripts/audio/sound_manifest.gd`（生成物。`python3 tools/audio/build.py --kenney <dir>` で作り直す）。
+- `Audio`（ルート直下の AudioHub）: バス Master / Music / SFX / Ambience / Voice（設定画面の音量）。`Audio.play(key)` 2D、`Audio.play_at(key, pos)` 3D
+  （接頭辞ごとの距離減衰・ピッチ±と音量±の揺らぎ・key ごとの同時発音数・40 音のプールで遠く優先度の低いものから置きかえ・聞こえない距離は鳴らさない）、
+  `Audio.loop_at(host, key)` 乗り物・火・導火線、`Audio.music(key)` BGM のクロスフェード。屋内は Ambience をローパス、SFX に残響（`Audio.set_indoor`）。ヘッドレスでは鳴らさない。
+  旧 `Sfx` / `UISfx` は key を返す互換ラッパ。
+- 足音 `Footsteps`（Player・町人・兵・人物・Npc・馬の子）: 移動距離で一歩（速さで歩幅）、走り・着地・泳ぎ、馬は歩様（常歩・速歩・駈歩・襲歩）の蹄。
+  床材 `Surface.at(pos)`: 下向きのレイ → 形/ボディの meta "surface"（Architecture の土台・段、PresentWorld）／船（`Ship.surface_at`：木造は板、鋼船は上甲板の材・船内と上部構造は鋼）／
+  建物の中（`WorldInteriors.surface_at`：`InteriorBuilder.finish` が記録した畳・板・土間・石・リノリウム・絨毯）／破壊ユニットの材／地形（道・広場は時代の舗装、田は泥、岸は砂、急斜面は砂利、昭和の山頂は雪）。
+  足が水面より下なら水（海・川・`EraWorld.water_rects` の池・堀）。
+- 環境音 `AmbienceDirector`（Session・HubSession の子）: 時代の季節（鶯・蝉・ひぐらし・鈴虫）、海までの距離（波）・川・森・田（蛙）・町人の数（ざわめき）・合戦・高さ（強風）・屋内・船（木のきしみ／鋼の機関）、
+  一発の音（鳥・烏・鳶・鴎・梟・寺の鐘・犬・風鈴・拍子木・汽車と汽船の汽笛）、2026 年は研究所の機械音と往来。
+  天気（下の「天気」）: 小雨・大雨・屋内の屋根の雨（木造＝瓦・板・茅／洋館・昭和の建物・鋼船＝トタン）・台風のうなり・雪のしじま。雨と雪の間は鳥・虫を黙らせ、
+  雪はざわめきも吸う。雷は WeatherDirector が光ってから距離÷343 秒後に鳴らし、強風の日は突風（wind_gust）。
+  足音は `Footsteps.weather_surface`（屋外だけ）：濡れた石・板・舗装＝step_wet、濡れた草＝step_wet_grass、土＝泥、積雪＝雪（`Surface.WEATHER`）。
+- 検査: `godot --headless --path . res://tests/test_audio.tscn`（全 key の素材、コードが使う key の解決、床材の判定、Audio を有効にした再生経路の通し）。
+
 ## ルック（アニメ調の描画）— `shaders/`・`scripts/world/atmosphere.gd`・`era_styles.gd`
 - 時代ごとのプリセット（`EraStyles._anime`）: 太陽の色・高さ、影色 `shade_color`、空・雲、漆喰の色味 `plaster_tint`/`wood_tint`/`roof_tint`、低い霞 `haze_*`、
   カラーグレーディング `grade`（`WorldAtmosphere.grade_lut` が 32³ の 3D LUT を作り `Environment.adjustment_color_correction` に。夜は `grade_night`）。
@@ -191,3 +226,47 @@ EraWorld.interior_at(pos) -> int
 - 屋内: `WorldInteriors` がプレイヤーの出入りで `WorldAtmosphere.set_indoor` を 0→1 に補間（暖かい環境光・露出・灯りのにじみ）。
 - 人物（MToon）: `_HsKind`（`AnimeChar._tag_materials` が VRM 読み込み時に設定。1 髪＝天使の輪 / 2 肌＝血色の帯 / 3 顔＝影を柔らかく / 4 目）、全員にリムライト、服は影の 3 段目。
 - 被写界深度: `WorldAtmosphere.set_dof(world.env_nodes, 焦点距離)`（0 で無効）。検証は `tests/shot_visual.tscn -- <era> <tag> [shots]`。
+- 材質キー（`WorldMaterials.get_mat`）の追加: `boards`（屋内の板の間。継ぎ目・板ごとの濃淡はシェーダ `mat_kind` 8 が描く。細い板を浮かせると輪郭処理の稜線ハイライトで白線になる）、
+  `steel`（鋼船の船体・隔壁の軍艦色。空の映り込み控えめ）。屋内のガラス（`hs_indoor`）は外の景色（空・木立・地面）を描いた発光面で、白飛びしない。
+- 白い布（MToon の服 `_HsKind` 0）: 淡い布ほど影を寒色に下げ、UV 上のしわの揺らぎで明暗の境を波打たせる。
+- モーションキャプチャ（`assets/characters/mocap`）の腰の位置は `Humanoid._mocap_in_place` でその場・素体の腰の高さに直す（収録位置のずれで体が当たり判定から 1〜2m ずれていた）。
+  待機は KayKit の `Idle_A`（`Mocap_Stand` は実は歩きの一部）。
+- 自分で建てた施設（`Facility._build_visual`）は MeshKit＋建物シェーダ: 製糸場＝木骨煉瓦・瓦の切妻・越屋根（富岡製糸場）、機械工場＝鋸屋根、反射炉＝韮山の白い連双煙突、
+  高炉＝石積み、銀行＝列柱と破風など。検証は `tests/shot_vis2.tscn -- facilities|ships <era> <tag>`。
+
+## 天気（担当: world/gameplay）— `data/weather/`・`scripts/core/hist_weather.gd`・`scripts/core/kyureki.gd`・`scripts/world/weather_fx.gd`
+史実の天気を、記録が遡れる深さに応じた層で決める（「出来れば遡れるだけの時代の天気」）。
+- 日付: 時点ごとに事件の日（`data/weather/eras.json` の points：旧暦 `lunar` か西暦 `date`）。無い時点は時代の見た目の季節の代表日（season）。
+  旧暦は `Kyureki`（Meeus の朔・太陽黄経、ΔT、冬至を含む月が 11 月・中気の無い月が閏月、1844 年からは定気、それまでは平気。日本時間の真夜中で日を区切る）で換算する。
+  宣明暦（〜1684 年）は独自の定数のため 1 日ずれる月がある（ザビエル上陸 1549 年など）。表示は 1582 年 10 月 15 日より前がユリウス暦、季節の計算は先発グレゴリオ暦。
+- 層（`HistWeather.lookup(era, year, jd)`）:
+  1. 有名な日 `famous_days.json`：verdict（verified / documented / secondary / disputed / unverified）・basis・sources・HUD の一言 line・その日の移り変わり sequence。
+     unverified と `apply:false` は上書きしない（本能寺の変・憲法発布の日）。文永の役は「論争中・台風ではない冬の嵐」、赤穂浪士の夜は「論争中」と表示する。
+  2. 気候値 `regions.json`：地点（東京・鎌倉=横浜・京都・奈良・博多・名古屋・関ヶ原=岐阜）の月別の平年値（気象庁 1991〜2020 年：気温・降水量・降水日数・雪日数・雷・霧・台風の接近・梅雨入り/明け・風）。
+     その日の天気は地点と日付の決まった乱数（数日周期でつながる天気図＋その日の揺らぎ。分布は経験分布で一様化し、雨の日の割合を平年値に合わせる）。
+     前の 12 日から積雪と地面の濡れを持ち越す。気温が低いほど降水は雪になる。
+  3. 代理指標による補正 `eras.json` periods / anomalies：完新世の温暖期・古墳寒冷期・京都の桜の満開日（Aono & Kazui 2008）による 3 月の気温・小氷期・
+     東京の観測（1875 年〜）の都市化の分、飢饉の年（寛喜 1230〜31・天明 1783〜87・天保 1833〜38）の冷夏・長雨。昔ほど霧を増やす（fog_mult）。
+  時代の地点：縄文〜奈良＝奈良盆地、平安・戦国＝京、鎌倉室町＝鎌倉（1185・1274・1281・1371 は博多）、桶狭間＝名古屋、関ヶ原、江戸〜昭和＝東京。
+- 演出 `WeatherDirector`（Session の子、`HistWeather.live` に今の値を書く）: 目標へなめらかに移る（雨は十数秒・霧は数十秒）、雨の帯・突風の揺らぎ。
+  雨筋（カメラに付いてくる GPUParticles3D、`shaders/weather_drop.gdshader`：風で斜めに伸びたカメラ向きの帯）、足元の地面に水はねの輪。屋根・木で粒を止める
+  `GPUParticlesCollisionHeightField3D`＋当たった所のはね（サブエミッタ）は `WeatherDirector.roof_collision`（既定オフ：ソフトウェア Vulkan では高さの場が描かれず粒がすぐ消えたため。
+  GPU で確かめてから有効にする。写真は `WX_HF=1`）。雪片（乱流でゆらぐ）。屋内では粒を止める。霧＝環境の深度霧・高さ霧。空＝`anime_sky` の overcast（雲底の筆ムラ・太陽と星を隠す）。
+  稲光＝`world_weather.w` で `post_anime` が画面を照らす（空ほど強く）＋遠くの稲妻の帯。日差し＝`WorldAtmosphere.refresh_sun`（時刻 base_e × 天気 wx_e × 屋内 in_k）。
+  色調＝Environment の彩度・明るさ・コントラスト、`world_sky_color`・`world_sun_color` を灰色へ。海の波（wave_amp）を荒らす。風＝`world_wind`（草・葉の揺れ、w は雨の強さ）。
+- グローバルシェーダ変数 `world_weather`（x 地面の濡れ、y 積雪、z 厚い雲、w 稲光）。`toon.gdshaderinc` の `weather_wet`（吸う材ほど暗く深い色）・`weather_snow`（上を向いた面から白く）・
+  `weather_puddle`（平らな道・広場の水たまりが空を映す）を地形・建物（瓦は濡れて艶）・草（先端に雪）・葉が使う。水面に雨の輪（`water.gdshader`）。
+- ゲームへの影響（`HistWeather` の関数。値は控えめ）:
+  火縄銃の不発 +35%×雨（小雨で約 +10%・雪 +12%・強風で口薬が飛ぶ +4%、屋内は 0）。自分の火縄銃も敵の火縄銃も。薬莢の小銃・弓は影響なし
+  （根拠：火皿の口薬が湿ると点火が途切れる。火蓋・雨覆はその対策だが完全ではない＝国土交通省の多言語解説「火縄銃の仕組み」）。
+  敵の気づく距離 ×見通し（濃霧 0.38・大雨 0.7・雪 0.7・夜 0.8、下限 0.35。任務の標的は従来どおり）。馬の速さ（土の道は濡れで −13%、雪で −16%）・車のグリップ（雪道 −40%）。
+  船の揺れ（時化で縦揺れ ×3・横揺れ ×4、大きな船も揺れる）。飛行機の乱気流（Skills.plane_wobble に加算）。
+  歴史の結果には影響させない（史実の天気が出来事を決めた因果は、歴史モデルの中に既にある分だけ。新しい規則は足していない）。
+- HUD: 右上に天気の絵と「晴」「雨」「雪」「大雪」「雷雨」「台風」「霧」「降灰」「梅雨・雨」・地点・気温・風・出典の種類（史実の記録／後世の記録／記録（論争あり）／気候値／気候値＋代理指標）・
+  日付（明治 6 年より前は旧暦も）。有名な日に降り立つと「史実：この日は大雪だった（桜田門外の変）」のような一言。
+- 検査: `godot --headless --path . res://tests/test_weather.tscn`（旧暦の換算 20 例と往復・有名な日の上書き・上書きしない日・全時点の天気・気候値の妥当さ・
+  不発/見通し/ぬかるみ・足音の言いかえと素材・WeatherDirector/HUD/環境音/Session がヘッドレスで動く）。
+  写真: `xvfb-run -a godot --path . --rendering-driver vulkan --resolution 1280x720 res://tests/shot_weather.tscn -- edo:1860 sengoku:1600 kamakura_muromachi:1281 showa:1936:rain`。
+- 素材: `tools/audio/gen_weather.py`（合成・CC0）。`python3 tools/audio/build.py --kenney <dir> --only "amb_rain_*,thunder_*,wind_gust,step_wet*,amb_storm_wind,amb_snow_hush"`。
+- 調べられなかったこと: 気象庁の過去の気象データ（www.data.jma.go.jp）・山梨大学の歴史天候データベース（hwdb.yamanashi.ac.jp）・国立天文台の暦（eco.mtk.nao.ac.jp）は
+  この作業環境から接続できなかった。明治以後の日ごとの観測値・江戸の日記の日ごとの天気は取り込めておらず、有名な日と月別の平年値のみ。

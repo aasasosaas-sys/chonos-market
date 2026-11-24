@@ -63,6 +63,7 @@ var tree_defs: Array = []       # 倒せる木 [species, Transform3D, [MultiMesh
 var destruction: Destruction    # 破壊システム（ワールドごとに作り直し＝再入場でリセット）
 var interior_defs: Array = []   # 入れる建物（Architecture.reg_interior が登録。内装は WorldInteriors が近づいた時だけ生成）
 var interiors: WorldInteriors
+var water_rects: Array = []     # 池・堀の水面 [center, size, angle]（add_water_rect）
 ## 年（data/eras/<era>_timeline.json の時点・ミッションの年。0 = 年の指定なし＝従来の時代全体の姿）と、この世界の歴史
 ## （hist = {"ruins": あなたが前の年に壊した建物 …}。Session が HistoryState から渡す）。港の船・建物の有無・被災が年で変わる（TimelineWorld）
 var year := 0
@@ -253,17 +254,20 @@ func set_time_of_day(hours: float) -> void:
 		# 夜: 月明かり（青白い弱い光）として太陽ライトを流用
 		WorldAtmosphere.set_sun_dir(sun, az + 180.0, 35.0)
 		sun.light_color = Color(0.55, 0.65, 1.0)
-		sun.light_energy = 0.18
+		sun.set_meta("base_e", 0.18)
 		sun.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
 	else:
 		WorldAtmosphere.set_sun_dir(sun, az, elev)
 		var low := 1.0 - clampf(elev / 25.0, 0.0, 1.0)
 		sun.light_color = (style["sun_color"] as Color).lerp(style["sunset_color"], low * 0.6)
-		sun.light_energy = float(style["sun_energy"]) * 0.85 * lerpf(0.35, 1.0, day)
+		sun.set_meta("base_e", float(style["sun_energy"]) * 0.85 * lerpf(0.35, 1.0, day))
 		sun.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_AND_SKY
+	WorldAtmosphere.refresh_sun(sun)
 	sun.visible = true
 	env.ambient_light_energy = lerpf(0.14, float(style["ambient_energy"]), day)
 	env.fog_light_color = Color(0.1, 0.13, 0.24).lerp(style["aerial"], day)
+	env.set_meta("base_fog_col", env.fog_light_color)   # 天気（WeatherDirector）はこれを灰色へ寄せる
+	env.set_meta("base_amb", env.ambient_light_energy)
 	var sky_mat: ShaderMaterial = env_nodes.get("sky_mat")
 	if sky_mat:
 		sky_mat.set_shader_parameter("night", 1.0 if elev < -2.0 else 0.0)
@@ -567,6 +571,7 @@ func _river_mesh(noise_tex: Texture2D) -> MeshInstance3D:
 
 ## 池・堀などの局所水面（矩形）。y は水面高
 func add_water_rect(center: Vector3, size: Vector2, angle: float) -> void:
+	water_rects.append([center, size, angle])   # 足音（浅瀬）の判定用（scripts/audio/surface.gd）
 	var mi := MeshInstance3D.new()
 	mi.name = "Pond"
 	var pm := PlaneMesh.new()

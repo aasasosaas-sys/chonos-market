@@ -1,0 +1,51 @@
+name: Windows build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: 4.5.1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and export templates
+        run: |
+          base=https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable
+          curl -sSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 /usr/local/bin/godot
+          curl -sSL -o tpl.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          unzip -q tpl.tpz -d tpl && mv tpl/templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+
+      - name: Import assets
+        working-directory: HistoryShift
+        run: godot --headless --path . --import || true
+
+      - name: Export Windows
+        working-directory: HistoryShift
+        run: |
+          mkdir -p export/windows
+          godot --headless --path . --export-release "Windows Desktop" export/windows/JidaiShift.exe
+          test -s export/windows/JidaiShift.exe
+          cp assets/audio/ASSET_CREDITS.txt export/windows/ 2>/dev/null || true
+          cp addons/vrm/ASSET_CREDITS.txt export/windows/VRM_CREDITS.txt 2>/dev/null || true
+          cd export/windows && zip -q -9 ../../../JidaiShift-Windows.zip *
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('build-{0}', github.run_number) }}
+          name: JIDAI SHIFT ${{ github.ref_type == 'tag' && github.ref_name || format('build {0}', github.run_number) }}
+          prerelease: true
+          files: JidaiShift-Windows.zip
+          body: |
+            Windows版。zip を展開して JidaiShift.exe をダブルクリックで起動します。
+            「WindowsによってPCが保護されました」と出たら「詳細情報」→「実行」。

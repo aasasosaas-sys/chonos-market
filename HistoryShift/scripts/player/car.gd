@@ -13,6 +13,9 @@ var _wheel_pts: Array[Vector3] = [] # ローカル取付位置
 var _steer := 0.0
 var _spin := 0.0
 var _engine: AudioStreamPlayer3D
+var _skid: AudioStreamPlayer3D
+var _slip := 0.0
+var _crash_t := 0.0
 var _smoke_t := 0.0
 var _flip_t := 0.0
 var _dead := false
@@ -114,7 +117,8 @@ func _build(seed: int, era_id: String) -> void:
 	seat.name = "Seat"
 	seat.position = Vector3(-0.4, 0.35 if style != "classic" else 0.6, 0.1 if style != "truck" else -1.5)
 	add_child(seat)
-	_engine = Sfx.loop_player(self, Sfx.engine(), -6.0)
+	_engine = Audio.loop_at(self, "car_engine_loop", -2.0, {"unit": 8.0, "max_dist": 160.0})
+	_skid = Audio.loop_at(self, "tire_skid", -60.0, {"unit": 8.0, "max_dist": 120.0})
 	display_name = {"classic": "クラシックカー", "truck": "トラック", "sports": "スポーツカー"}.get(style, "自動車")
 
 
@@ -131,12 +135,16 @@ func get_velocity_vec() -> Vector3: return linear_velocity
 
 func enter(p) -> void:
 	driver = p
-	_engine.play()
+	if Audio.enabled:
+		Audio.play_at("car_start", global_position, 0.0)
+		_engine.play()
 
 
 func exit() -> void:
 	driver = null
 	_engine.stop()
+	_skid.stop()
+	Audio.play_at("door_wood_close", global_position, -6.0, {"pitch": 1.2})
 
 
 func exit_point() -> Vector3:
@@ -166,6 +174,7 @@ func _explode() -> void:
 				(mi as MeshInstance3D).material_override = Humanoid.mat(Color(0.06, 0.05, 0.05), 0.9)
 	remove_from_group("vehicle")
 	_engine.stop()
+	_skid.stop()
 	await get_tree().create_timer(20.0).timeout
 	if is_inside_tree():
 		queue_free()
@@ -181,6 +190,9 @@ func _on_body_entered(b: Node) -> void:
 		b.take_hit(v * 5.0, 0, b.global_position, linear_velocity.normalized())
 	elif b.has_method("panic"):
 		b.panic(global_position)
+	if Time.get_ticks_msec() / 1000.0 - _crash_t > 0.4:
+		_crash_t = Time.get_ticks_msec() / 1000.0
+		Audio.play_at("car_crash" if v > 12.0 else "impact_metal", global_position, clampf((v - 6.0) * 0.5 - 4.0, -8.0, 3.0))
 	if v > 14.0:
 		take_hit(v * 0.8, -1)
 		Effects.spark(get_tree(), global_position + linear_velocity.normalized() * 2.0, -linear_velocity.normalized())
@@ -238,7 +250,8 @@ func _physics_process(dt: float) -> void:
 		var wf := -wb.z
 		var wr := wb.x
 		var lat := pvel.dot(wr)
-		var grip := Skills.car_grip(lv) * (1.0 if not brake else 0.5)
+		_slip = maxf(_slip, absf(lat) + (absf(pvel.dot(wf)) * 0.3 if brake else 0.0))
+		var grip := Skills.car_grip(lv) * (1.0 if not brake else 0.5) * HistWeather.grip_mult(HistWeather.cur("wet"), HistWeather.cur("snow_cover"))
 		apply_force(-wr * lat * mass * 0.25 * grip / maxf(dt * 4.0, 0.016), mount - global_position)
 		if i >= 2:
 			var power := 9000.0 * (1.8 if boost else 1.0) * Skills.car_power_mult(lv)
@@ -270,7 +283,27 @@ func _physics_process(dt: float) -> void:
 	else:
 		_flip_t = 0.0
 	if driver != null:
-		_engine.pitch_scale = lerpf(0.6, 2.0, clampf(absf(fspeed) / 35.0, 0, 1)) + throttle * 0.1
+		# 変速の段ごとに回転数が上がって下がる（エンジン音のピッチ）
+		var sp := absf(fspeed)
+		var gears := [0.0, 7.0, 15.0, 24.0, 36.0, 60.0]
+		var g := 0
+		while g < gears.size() - 2 and sp > float(gears[g + 1]):
+			g += 1
+		var frac := clampf((sp - float(gears[g])) / (float(gears[g + 1]) - float(gears[g])), 0.0, 1.0)
+		var rpm := lerpf(0.75, 1.75, frac) * (1.0 + 0.05 * g) if sp > 0.5 else 0.6
+		_engine.pitch_scale = lerpf(_engine.pitch_scale, rpm + maxf(throttle, 0.0) * 0.12, 1.0 - exp(-dt * 6.0))
+		_engine.volume_db = float(_engine.get_meta("base_db", -2.0)) + (2.0 if absf(throttle) > 0.1 else -3.0)
+		if Input.is_action_just_pressed("horn") and not Game.input_blocked:
+			Audio.play_at("car_horn_old", global_position, 0.0)
+		# 横滑り・急ブレーキ：タイヤのきしみ
+		var want_skid := grounded > 0 and _slip > 4.5 and sp > 4.0
+		if want_skid and Audio.enabled:
+			if not _skid.playing:
+				_skid.play()
+			_skid.volume_db = lerpf(-14.0, 0.0, clampf((_slip - 4.5) / 6.0, 0.0, 1.0))
+		elif _skid.playing:
+			_skid.stop()
+	_slip = 0.0
 	if hp < 70.0 and not _dead:
 		_smoke_t -= dt
 		if _smoke_t <= 0.0:

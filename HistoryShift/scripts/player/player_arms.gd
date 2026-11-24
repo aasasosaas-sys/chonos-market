@@ -153,6 +153,9 @@ func _announce() -> void:
 		var hint: String = {"fists": "左クリック:殴る　長押し:蹴る", "melee": "左クリック:斬る　長押し:強く斬る　右クリック:受け",
 			"bow": "長押しで引いて離す", "gun": "左クリック:撃つ　R:装填"}.get(kind(), "")
 		hud.toast("%s を手にした　%s" % [weapon_name(), hint], 2.0)
+	if player and player.is_inside_tree():
+		var k := kind()
+		Audio.play_at("sword_draw" if k == "melee" else ("pickup_weapon" if k in ["gun", "bow"] else "cloth"), player.global_position + Vector3.UP * 1.2, -2.0)
 	refresh_model()
 
 
@@ -245,7 +248,25 @@ func swing(heavy: bool) -> void:
 	var rig = player.get("rig")
 	if rig:
 		rig.set("aiming", true)
-	Sfx.play_at(get_tree(), Sfx.whoosh(), player.global_position + Vector3.UP * 1.3, -6.0 if not heavy else -2.0)
+	Audio.play_at(swing_key(heavy), player.global_position + Vector3.UP * 1.3, 0.0 if not heavy else 2.0)
+
+
+## 振りの音：素手・槍・刀（強い振りは重い風切り）
+func swing_key(heavy: bool) -> String:
+	if kind() == "fists":
+		return "swing_fist"
+	if heavy:
+		return "swing_heavy"
+	return "swing_spear" if skill_id() == "sojutsu" else "swing_blade"
+
+
+## 当たった音：拳・蹴り・刃（十手は打撃）
+func hit_key(heavy: bool) -> String:
+	if kind() == "fists":
+		return "hit_kick" if heavy else "hit_punch"
+	if current_id() == "jutte":
+		return "hit_punch"
+	return "hit_blade"
 
 
 func _facing() -> Vector3:
@@ -287,7 +308,7 @@ func _do_swing_hit() -> void:
 		if to.length() > 0.3 and fwd.angle_to(to.normalized()) > deg_to_rad(75.0):
 			continue
 		var target: Node = Effects.find_target(col as Node)
-		Player.apply_hit(get_tree(), {"collider": col, "position": tp, "normal": -fwd}, fwd, dmg, Player.TEAM)
+		Player.apply_hit(get_tree(), {"collider": col, "position": tp, "normal": -fwd}, fwd, dmg, Player.TEAM, false)
 		if target and target.has_method("is_enemy"):
 			hits += 1
 			if (heavy or fists) and target is CharacterBody3D:
@@ -297,7 +318,7 @@ func _do_swing_hit() -> void:
 		if col is RigidBody3D:
 			(col as RigidBody3D).apply_impulse(fwd * (9.0 if heavy else 4.0))
 	if hits > 0:
-		Sfx.play_at(get_tree(), Sfx.hit(), origin + fwd, 0.0)
+		Audio.play_at(hit_key(heavy), origin + fwd, 2.0 if heavy else 0.0)
 		Effects.shake = maxf(Effects.shake, 0.18 if heavy else 0.08)
 		_hit_stop(0.05 if heavy else 0.03)
 		prof().practice(skill_id(), 0.35 * hits)
@@ -369,7 +390,7 @@ func filter_damage(amount: float, _dir: Vector3) -> float:
 		for e in get_tree().get_nodes_in_group("enemy"):
 			if is_instance_valid(e) and not e.get("dead") and (e as Node3D).global_position.distance_to(player.global_position) < 3.5 and e.has_method("stagger"):
 				e.stagger(1.4)
-		Sfx.play_at(get_tree(), Sfx.hit(), player.global_position + Vector3.UP * 1.4, 2.0)
+		Audio.play_at("sword_parry", player.global_position + Vector3.UP * 1.4, 0.0)
 		Effects.spark(get_tree(), player.global_position + Vector3.UP * 1.4 + _facing() * 0.6, -_facing(), Color(1, 0.95, 0.7))
 		var hud = get_tree().get_first_node_in_group("hud")
 		if hud:
@@ -382,6 +403,7 @@ func filter_damage(amount: float, _dir: Vector3) -> float:
 		red *= 0.5
 	_wear(amount * 0.05)
 	prof().practice(skill_id(), 0.08)
+	Audio.play_at("sword_block" if kind() == "melee" else "hit_punch", player.global_position + Vector3.UP * 1.3, -2.0)
 	return amount * (1.0 - red)
 
 
@@ -392,6 +414,7 @@ func _tick_bow(t: float, _dt: float) -> void:
 	var full := float(st.get("draw", 0.7)) * Skills.bow_draw_mult(lv)
 	if Input.is_action_just_pressed("fire") and t >= _busy_until and reserve() > 0:
 		_charge = t
+		Audio.play_at("bow_draw", player.global_position + Vector3.UP * 1.4, -2.0)
 	elif Input.is_action_just_pressed("fire") and reserve() <= 0:
 		_no_ammo()
 	if _charge >= 0.0:
@@ -434,13 +457,40 @@ func shoot_arrow(frac: float) -> void:
 	var spd := float(st.get("arrow_speed", 45.0)) * Skills.bow_power_mult(lv) * lerpf(0.5, 1.0, frac)
 	var dmg := float(st.get("damage", 20.0)) * Skills.bow_power_mult(lv) * lerpf(0.4, 1.0, frac) * (0.8 + 0.4 * prof().stack_quality("ya"))
 	Arrow.fire(get_tree(), from, dir * spd, dmg)
-	Sfx.play_at(get_tree(), Sfx.bow(), from, -2.0)
+	Audio.play_at("bow_release", from, lerpf(-6.0, 0.0, frac))
 	prof().practice("kyujutsu", 0.06)
 	_wear(0.3)
 	Wanted.report(player.global_position, 0.015)
 
 
 # ------------------------------------------------------------------ 銃
+## 銃声（品ごと）: 火縄銃 / 村田銃（黒色火薬）/ 三八式 / 拳銃 / 軽機関銃 / 時空銃
+static func gun_key(id: String) -> String:
+	match id:
+		"hinawaju":
+			return "gun_matchlock"
+		"murataju":
+			return "gun_blackpowder_rifle"
+		"pistol14":
+			return "gun_pistol"
+		"lmg96":
+			return "gun_lmg"
+		"jikuju":
+			return "gun_energy"
+	return "gun_rifle"
+
+
+func reload_key() -> String:
+	match current_id():
+		"hinawaju":
+			return "reload_matchlock"
+		"pistol14":
+			return "reload_pistol"
+		"jikuju":
+			return "reload_energy"
+	return "reload_bolt"
+
+
 func _tick_gun(t: float) -> void:
 	var b := base()
 	var st := stats()
@@ -475,12 +525,15 @@ func _tick_gun(t: float) -> void:
 		misfire *= 1.0 + 2.0 * (1.0 - dr)
 	if ammo_id() != "":
 		misfire += (1.0 - prof().stack_quality(ammo_id())) * 0.04
+	# 天気：雨・雪は火縄銃の火皿の口薬と火縄を湿らせる（HistWeather.matchlock_misfire_add）
+	misfire += HistWeather.misfire_add_now(current_id())
 	if randf() < misfire:
 		_misfire()
 		return
 	if current_id() == "hinawaju":
 		# 火縄が火皿の口薬に落ち、火が回るまで一拍
 		_hang_fire = t + 0.18
+		Audio.play_at("gun_pan_flash", _muzzle_pos(), 0.0)
 		Effects.burst(get_tree(), _muzzle_pos(), Vector3.UP, Color(1, 0.9, 0.6), Color(0.6, 0.6, 0.6), 6, 1.5, 0.3, 0.6, 0.0, true, 40)
 		return
 	_discharge()
@@ -493,6 +546,7 @@ func start_reload() -> void:
 	reloading = true
 	var t := float(stats().get("reload", 2.0)) * Skills.reload_mult(skill_level())
 	_reload_end = _now() + t
+	Audio.play_at(reload_key(), player.global_position + Vector3.UP * 1.3, -2.0, {"pitch": clampf(2.0 / maxf(t, 0.5), 0.8, 1.25)})
 	if current_id() == "hinawaju":
 		var hud = get_tree().get_first_node_in_group("hud")
 		if hud and randf() < 0.3:
@@ -517,14 +571,16 @@ func _finish_reload() -> void:
 
 func _misfire() -> void:
 	var w := current()
-	Sfx.play_at(get_tree(), Sfx.click(), player.global_position + Vector3.UP * 1.4, 0.0)
+	Audio.play_at("gun_empty", player.global_position + Vector3.UP * 1.4, 0.0)
+	if current_id() == "hinawaju":
+		Audio.play_at("gun_pan_flash", _muzzle_pos(), -2.0)
 	var hud = get_tree().get_first_node_in_group("hud")
 	if current_id() == "hinawaju":
 		# 火皿の口薬だけ燃えて弾が出ない（火皿の火）
 		Effects.burst(get_tree(), _muzzle_pos(), Vector3.UP, Color(0.9, 0.9, 0.9, 0.7), Color(0.5, 0.5, 0.5), 10, 1.2, 0.8, 1.2, -0.05, false, 30)
 		w["mag"] = maxi(0, int(w.get("mag", 0)) - 1)
 		if hud:
-			hud.toast("不発！（火皿の火）", 1.2)
+			hud.toast("不発！（雨で火皿の口薬が湿った）" if HistWeather.cur("rain") + HistWeather.cur("snow") > 0.15 and HistWeather.cur("indoor") < 0.5 else "不発！（火皿の火）", 1.4)
 	elif hud:
 		hud.toast("不発！", 1.0)
 	_next_shot = _now() + 0.7
@@ -534,7 +590,7 @@ func _no_ammo() -> void:
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
 		hud.toast("%sがない（倒した兵・蔵・店で手に入る。弾薬は工房で作れる）" % CraftDB.item_name(ammo_id()) if ammo_id() != "" else "弾がない", 2.0)
-	Sfx.play(get_tree(), Sfx.click(), -6.0)
+	Audio.play("gun_empty" if kind() == "gun" else "ui_error", -4.0)
 
 
 func _discharge() -> void:
@@ -576,9 +632,7 @@ func _discharge() -> void:
 	if current_id() in ["hinawaju", "murataju"]:
 		# 黒色火薬の白煙
 		Effects.burst(get_tree(), muzzle_pos, dirv, Color(0.9, 0.9, 0.9, 0.7), Color(0.6, 0.6, 0.6), 16, 3.0, 1.2, 1.8, -0.05, false, 25)
-		Sfx.play(get_tree(), Sfx.musket(), -4.0)
-	else:
-		Sfx.play(get_tree(), Sfx.shot(), -8.0)
+	Audio.play(gun_key(current_id()), -3.0, {"pitch_var": 0.03, "vol_var": 1.0})
 	# 反動：技能が低いほど銃口が跳ね上がる
 	cam.pitch = clampf(cam.pitch + float(st.get("recoil", 1.0)) * Skills.recoil_mult(lv) * 0.012, -1.3, 1.2)
 	cam.yaw += randf_range(-1, 1) * float(st.get("recoil", 1.0)) * Skills.recoil_mult(lv) * 0.004
@@ -634,10 +688,14 @@ class Arrow extends Node3D:
 		var q := PhysicsRayQueryParameters3D.create(from, to, Game.COLLISION_WORLD | Game.COLLISION_ENEMY | Game.COLLISION_VEHICLE | Game.COLLISION_PROP | Game.COLLISION_CIVILIAN)
 		var hit := get_world_3d().direct_space_state.intersect_ray(q)
 		if not hit.is_empty():
-			Player.apply_hit(get_tree(), hit, vel.normalized(), damage, Player.TEAM)
+			Player.apply_hit(get_tree(), hit, vel.normalized(), damage, Player.TEAM, false)
 			var tgt: Node = Effects.find_target(hit["collider"] as Node) if hit["collider"] is Node else null
 			if tgt and tgt.has_method("is_enemy") and Game.profile:
 				Game.profile.practice("kyujutsu", 0.2)
+			if tgt and (tgt.has_method("is_enemy") or tgt.has_method("panic")):
+				Audio.play_at("impact_flesh", hit["position"], 0.0)
+			else:
+				Audio.play_at(Impacts.arrow_key(hit, Game.world), hit["position"], 0.0)
 			global_position = hit["position"]
 			_stuck = true
 			life = 3.0

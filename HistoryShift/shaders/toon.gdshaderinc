@@ -7,6 +7,8 @@ global uniform vec4 toon_params;
 global uniform float world_night;
 global uniform vec4 world_sky_color;
 global uniform vec4 world_sun_color;
+// 天気（scripts/world/weather_fx.gd）: x 地面の濡れ, y 積雪, z 嵐の暗さ（厚い雲）, w 稲光
+global uniform vec4 world_weather;
 
 // 呼び出し側で TOON_RIM / TOON_WRAP を上書きしたい場合は #define 前にこのファイルを include しない
 
@@ -47,4 +49,40 @@ void toon_light_common(vec3 N, vec3 V, vec3 L, vec3 lcol, float atten, bool dire
 		vec3 add = lcol / PI * atten * smoothstep(0.2, 0.8, d);
 		diffuse += add / (1.0 + add * 0.6);
 	}
+}
+
+// ---- 天気の上塗り（地形・建物・草・葉で共有）
+// up: 面の上向きの度合い（ワールド法線の y）, n: 0..1 の模様ノイズ, porous: 吸水性（土・茅 1、石・瓦・漆喰 0.3）
+// 濡れ: 吸い込む材ほど暗く・少し彩度が上がる（雨の日の背景画の深い色）。積雪: 上を向いた面から白くなる
+vec3 weather_wet(vec3 a, float up, float porous) {
+	float wet = world_weather.x * mix(0.55, 1.0, smoothstep(-0.2, 0.6, up));
+	float l = dot(a, vec3(0.3, 0.59, 0.11));
+	vec3 deep = mix(vec3(l), a, 1.18) * mix(0.82, 0.6, porous);
+	return mix(a, max(deep, vec3(0.0)), wet);
+}
+
+float weather_snow_mask(float up, float n) {
+	float c = world_weather.y;
+	if (c < 0.003) {
+		return 0.0;
+	}
+	float face = smoothstep(0.35, 0.8, up);
+	return face * smoothstep(1.0 - c - 0.12, 1.0 - c + 0.12, face * 0.55 + n * 0.45);
+}
+
+vec3 weather_snow(vec3 a, float up, float n) {
+	float m = weather_snow_mask(up, n);
+	// 雪は真っ白にせず、ほんのり青い影色（日なたは toon の光で明るくなる）
+	vec3 snow = mix(vec3(0.86, 0.9, 0.98), vec3(0.97, 0.98, 1.0), n);
+	return mix(a, snow, m);
+}
+
+// 濡れた平らな地面の水たまり（空の色の映り込み。浅い角度ほど強い）
+vec3 weather_puddle(vec3 a, float up, float n, float fres) {
+	float pud = smoothstep(0.56, 0.64, n) * pow(clamp(up, 0.0, 1.0), 12.0) * smoothstep(0.35, 0.8, world_weather.x) * (1.0 - world_weather.y);
+	vec3 sky = mix(world_sky_color.rgb, vec3(0.5, 0.53, 0.6), world_weather.z * 0.6) * mix(0.6, 1.0, fres);
+	// 縁は濡れた土の濃い色、中は空の映り込み（アニメの水たまりの塗り分け）
+	vec3 rim = a * 0.7;
+	vec3 inner = mix(rim, sky, mix(0.3, 0.75, fres));
+	return mix(a, mix(rim, inner, smoothstep(0.62, 0.7, n)), pud);
 }

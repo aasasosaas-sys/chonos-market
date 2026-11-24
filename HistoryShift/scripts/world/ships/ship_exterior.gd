@@ -108,7 +108,7 @@ func _hull() -> void:
 					var di := Vector3(d.x - side * th, d.y, d.z)
 					if absf(ai.x) < 0.05 or ai.x * side < 0.0:
 						continue
-					sk.quad(mat if ym > tp else "plaster" if sd.steel else "wood", ai, di, ci, bi, c_in if ym <= tp else bw_col.darkened(0.1), -hint)
+					sk.quad(mat if ym > tp else "steel" if sd.steel else "wood", ai, di, ci, bi, c_in if ym <= tp else bw_col.darkened(0.1), -hint)
 		# 舷側の上端（ブルワークの天端）
 		for i in ns:
 			var a: Vector3 = rows[i][nv]

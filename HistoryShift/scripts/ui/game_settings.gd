@@ -2,7 +2,7 @@ class_name GameSettings
 extends RefCounted
 ## 設定の保持・適用・保存（user://settings.cfg）。
 ## 適用先: EraWorld.quality / EraWorld.sdfgi（static var があれば）, Game.set_meta("quality"|"sdfgi"|"mouse_sensitivity"),
-##         AudioServer の Master バス, ウィンドウモード。
+##         AudioServer の Master / Music / SFX / Ambience / Voice バス, ウィンドウモード。
 
 const PATH := "user://settings.cfg"
 const ERA_WORLD_PATH := "res://scripts/world/era_world.gd"
@@ -12,7 +12,11 @@ static var values := {
 	"quality": 1,               # 0=低 1=中 2=高
 	"sdfgi": true,
 	"mouse_sensitivity": 1.0,   # 倍率（0.2〜3.0）
-	"volume": 0.8,              # 0〜1
+	"volume": 0.8,              # 0〜1（Master）
+	"vol_music": 0.7,           # BGM
+	"vol_sfx": 1.0,             # 効果音（足音・武器・破壊・乗り物・UI）
+	"vol_ambience": 0.9,        # 環境音（風・鳥・虫・波・町のざわめき）
+	"vol_voice": 1.0,           # 声
 	"fullscreen": true,
 	"master_mode": false,       # 技術完全習得モード（すべての技能 100・レシピ解禁。scripts/core/player_profile.gd）
 	"start_armed": false,       # 最初から武装（時空銃を貸与。気軽に遊びたい人向け）
@@ -51,6 +55,9 @@ static func apply(apply_window := true) -> void:
 	var vol := clampf(float(values["volume"]), 0.0, 1.0)
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(vol, 0.0001)))
 	AudioServer.set_bus_mute(0, vol <= 0.001)
+	Audio.ensure_buses()
+	for pair in [["Music", "vol_music"], ["SFX", "vol_sfx"], ["Ambience", "vol_ambience"], ["Voice", "vol_voice"]]:
+		Audio.set_bus_linear(String(pair[0]), clampf(float(values.get(pair[1], 1.0)), 0.0, 1.0))
 	if apply_window and DisplayServer.get_name() != "headless":
 		var want_fs: bool = values["fullscreen"]
 		var mode := DisplayServer.window_get_mode()

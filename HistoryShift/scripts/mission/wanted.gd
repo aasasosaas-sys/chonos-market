@@ -10,6 +10,7 @@ static var civil_count := 0
 const CIVIL_FLOOR := 4.0
 
 var era_id := ""
+var _last_stars := 0
 var _spawn_t := 0.0
 var _pursuers: Array = []
 var _air: Array = []
@@ -56,6 +57,11 @@ func _process(dt: float) -> void:
 	if now - _last_report > 12.0:
 		heat = maxf(CIVIL_FLOOR if civil_count > 0 else 0.0, heat - dt * 0.12)
 	var s := stars()
+	if s > _last_stars and Game.player != null:
+		# 手配度が上がった：江戸までは拍子木、明治からは半鐘
+		var modern := CraftDB.era_index(era_id) > CraftDB.era_index("edo")
+		Audio.play_at("hansho" if modern or s >= 4 else "hyoshigi", (Game.player as Node3D).global_position + Vector3(30, 6, 20), -2.0)
+	_last_stars = s
 	if s == 0:
 		for e in _pursuers:
 			if is_instance_valid(e) and e.global_position.distance_to(Game.player.global_position if Game.player else Vector3.ZERO) > 90.0:

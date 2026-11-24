@@ -478,10 +478,41 @@ static func anim_library() -> AnimationLibrary:
 				var a: Animation = ap.get_animation(n).duplicate()
 				var looped: bool = n in LOOPS or (n.begins_with("Mocap_") and not n in ["Mocap_Fall", "Mocap_Shoot"])
 				a.loop_mode = Animation.LOOP_LINEAR if looped else Animation.LOOP_NONE
+				if n.begins_with("Mocap_") and n != "Mocap_Sit":
+					_mocap_in_place(a, n, looped)
 				a.set_meta("src", path)
 				_lib.add_animation(n, a)
 		inst.free()
 	return _lib
+
+
+## モーションキャプチャの腰の位置は収録場所の座標のまま（腰が 1〜3m 横にずれ、歩きは前へ進み続ける）で、
+## 高さも素体の腰より 14〜28% 高い。そのままだと体（当たり判定）から見た目が 1.5m ほどずれて、
+## 屋内では土間の上に浮いて見えた（上がり框の当たり判定に立っているのに、絵は隣の低い土間の上）。
+## 水平はその場（ループは進んだ分を差し引く）、高さは素体の腰の高さ（1.0 = 休止姿勢）に合わせる。
+const MOCAP_HIPS_Y := {"Mocap_Stand": 0.99, "Mocap_Idle": 0.99, "Mocap_Walk": 0.975, "Mocap_SlowWalk": 0.98, "Mocap_March": 0.975,
+	"Mocap_Jog": 0.955, "Mocap_Run": 0.935, "Mocap_Shoot": 0.98}
+
+
+static func _mocap_in_place(a: Animation, n: String, looped: bool) -> void:
+	for t in a.get_track_count():
+		if a.track_get_type(t) != Animation.TYPE_POSITION_3D or not String(a.track_get_path(t)).ends_with(":Hips"):
+			continue
+		var kc := a.track_get_key_count(t)
+		if kc == 0:
+			return
+		var p0: Vector3 = a.track_get_key_value(t, 0)
+		var p1: Vector3 = a.track_get_key_value(t, kc - 1)
+		var drift := (p1 - p0) if looped else Vector3.ZERO
+		var dy := (p0.y - float(MOCAP_HIPS_Y[n])) if MOCAP_HIPS_Y.has(n) else 0.0
+		for k in kc:
+			var v: Vector3 = a.track_get_key_value(t, k)
+			var f := a.track_get_key_time(t, k) / maxf(a.length, 0.001)
+			v.x -= p0.x + drift.x * f
+			v.z -= p0.z + drift.z * f
+			v.y -= dy
+			a.track_set_key_value(t, k, v)
+		return
 
 
 static func _anim_node(n: String) -> AnimationNodeAnimation:
@@ -774,7 +805,7 @@ func _setup_tree(model: Node3D, outfit: int, armed: bool) -> void:
 	var bt := AnimationNodeBlendTree.new()
 	var bs := AnimationNodeBlendSpace1D.new()
 	var mocap := lib.has_animation("Mocap_Walk")
-	var idle_name := "Skeletons_Idle" if outfit == Outfit.GUARDIAN else ("Mocap_Stand" if mocap else "Idle_A")
+	var idle_name := "Skeletons_Idle" if outfit == Outfit.GUARDIAN else "Idle_A"
 	bs.add_blend_point(_anim_node(idle_name), 0.0)
 	if mocap:
 		var soldier := outfit in [Outfit.SOLDIER, Outfit.ASHIGARU, Outfit.SAMURAI]

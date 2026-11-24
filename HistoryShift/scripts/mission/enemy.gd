@@ -88,6 +88,7 @@ func _ready() -> void:
 	add_child(_tag)
 	_cool = randf_range(0.5, 2.0)
 	_strafe = 1.0 if randf() < 0.5 else -1.0
+	Footsteps.attach(self, "npc")
 	if is_guardian:
 		var l := OmniLight3D.new()
 		l.light_color = Effects.GUARD
@@ -113,7 +114,7 @@ func _die() -> void:
 	collision_mask = Game.COLLISION_WORLD
 	_rig.die()
 	_tag.visible = false
-	Sfx.play_at(get_tree(), Sfx.hit(), global_position, -4.0)
+	Audio.play_at("body_fall", global_position, 0.0)
 	if is_guardian:
 		Effects.burst(get_tree(), global_position + Vector3.UP, Vector3.UP, Effects.GUARD, Effects.CYAN, 40, 6.0, 0.25, 0.9, -0.2, true, 180)
 	Wanted.report(global_position, 0.35)
@@ -140,7 +141,8 @@ func _physics_process(dt: float) -> void:
 		target = p.vehicle.global_position
 	var to := target - global_position
 	var dist := to.length()
-	if dist < aggro_range:
+	# 天気：霧・大雨・雪では気づかれる距離が縮む（任務の標的は従来どおり）
+	if dist < aggro_range * (1.0 if mission_target else HistWeather.visibility_now()):
 		_alert = true
 	if dist > aggro_range * 2.2 and not mission_target:
 		_alert = false
@@ -221,11 +223,13 @@ func _melee(dt: float, dist: float) -> void:
 		_windup -= dt
 		if _windup < 0.0:
 			_cool = randf_range(1.2, 2.0)
+			Audio.play_at("swing_blade" if weapon == "blade" else "swing_spear", global_position + Vector3.UP * 1.3, -2.0)
 			if dist < reach + 0.5 and not p.in_vehicle():
+				var arms = p.get("arms")
+				var guarded: bool = arms != null and arms.get("blocking") == true
 				p.take_hit(14.0 if weapon == "blade" else 12.0, 1, global_position + Vector3.UP * 1.2, (p.global_position - global_position).normalized())
-				Sfx.play_at(get_tree(), Sfx.hit(), global_position, -4.0)
-			else:
-				Sfx.play_at(get_tree(), Sfx.whoosh(), global_position, -6.0)
+				if not guarded:
+					Audio.play_at("hit_blade", p.global_position + Vector3.UP * 1.2, 0.0)
 		return
 	_cool -= dt
 	if dist < reach and _cool <= 0.0:
@@ -256,20 +260,25 @@ func _combat(dt: float, target: Vector3, dist: float) -> void:
 	if weapon == "bow":
 		aim += Vector3.UP * dist * dist * 0.0017  # 山なり
 	var dir := (aim - muzzle).normalized() + Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * inacc
+	if weapon == "musket" and randf() < HistWeather.misfire_add_now("musket"):
+		# 雨で火皿が湿って不発（口薬だけ燃える）
+		_cool = randf_range(2.0, 3.0)
+		Audio.play_at("gun_pan_flash", muzzle, -2.0)
+		return
 	Projectile.fire(get_tree(), muzzle, dir, weapon, 1)
 	match weapon:
 		"bow":
-			_cool = randf_range(1.8, 2.8); Sfx.play_at(get_tree(), Sfx.bow(), muzzle, -2.0)
+			_cool = randf_range(1.8, 2.8); Audio.play_at("bow_release", muzzle, -2.0)
 		"musket":
-			_cool = randf_range(3.0, 4.2); Sfx.play_at(get_tree(), Sfx.musket(), muzzle, 0.0)
+			_cool = randf_range(3.0, 4.2); Audio.play_at("gun_matchlock", muzzle, 0.0)
 			Effects.burst(get_tree(), muzzle, dir, Color(0.85, 0.85, 0.85, 0.7), Color(0.6, 0.6, 0.6), 12, 2.5, 1.0, 1.6, -0.05, false, 25)
 		"rifle":
-			_cool = randf_range(1.3, 2.0); Sfx.play_at(get_tree(), Sfx.shot(), muzzle, -2.0)
+			_cool = randf_range(1.3, 2.0); Audio.play_at("gun_rifle", muzzle, -1.0)
 		"mg":
 			_burst += 1
 			_cool = 0.12 if _burst % 5 != 0 else randf_range(1.5, 2.5)
-			Sfx.play_at(get_tree(), Sfx.shot(), muzzle, -4.0)
+			Audio.play_at("gun_lmg", muzzle, -2.0)
 		"energy":
-			_cool = randf_range(0.9, 1.5); Sfx.play_at(get_tree(), Sfx.energy(), muzzle, -2.0)
+			_cool = randf_range(0.9, 1.5); Audio.play_at("gun_energy", muzzle, -2.0)
 	if weapon != "bow":
 		Effects.muzzle(get_tree(), muzzle, dir, Effects.GUARD if is_guardian else Color(1, 0.75, 0.35))

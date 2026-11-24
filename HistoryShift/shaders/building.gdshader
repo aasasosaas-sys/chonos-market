@@ -146,10 +146,38 @@ void fragment() {
 		float rush = smoothstep(0.35, 0.65, fract(dot(v_wpos.xz, vec2(1.0, 0.0)) * 9.0 + texture(macro_tex, v_wpos.xz * 0.3).r * 0.5));
 		a *= mix(0.95, 1.03, rush);
 		a *= mix(vec3(1.0), vec3(1.05, 1.0, 0.86), texture(macro_tex, v_wpos.xz * 0.07).r);
+	} else if (mat_kind > 7.5 && mat_kind < 8.5) {
+		// 板の間: 幅 30cm の板ごとの濃淡＋互い違いの継ぎ目。継ぎ目は細く暗い溝（遠くでは消える）
+		vec2 fm = UV / max(uv_scale, 1e-4);
+		float bx = fm.x / 0.3;
+		float bi = floor(bx);
+		float hb = hash13(vec3(bi, 1.7, 7.3));
+		float zz = fm.y / 1.82 + hb * 3.7;
+		float bj = floor(zz);
+		float hj = hash13(vec3(bi, bj, 3.1));
+		a *= mix(0.88, 1.06, hj) * mix(vec3(1.0), vec3(1.03, 0.99, 0.94), hb);
+		float fx = fract(bx);
+		float fz = fract(zz);
+		float dbx = fwidth(bx);
+		float dzz = fwidth(zz);
+		float sx = 1.0 - smoothstep(0.0, 0.012 + dbx * 0.9, min(fx, 1.0 - fx));
+		float sz = 1.0 - smoothstep(0.0, 0.003 + dzz * 0.9, min(fz, 1.0 - fz));
+		float seam = max(sx, sz * 0.8) * (1.0 - smoothstep(0.12, 0.35, dbx));
+		a = mix(a, a * vec3(0.46, 0.38, 0.34), seam * 0.7);
 	} else if (mat_kind > 4.5 && mat_kind < 5.5) {
 		// 茅葺: 毛羽立った筆の縦筋
 		float fib = texture(macro_tex, vec2(wall_u * 2.2, v_wpos.y * 0.2)).r;
 		a *= mix(0.88, 1.08, fib);
+	}
+	// 天気（屋外の面だけ）: 濡れ（茅・木・土壁はよく吸う。瓦・石は艶が出る）・屋根や軒の積雪
+	if (hs_indoor < 0.5 && world_weather.x + world_weather.y > 0.002) {
+		float porous = (mat_kind > 4.5 && mat_kind < 5.5) ? 1.0 : ((mat_kind > 1.5 && mat_kind < 2.5) ? 0.75 : 0.35);
+		a = weather_wet(a, v_wnrm.y, porous);
+		if (mat_kind > 2.5 && mat_kind < 3.5) {
+			float fres_w = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 2.0);
+			a = mix(a, mix(world_sky_color.rgb, vec3(0.6, 0.64, 0.7), 0.5), fres_w * world_weather.x * 0.45 * smoothstep(-0.2, 0.5, v_wnrm.y));
+		}
+		a = weather_snow(a, v_wnrm.y, m1 * 0.6 + stroke * 0.4);
 	}
 	vec3 d_emis = vec3(0.0);
 	if (v_dstate.g + v_dstate.b > 0.001 || v_dcut.x < 1e5) {
@@ -167,8 +195,9 @@ void fragment() {
 		if (mat_kind > 1.5 && mat_kind < 2.5) {
 			a *= vec3(1.06, 1.0, 0.9);
 		}
-		float paper = smoothstep(0.78, 0.92, vlum) * vert * step(mat_kind, 1.5);
-		in_emis = a * vec3(1.0, 0.95, 0.84) * paper * (0.09 * (1.0 - world_night) + 0.06 * world_night);
+		// 透けるのは障子紙（ごく白いベタ面）だけ。漆喰の壁や襖まで光ると、奥の間仕切りが白い壁に飛んで見えた
+		float paper = smoothstep(0.9, 0.96, vlum) * vert * (1.0 - step(0.5, mat_kind));
+		in_emis = a * vec3(1.0, 0.93, 0.8) * paper * (0.06 * (1.0 - world_night) + 0.05 * world_night);
 		a *= mix(1.0, 0.86, smoothstep(-0.3, -0.8, v_wnrm.y));
 	}
 	// 瓦・金属: 空の映り込み（浅い角度ほど空の色）。夜は弱く
@@ -190,11 +219,35 @@ void fragment() {
 		vec3 skyc = mix(vec3(0.42, 0.55, 0.68), world_sky_color.rgb, 0.5);
 		vec3 gc = mix(skyc * 0.75, skyc * 1.15 + 0.08, gy) * (COLOR.rgb * 0.5 + 0.5);
 		float st = fract((v_wpos.x + v_wpos.z) * 0.4 + v_wpos.y * 0.5);
-		gc += vec3(0.35) * (step(0.78, st) * step(st, 0.86) + step(0.9, st) * step(st, 0.93));
+		// 窓ガラスは「暗い室内＋斜めに映る空」。正面から見るほど室内の暗さ、斜めほど空の映り込み（白い板に見えないように）
+		float gfres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 1.5);
+		vec3 room = vec3(0.1, 0.12, 0.17) + skyc * 0.12;
+		gc = mix(room, gc, 0.3 + 0.55 * gfres);
+		gc += vec3(0.3) * (step(0.78, st) * step(st, 0.86) + step(0.9, st) * step(st, 0.93));
 		ALBEDO = gc * (1.0 - world_night * 0.85);
 		SPECULAR = 0.5;
 		ROUGHNESS = 0.2;
 		EMISSION = vec3(1.0, 0.72, 0.38) * world_night * 1.6;
+		if (hs_indoor > 0.5) {
+			// 屋内から見る窓: 白く飛ばさず、外の景色（暖かい日差しの空・遠くの木立・庭の地面）を描いた明るい面にする
+			vec3 vd = normalize(v_wpos - CAMERA_POSITION_WORLD);
+			float az = atan(vd.x, vd.z);
+			float el = vd.y;
+			float ridge = 0.06 + 0.14 * texture(macro_tex, vec2(az * 0.6, 0.31)).r + 0.06 * texture(macro_tex, vec2(az * 2.3, 0.77)).r;
+			vec3 sky_hi = mix(vec3(0.5, 0.68, 0.9), world_sky_color.rgb, 0.35);
+			vec3 sky_lo = vec3(1.0, 0.9, 0.72);
+			vec3 view = mix(sky_lo, sky_hi, smoothstep(0.02, 0.3, el));
+			float tree = 1.0 - smoothstep(ridge - 0.008, ridge + 0.008, el);
+			vec3 leaf = mix(vec3(0.3, 0.46, 0.26), vec3(0.52, 0.62, 0.3), texture(macro_tex, vec2(az * 4.0, el * 6.0)).r);
+			view = mix(view, leaf, tree);
+			float ground = 1.0 - smoothstep(-0.12, -0.08, el);
+			view = mix(view, vec3(0.72, 0.62, 0.46), ground);
+			view *= COLOR.rgb * 0.35 + 0.65;
+			float st2 = fract((v_wpos.x + v_wpos.z) * 0.6 + v_wpos.y * 0.7);
+			view += vec3(0.12) * step(0.8, st2) * step(st2, 0.86);
+			ALBEDO = vec3(0.0);
+			EMISSION = view * mix(0.95, 0.12, world_night) + vec3(0.25, 0.18, 0.1) * world_night;
+		}
 	}
 	// 夜: 軒下・壁面がほのかに暖色（屋内の灯りの照り返し）
 	float under = smoothstep(0.2, -0.6, v_wnrm.y) * 0.5 + (1.0 - abs(v_wnrm.y)) * 0.15;

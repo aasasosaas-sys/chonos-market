@@ -157,7 +157,12 @@ static func explosion(tree: SceneTree, pos: Vector3, radius: float, damage: floa
 	burst(tree, pos, Vector3.UP, Color(0.22, 0.2, 0.19, 0.85), Color(0.4, 0.38, 0.35), 34, 5.0, 4.5, 3.2, -0.08, false, 90)
 	burst(tree, pos, Vector3.UP, Color(1, 0.88, 0.45), Color.WHITE, 40, 24.0, 0.14, 1.3, 1.5, true, 180)
 	flash(tree, pos + Vector3.UP, Color(1, 0.6, 0.3), 12.0, radius * 4.0, 0.6)
-	Sfx.play_at(tree, Sfx.explode(), pos, 6.0)
+	# 規模で音を変える（焙烙玉・手榴弾は小、樽・ダイナマイト・砲弾・誘爆は大）。水面なら水柱の音
+	Audio.play_at("explosion_large" if radius >= 7.0 else "explosion_small", pos, clampf((radius - 7.0) * 0.4, -3.0, 4.0))
+	if Surface.water_at(Game.world, pos + Vector3.DOWN * 0.6):
+		Audio.play_at("splash_big", pos, 2.0)
+	elif radius >= 7.0:
+		Audio.play_at("debris", pos, -4.0)
 	var cam := tree.root.get_viewport().get_camera_3d()
 	if cam:
 		shake = maxf(shake, clampf(1.6 - cam.global_position.distance_to(pos) / (radius * 6.0), 0.0, 1.0))

@@ -246,6 +246,8 @@ func return_loans() -> void:
 func add_money(mon: int) -> void:
 	money = maxi(0, money + mon)
 	_changed()
+	if mon > 0:
+		Audio.play("pickup_coins", -4.0)   # 銭の音（ヘッドレスでは鳴らない）
 
 
 func spend(mon: int) -> bool:
@@ -253,6 +255,8 @@ func spend(mon: int) -> bool:
 		return false
 	money -= mon
 	_changed()
+	if mon > 0:
+		Audio.play("pickup_coins", -6.0)
 	return true
 
 

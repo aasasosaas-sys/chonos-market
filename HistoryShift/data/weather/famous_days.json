@@ -1,0 +1,133 @@
+{
+ "about": "有名な日の史実の天気。verdict: verified（複数の資料で一致）/ documented（同時代の記録があるが一つの系統の資料）/ secondary（後世の編纂物・二次資料による）/ disputed（研究者の間で解釈が割れる）/ unverified（裏が取れない。天気は上書きしない）。apply=false の日は天気を上書きせず、気候値から生成する。state は WeatherDirector の状態（kind: clear/cloudy/overcast/rain/heavy_rain/thunder/typhoon/snow/fog、rain・snow・fog・cloud・storm は 0〜1、wind は m/s、snow_cover・wet は地面）。sequence はその日の移り変わり（秒）。",
+ "days": [
+  {
+   "id": "bunei_1274", "era": "kamakura_muromachi", "year": 1274, "lunar": [1274, 10, 20, false], "place": "博多湾", "region": "fukuoka",
+   "event": "文永の役", "verdict": "disputed", "apply": true,
+   "state": {"kind": "overcast", "cloud": 0.85, "wind": 11.0, "storm": 0.35, "rain": 0.0, "wet": 0.2},
+   "sequence": [{"t": 150, "kind": "rain", "rain": 0.75, "wind": 17.0, "storm": 0.6}],
+   "line": "史実：『高麗史』はこの夜の「大風雨」を記す。ただし台風だったかは論争中（西暦では11月末）",
+   "basis": "『高麗史』金方慶伝に、日本から引き揚げる夜に大風雨があり戦艦が岩にあたって多く壊れたとある。荒川秀俊（1958）は、文永11年10月20日は西暦1274年11月26日（先発グレゴリオ暦）にあたり台風の季節ではないとして「神風」を否定し、遠征軍は自ら引き揚げたと論じた。その後、発達した温帯低気圧（冬の嵐）による大風雨とする説などがあり、決着していない。ここでは「台風ではない、荒れた冬の嵐」とした。",
+   "sources": ["『天気』2009年11月号（日本気象学会）文永・弘安の役の気象の論考 https://www.metsoc.jp/tenki/pdf/2009/2009_11_0071.pdf", "大阪大学『懐徳』32号 https://ir.library.osaka-u.ac.jp/repo/ouka/all/90362/kaitoku_32_071.pdf", "nippon.com「元寇」 https://www.nippon.com/ja/japan-topics/c13705/", "英語版Wikipedia『Kamikaze (typhoon)』（『高麗史』の原文の引用）"]
+  },
+  {
+   "id": "koan_1281", "era": "kamakura_muromachi", "year": 1281, "lunar": [1281, 7, 1, true], "place": "博多湾〜鷹島沖", "region": "fukuoka",
+   "event": "弘安の役", "verdict": "verified", "apply": true,
+   "state": {"kind": "typhoon", "cloud": 1.0, "rain": 0.9, "wind": 26.0, "storm": 1.0, "wet": 1.0},
+   "line": "史実：弘安4年閏7月1日、大風（台風）が元の大船団を壊滅させた（弘安の役）",
+   "basis": "弘安4年閏7月1日（ユリウス暦1281年8月16日。前夜から）の大風で、鷹島（伊万里湾）付近に集まった元の東路軍・江南軍の船の多くが沈んだ。台風による暴風とする史料が多く残る。夏の終わりで台風の季節にあたる。鷹島海底遺跡の調査で沈没船が見つかっている。",
+   "sources": ["『天気』1960年1月号（日本気象学会）台風による船の被害の最古の記録として弘安4年閏7月1日を挙げる https://www.metsoc.jp/tenki/pdf/1960/1960_01_0016.pdf", "『天気』2009年11月号 https://www.metsoc.jp/tenki/pdf/2009/2009_11_0071.pdf"]
+  },
+  {
+   "id": "okehazama_1560", "era": "sengoku", "year": 1560, "lunar": [1560, 5, 19, false], "place": "尾張 桶狭間", "region": "nagoya",
+   "event": "桶狭間の戦い", "verdict": "documented", "apply": true,
+   "state": {"kind": "cloudy", "cloud": 0.7, "wind": 3.0, "storm": 0.15, "wet": 0.1},
+   "sequence": [{"t": 75, "kind": "heavy_rain", "rain": 1.0, "wind": 14.0, "storm": 0.8, "hail": true}, {"t": 210, "kind": "cloudy", "rain": 0.0, "wind": 4.0, "storm": 0.1}],
+   "line": "史実：『信長公記』—にわかに急雨が石や氷を投げ打つように降り、敵の顔に打ちつけた（桶狭間）",
+   "basis": "太田牛一『信長公記』首巻は、信長勢が山際まで寄せたところで「にわかに急雨、石氷を投げ打つ様に」敵の顔に降りつけたと書く（雹まじりの驟雨）。太田牛一は信長の家臣で同時代の筆者だが、首巻は後年のまとめで年の記述に誤りもある。旧暦5月19日はユリウス暦1560年6月12日（梅雨入りの頃の蒸し暑い日）。",
+   "sources": ["乃至政彦「桶狭間の勝因はゲリラ豪雨」president.jp https://president.jp/articles/-/70595", "太田牛一『信長公記』首巻（翻刻は国立国会図書館デジタルコレクションなど）。原文の文言は今回の検索では直接確認できず、二次資料で照合"]
+  },
+  {
+   "id": "honnoji_1582", "era": "sengoku", "year": 1582, "lunar": [1582, 6, 2, false], "place": "京 本能寺", "region": "kyoto",
+   "event": "本能寺の変", "verdict": "unverified", "apply": false,
+   "basis": "当日の天気をはっきり書いた同時代の記録は今回の調査では見つからなかった（『言経卿記』『兼見卿記』『多聞院日記』を当たる必要がある）。ユリウス暦1582年6月21日は梅雨のさなかで、天気は気候値から生成する。",
+   "sources": ["serai.jp 本能寺の変の一次史料の紹介 https://serai.jp/hobby/1131769"]
+  },
+  {
+   "id": "sekigahara_1600", "era": "sengoku", "year": 1600, "lunar": [1600, 9, 15, false], "place": "美濃 関ヶ原", "region": "sekigahara",
+   "event": "関ヶ原の戦い", "verdict": "secondary", "apply": true,
+   "state": {"kind": "fog", "fog": 0.95, "cloud": 0.75, "wind": 1.0, "wet": 0.6},
+   "sequence": [{"t": 200, "kind": "fog", "fog": 0.55}, {"t": 360, "kind": "cloudy", "fog": 0.1, "cloud": 0.6, "wind": 2.5}],
+   "line": "史実：朝の関ヶ原は深い霧に包まれ、霧の中で合戦が始まったと伝わる（後世の軍記による）",
+   "basis": "慶長5年9月15日（グレゴリオ暦1600年10月21日）。朝の濃霧の中で午前8時ごろ戦いが始まったとされる（前夜は雨だったとも伝わるが、今回は確認できていない）。ただし合戦の経過を描くのは『関原始末記』など後世の編纂物で、一次史料での裏付けは弱い（呉座勇一の指摘）。谷間の盆地で秋の放射霧が出やすい地形でもある。",
+   "sources": ["呉座勇一の著書の抜粋 president.jp https://president.jp/articles/-/75697", "president.jp https://president.jp/articles/-/75298"]
+  },
+  {
+   "id": "meireki_1657", "era": "edo", "year": 1657, "lunar": [1657, 1, 18, false], "place": "江戸 本郷", "region": "tokyo",
+   "event": "明暦の大火", "verdict": "verified", "apply": true,
+   "state": {"kind": "clear", "cloud": 0.15, "wind": 13.0, "storm": 0.0, "wet": 0.0, "dust": 0.6},
+   "line": "史実：80日近く雨が降らず、北西の強風が砂ぼこりを巻き上げていた（明暦の大火）",
+   "basis": "明暦2年11月から翌3年1月まで江戸では80日近く雨がなく、出火の1月18日（グレゴリオ暦1657年3月2日）は砂ぼこりの舞う北西の強風だった。夕刻から風が西に変わり延焼が広がった。",
+   "sources": ["東京消防庁『消防雑学事典』明暦の大火 https://www.tfd.metro.tokyo.lg.jp/learning/elib/qa/qa_30.html", "内閣府 災害教訓の継承に関する専門調査会『1657 明暦の江戸大火』報告書 第2章 https://www.bousai.go.jp/kyoiku/kyokun/kyoukunnokeishou/rep/1657_meireki_edotaika/pdf/1657-meireki-edoTAIKA_04_chap2.pdf"]
+  },
+  {
+   "id": "ako_1702", "era": "edo", "year": 1702, "lunar": [1702, 12, 14, false], "place": "江戸 本所松坂町（吉良邸）", "region": "tokyo",
+   "event": "赤穂浪士の討ち入り", "verdict": "disputed", "apply": true,
+   "state": {"kind": "clear", "cloud": 0.25, "wind": 2.0, "snow_cover": 0.55, "night": true},
+   "line": "史実：討ち入りの夜（12月14日）。芝居では雪の降る夜だが、雪は前に降ったものとも、当夜は晴れて月が出ていたとも言われ、確かではない",
+   "basis": "元禄15年12月14日夜〜15日未明（グレゴリオ暦1703年1月30〜31日）。雪が降りしきる情景は後の芝居・講談で定着したもの。当夜の天候を書いた一次史料は今回の調査では確認できなかった。旧暦14日なので満月に近い（月齢の計算で約13）ことは確か。ここでは「積もった雪と晴れた月夜」とし、論争中として表示する。",
+   "sources": ["ben54.jp『忠臣蔵』討ち入りの通説 https://www.ben54.jp/news/2973", "月齢は scripts/core/kyureki.gd の計算"]
+  },
+  {
+   "id": "asama_1783", "era": "edo", "year": 1783, "lunar": [1783, 7, 8, false], "place": "江戸（浅間山の東南東 約140km）", "region": "tokyo",
+   "event": "浅間山の天明大噴火", "verdict": "documented", "apply": true,
+   "state": {"kind": "overcast", "cloud": 0.95, "wind": 3.0, "ash": 0.7, "fog": 0.35},
+   "line": "史実：天明3年7月8日、浅間山が大噴火。江戸でも鳴動が聞こえ、灰が降った",
+   "basis": "噴火は旧暦4月から続き、7月8日（グレゴリオ暦1783年8月5日）に最大の爆発と鎌原の土石なだれが起きた。杉田玄白は江戸で7月6日夜の鳴動を書き留め、江戸でも降灰があった。灰の量・空の暗さの程度は江戸では資料ごとに異なるため、薄い灰の霞とした。冷夏と重なり天明の飢饉となった。",
+   "sources": ["国土交通省 利根川水系砂防事務所 天明3年の浅間山噴火 https://www.ktr.mlit.go.jp/tonesui/tonesui00023.html", "president.jp（杉田玄白の記録・江戸の降灰） https://president.jp/articles/-/97619", "内閣府『災害を語りつぐ』 https://www.bousai.go.jp/kohou/kouhoubousai/h28/84/past.html"]
+  },
+  {
+   "id": "perry_1853", "era": "edo", "year": 1853, "lunar": [1853, 6, 3, false], "place": "浦賀沖", "region": "tokyo",
+   "event": "ペリー来航", "verdict": "secondary", "apply": true,
+   "state": {"kind": "clear", "cloud": 0.3, "wind": 3.5},
+   "line": "史実：嘉永6年6月3日（1853年7月8日）夕方、黒船4隻は晴れた空の下で浦賀沖に錨を下ろしたという",
+   "basis": "艦隊は朝に浦賀水道に入り、夕方5時ごろ晴天の下で投錨したと、Wiley の著書を引く記事が伝える。日本側の日記の天気記事は確認できていない。",
+   "sources": ["Japan Today（Peter Booth Wiley の著書を引用） https://japantoday.com/category/features/lifestyle/commodore-perrys-black-ships-deliver-a-letter-to-japan-in-july-1853"]
+  },
+  {
+   "id": "sakuradamon_1860", "era": "edo", "year": 1860, "lunar": [1860, 3, 3, false], "place": "江戸城 桜田門外", "region": "tokyo",
+   "event": "桜田門外の変", "verdict": "verified", "apply": true,
+   "state": {"kind": "snow", "snow": 0.8, "cloud": 1.0, "wind": 3.0, "snow_cover": 0.75, "temp": 1.0},
+   "line": "史実：この日は大雪だった（桜田門外の変）。彦根藩士は刀に柄袋をかけていて抜くのが遅れた",
+   "basis": "安政7年3月3日（1860年3月24日）は上巳の節句で、江戸は季節外れの雪だった。午前9時ごろ、雪の中を登城する井伊直弼の行列が襲われた。供の彦根藩士は雪から刀を守る柄袋をつけていた。",
+   "sources": ["文春オンライン https://bunshun.jp/articles/-/1840", "president.jp https://president.jp/articles/-/2571", "明治大学図書館紀要 https://meiji.repo.nii.ac.jp/record/14210/files/toshokankiyo_19_51.pdf"]
+  },
+  {
+   "id": "kenpo_1889", "era": "meiji_taisho", "year": 1889, "date": [1889, 2, 11], "place": "東京 宮城", "region": "tokyo",
+   "event": "大日本帝国憲法発布", "verdict": "unverified", "apply": false,
+   "basis": "式典の朝に雪が積もっていたという話があるが、今回の調査では当日の観測値・日記を確認できなかった（気象庁の過去の気象データに接続できなかった）。天気は気候値から生成する。",
+   "sources": ["国立公文書館 https://www.digital.archives.go.jp/DAS/pickup/view/print/printArchives/0000000001"]
+  },
+  {
+   "id": "kanto_1923", "era": "meiji_taisho", "year": 1923, "date": [1923, 9, 1], "place": "東京", "region": "tokyo",
+   "event": "関東大震災", "verdict": "verified", "apply": true,
+   "state": {"kind": "cloudy", "cloud": 0.65, "wind": 11.0, "storm": 0.25, "wet": 0.35, "temp": 27.0},
+   "sequence": [{"t": 300, "kind": "cloudy", "wind": 15.0, "storm": 0.35}],
+   "line": "史実：日本海を進む台風の影響で、地震のとき東京は毎秒10m以上の南寄りの強風。夜は北寄りに変わり火災が広がった",
+   "basis": "9月1日6時に台風は金沢の西の海上にあり、18時には三陸沖へ進んだ。地震発生時（11時58分）の東京は南〜南南西の風約10〜12m/s、夜は西〜北に急変し、中央気象台（麹町）では22時に最大風速21m/sを記録した。朝は雨が残った。",
+   "sources": ["気象庁 関東大震災の概要・記録 https://www.data.jma.go.jp/eqev/data/1923_09_01_kantoujishin/gaiyo.html", "防災科学技術研究所 自然災害情報室 https://dil.bosai.go.jp/workshop/01kouza_kiso/06kasai.html", "東京消防庁 https://www.tfd.metro.tokyo.lg.jp/content/000017305.pdf"]
+  },
+  {
+   "id": "niniroku_1936", "era": "showa", "year": 1936, "date": [1936, 2, 26], "place": "東京 永田町", "region": "tokyo",
+   "event": "二・二六事件", "verdict": "verified", "apply": true,
+   "state": {"kind": "snow", "snow": 0.45, "cloud": 1.0, "wind": 2.5, "snow_cover": 0.9, "temp": 0.5},
+   "line": "史実：二・二六事件の朝、帝都は雪に覆われ、部隊は雪の中を出動した",
+   "basis": "1936年2月の東京は「49年ぶりの暴風雪」とも書かれる大雪に見舞われ（現代ビジネス）、26日の朝は雪の中を部隊が出動した。事件の写真には雪の積もった街が写る。積雪の深さの数値は気象庁のデータに接続できず未確認。",
+   "sources": ["中央区デジタルミュージアム 二・二六事件 https://www.city.chuo.lg.jp/virtualmuseum/sensokiroku/history/1936_0226.html", "東京都 ToMuCo『二・二六事件写真　雪の某邸前』 https://museumcollection.tokyo/en/works/7006107/", "現代ビジネス https://gendai.media/articles/-/106530"]
+  },
+  {
+   "id": "airraid_1945", "era": "showa", "year": 1945, "date": [1945, 3, 10], "place": "東京 下町", "region": "tokyo",
+   "event": "東京大空襲", "verdict": "verified", "apply": true, "default": false,
+   "state": {"kind": "clear", "cloud": 0.2, "wind": 13.0, "night": true},
+   "line": "史実：3月10日未明、強い季節風にあおられて焼夷弾の火が下町に燃え広がった",
+   "basis": "B-29 約300機が超低空から焼夷弾を投下し、強風で火災が広がった。風速の数値は今回確認できていない（北寄りの強い風とされる）。",
+   "sources": ["文春オンライン https://bunshun.jp/articles/-/61156", "中央区デジタルミュージアム https://www.city.chuo.lg.jp/virtualmuseum/sensokiroku/history/1945_0309.html"]
+  },
+  {
+   "id": "shusen_1945", "era": "showa", "year": 1945, "date": [1945, 8, 15], "place": "東京", "region": "tokyo",
+   "event": "終戦の詔書の放送", "verdict": "verified", "apply": true,
+   "state": {"kind": "clear", "cloud": 0.1, "wind": 2.5, "temp": 32.3},
+   "line": "史実：8月15日の東京は晴れ。最高気温は約32℃の暑い日だった",
+   "basis": "多くの回想が「抜けるような青空」「とても暑い日」と語り、作家の日記にも「晴」とある。最高気温32.3℃とする報道がある。",
+   "sources": ["ウェザーニュース そらマガジン https://weathernews.jp/soramagazine/201608/05/", "The Japan Times 2015-08-14 https://japantimes.co.jp/news/2015/08/14/national/history/emperors-wwii-surrender-aired-amid-turmoil-wartime-regime"]
+  },
+  {
+   "id": "olympic_1964", "era": "showa", "year": 1964, "date": [1964, 10, 10], "place": "東京 国立競技場", "region": "tokyo",
+   "event": "東京オリンピック開会式", "verdict": "verified", "apply": true,
+   "state": {"kind": "clear", "cloud": 0.05, "wind": 2.0, "wet": 0.25},
+   "line": "史実：前夜の激しい雨が嘘のような秋晴れ（東京オリンピック開会式）",
+   "basis": "開会式の前夜は激しい雨で、当日は「世界中の青空を集めたような」快晴になった。",
+   "sources": ["nippon.com「1964 TOKYOから50年」 https://www.nippon.com/ja/column/g00213/"]
+  }
+ ]
+}

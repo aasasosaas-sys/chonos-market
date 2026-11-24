@@ -26,6 +26,9 @@ var session: Node = null         # 実行中の Session（ミッション / 自�
 var backdrop: Node = null        # タイトル背景用の Session
 var current := ""                # 表示中の画面名
 var allow_backdrop := true       # false でタイトル背景を 2D に固定（テスト用）
+var use_hub_3d := true           # ハブを 2026 年の研究所（歩ける 3D：scripts/mission/hub_session.gd）にする。false で従来の 2D 画面だけ
+var hub3d: Node = null           # 歩けるハブ（HubSession）。採点ハブの画面を出している間は止めておく
+var _hub_qid := ""
 
 var _fader: ColorRect
 var _backdrop_idx := 0
@@ -138,8 +141,10 @@ func _play_mode() -> void:
 # ------------------------------------------------------------------ タイトル
 func show_title() -> void:
 	_end_session()
+	_stop_hub3d()
 	get_tree().paused = false
 	_start_backdrop()
+	Audio.music("music_hub", 3.0)
 	var t := TitleScreen.new()
 	t.has_backdrop = backdrop != null
 	t.backdrop_era = _backdrop_era_id()
@@ -204,6 +209,8 @@ func start_new_game() -> void:
 
 func show_exam() -> void:
 	_stop_backdrop()
+	_stop_hub3d()
+	Audio.music_stop(3.0)   # 試験中は静かに
 	var e := ExamScreen.new()
 	e.submitted.connect(_on_exam_submitted)
 	_show(e, "exam")
@@ -220,13 +227,22 @@ func _on_exam_submitted() -> void:
 
 
 # ------------------------------------------------------------------ ハブ
-func show_hub(select_qid := "", reveal := false) -> void:
+## menu = true：歩けるハブの操作卓から開いた一覧（採点ハブの画面）。reveal（採点直後）も一覧を先に出す
+func show_hub(select_qid := "", reveal := false, menu := false) -> void:
 	_stop_backdrop()
 	_end_session()
+	Audio.music("music_hub", 3.0, -2.0)
 	get_tree().paused = false
 	if not Game.state.exam_submitted:
 		show_exam()
 		return
+	if select_qid != "":
+		_hub_qid = select_qid
+	if use_hub_3d and not reveal and not menu and _start_hub3d():
+		_show_hub3d()
+		return
+	if hub3d != null and is_instance_valid(hub3d):
+		hub3d.set_active(false)
 	var h := HubScreen.new()
 	h.select_qid = select_qid
 	h.reveal = reveal
@@ -243,6 +259,53 @@ func show_hub(select_qid := "", reveal := false) -> void:
 		show_title())
 	h.open_settings.connect(func(): SettingsScreen.open(root))
 	_show(h, "hub")
+	if use_hub_3d and session_available():
+		_add_lab_button(h)
+
+
+# ------------------------------------------------------------------ 歩けるハブ（2026年の研究所と町）
+func _start_hub3d() -> bool:
+	if hub3d != null and is_instance_valid(hub3d):
+		return true
+	if not session_available() or not ResourceLoader.exists("res://scripts/mission/hub_session.gd"):
+		return false
+	var HS = load("res://scripts/mission/hub_session.gd")
+	if HS == null or not HS.can_instantiate():
+		return false
+	hub3d = HS.create()
+	hub3d.open_menu.connect(func(): show_hub(_hub_qid, false, true))
+	add_child(hub3d)
+	return true
+
+
+func _show_hub3d() -> void:
+	hub3d.set_active(true)
+	var o := Control.new()
+	o.name = "Hub3DOverlay"
+	JSUI.full_rect(o)
+	o.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_show(o, "hub")
+	root.visible = true
+	_play_mode()
+
+
+func _stop_hub3d() -> void:
+	if hub3d != null and is_instance_valid(hub3d):
+		hub3d.end()
+	hub3d = null
+
+
+## 採点ハブの画面の右上に「研究所を歩く」（2026 年の研究所へ）
+func _add_lab_button(h: Control) -> void:
+	var b := Button.new()
+	b.text = "研究所を歩く（2026年）"
+	b.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	b.position = Vector2(-300, 8)
+	b.custom_minimum_size = Vector2(280, 40)
+	b.pressed.connect(func():
+		if _start_hub3d():
+			_show_hub3d())
+	h.add_child(b)
 
 
 # ------------------------------------------------------------------ ブリーフィング
@@ -250,7 +313,7 @@ func show_briefing(q: Dictionary) -> void:
 	var b := BriefingScreen.new()
 	b.q = q
 	b.depart.connect(func(): depart(q, b.method))
-	b.back.connect(func(): show_hub(q["id"]))
+	b.back.connect(func(): show_hub(q["id"], false, hub3d != null and is_instance_valid(hub3d)))
 	_show(b, "briefing")
 
 
@@ -298,8 +361,10 @@ func _warp_into(title: String, subtitle: String, make: Callable) -> void:
 	w.caption = "時空跳躍"
 	warp_layer.add_child(w)
 	var t0 := Time.get_ticks_msec()
+	Audio.music_stop(1.5)
 	await w.covered
 	_stop_backdrop()
+	_stop_hub3d()
 	_clear_screen()
 	Game.input_blocked = true
 	await get_tree().process_frame
@@ -407,6 +472,7 @@ func _on_session_aborted() -> void:
 
 # ------------------------------------------------------------------ 結果
 func show_aftermath(q: Dictionary, changes: Array) -> void:
+	Audio.music("music_hub", 3.0, -2.0)
 	var a := AftermathScreen.new()
 	a.success = true
 	a.q = q
@@ -419,6 +485,7 @@ func show_aftermath(q: Dictionary, changes: Array) -> void:
 
 ## 自由探索の混乱で変わった歴史（aftermath_screen の混乱版）
 func show_chaos_aftermath(hits: Array, era_id: String, back_to := "hub") -> void:
+	Audio.music("music_hub", 3.0, -2.0)
 	var a := AftermathScreen.new()
 	a.success = true
 	a.chaos_hits = hits
@@ -436,6 +503,7 @@ func show_chaos_aftermath(hits: Array, era_id: String, back_to := "hub") -> void
 
 
 func show_failure(q: Dictionary, reason: String) -> void:
+	Audio.music("music_hub", 3.0, -2.0)
 	var a := AftermathScreen.new()
 	a.success = false
 	a.q = q
@@ -446,6 +514,8 @@ func show_failure(q: Dictionary, reason: String) -> void:
 
 
 func show_ending() -> void:
+	_stop_hub3d()
+	Audio.music("music_heian", 3.0)
 	var e := EndingScreen.new()
 	e.to_title.connect(show_title)
 	e.replay.connect(start_new_game)

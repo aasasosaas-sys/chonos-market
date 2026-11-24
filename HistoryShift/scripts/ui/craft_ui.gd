@@ -143,7 +143,23 @@ func _money() -> String:
 
 
 # ================================================================== 工房
+var _snd_key := ""
+var _snd_t := -10.0
+
+
+## 画面を開いた音（同じ画面の描き直しでは鳴らさない）
+func _open_snd(key: String) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	if key == _snd_key and now - _snd_t < 4.0:
+		_snd_t = now
+		return
+	_snd_key = key
+	_snd_t = now
+	Audio.play(key, -4.0)
+
+
 func open_workshop(st: CraftStation, msg := "") -> void:
+	_open_snd("door_slide_open")
 	_station = st
 	_page = "workshop"
 	_show()
@@ -318,6 +334,7 @@ func _stations_here() -> Array:
 
 
 func open_crafting(st: CraftStation, msg := "") -> void:
+	_open_snd("craft_hammer_wood")
 	_station = st
 	_page = "crafting"
 	_show()
@@ -410,6 +427,7 @@ func _craft_now(rid: String, station: String, score: float) -> void:
 
 # ================================================================== 店
 func open_shop(st: CraftStation, msg := "", sell := false) -> void:
+	_open_snd("ui_open")
 	_station = st
 	_page = "shop"
 	_show()
@@ -487,6 +505,7 @@ func _sell_stack(id: String, p: int) -> void:
 
 # ================================================================== 蔵
 func open_loot(st: CraftStation, got: Array, heat: float) -> void:
+	_open_snd("door_heavy_slide")
 	_station = st
 	_page = "loot"
 	_show()
@@ -502,6 +521,7 @@ func open_loot(st: CraftStation, got: Array, heat: float) -> void:
 
 # ================================================================== 持ち物・技能・製作・メモ
 func open_inventory(msg := "") -> void:
+	_open_snd("pickup_leather")
 	_station = null
 	_page = "inventory"
 	_show()
@@ -935,6 +955,7 @@ func _build(bid: String) -> void:
 
 # ================================================================== 施設の管理
 func open_factory(f: Facility, msg := "") -> void:
+	_open_snd("ui_open")
 	_station = f
 	_page = "factory"
 	_show()

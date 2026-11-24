@@ -26,6 +26,7 @@ func _ready() -> void:
 	near = 0.08
 	fov = 65.0
 	current = true
+	doppler_tracking = Camera3D.DOPPLER_TRACKING_PHYSICS_STEP   # 飛行機のエンジン音のドップラー（音の側で有効にしたものだけ）
 	var s = Game.get_meta("mouse_sensitivity", 1.0)
 	sensitivity = 0.0025 * float(s)
 

@@ -233,7 +233,7 @@ func small_collapse(u: Destructible, point: Vector3, dir: Vector3) -> void:
 		kit.box(pick[0], Transform3D.IDENTITY, s, pick[1], false)
 		var p := point + Vector3(randf_range(-1, 1), randf_range(0, 1.5), randf_range(-1, 1))
 		_spawn_one(kit.to_mesh(), p, s, (dir + Vector3(randf_range(-1, 1), randf_range(0.5, 1.5), randf_range(-1, 1))).normalized() * randf_range(3, 7))
-	Sfx.play_at(get_tree(), Sfx.wood_break() if u.cfg["mat"] == "wood" else Sfx.crumble(), point, -6.0)
+	Audio.play_at(break_key(String(u.cfg["mat"])), point, -4.0)
 
 
 func collapse_roof(u: Destructible, dir: Vector3) -> void:
@@ -254,7 +254,13 @@ func collapse_roof(u: Destructible, dir: Vector3) -> void:
 	var top := Vector3(ctr.x, u.top_y - 0.5, ctr.z)
 	Effects.burst(get_tree(), top, Vector3.UP, Color(0.5, 0.52, 0.56), Color(0.3, 0.3, 0.32), 30, 8.0, 0.25, 1.2, 1.6, false, 120)
 	_dust(top, ext.length() * 0.35, MAT_FX["plaster"][1])
-	Sfx.play_at(get_tree(), Sfx.tiles(), top, 0.0)
+	# 屋根の材で：瓦は滑り落ちて割れる、茅・板は崩れる
+	var roof_mats: Dictionary = u.def.get("ranges", {})
+	if roof_mats.has("rooftile"):
+		Audio.play_at("break_tiles", top, 0.0)
+	else:
+		Audio.play_at("collapse_small", top, -2.0)
+	Audio.play_at("creak_structure", u.center(), -2.0)
 	Wanted.report(ctr, float(u.cfg["wanted"]) * 0.3)
 
 
@@ -336,15 +342,16 @@ func destroy_unit(u: Destructible, dir: Vector3, power: float) -> void:
 	if not small:
 		_dust(Vector3(ctr.x, u.base_y + 0.5, ctr.z), r, fx[1])
 		Effects.burst(get_tree(), ctr, Vector3.UP, fx[0], (fx[0] as Color).darkened(0.5), int(clampf(r * 6.0, 16, 60)), 9.0 * sp, 0.22, 1.4, 1.6, false, 100)
-		Sfx.play_at(get_tree(), Sfx.crumble(), ctr, clampf(r * 0.6 - 2.0, -6.0, 6.0))
-		if mat == "wood":
-			Sfx.play_at(get_tree(), Sfx.wood_break(), ctr, 0.0)
+		Audio.play_at("collapse_building" if r > 7.0 else "collapse_small", ctr, clampf(r * 0.4 - 3.0, -4.0, 4.0))
+		Audio.play_at(break_key(mat), ctr + Vector3.UP * 2.0, 0.0)
+		if u.kind in ["brick", "concrete", "school", "warehouse", "hangar"]:
+			Audio.play_at("break_glass", ctr + Vector3.UP * 3.0, -2.0)   # 洋風の建物の窓ガラス
 		var cam := get_viewport().get_camera_3d() if get_viewport() else null
 		if cam:
 			Effects.shake = maxf(Effects.shake, clampf(r / 8.0 - cam.global_position.distance_to(ctr) / 120.0, 0.0, 0.8))
 	else:
 		Effects.burst(get_tree(), ctr, Vector3.UP, fx[0], (fx[0] as Color).darkened(0.4), 14, 6.0, 0.14, 0.9, 1.6, false, 100)
-		Sfx.play_at(get_tree(), Sfx.wood_break() if mat == "wood" else Sfx.hit(), ctr, -4.0)
+		Audio.play_at(break_key(mat), ctr, -2.0)
 	if u.burning:
 		for f in _fires:
 			if f["u"] == u:
@@ -446,8 +453,8 @@ func _sink(u: Destructible) -> void:
 	var sp := Vector3(ctr.x, wl + 0.3, ctr.z)
 	Effects.burst(get_tree(), sp, Vector3.UP, Color(0.85, 0.95, 1.0, 0.9), Color(0.6, 0.8, 0.95, 0.0), 50, 11.0, 1.2, 1.6, 1.4, false, 40)
 	_dust(sp, (u.local_max - u.local_min).length() * 0.4, Color(0.9, 0.95, 1.0, 0.7))
-	Sfx.play_at(get_tree(), Sfx.splash(), sp, 3.0)
-	Sfx.play_at(get_tree(), Sfx.wood_break(), sp, 0.0)
+	Audio.play_at("splash_big", sp, 3.0)
+	Audio.play_at("break_wood", sp, 0.0)
 	stats["ships"] = int(stats["ships"]) + 1
 	if u.flammable:
 		u.burning = false
@@ -569,7 +576,7 @@ func _physics_process(dt: float) -> void:
 				var tip: Vector3 = nd.global_position + Basis(f["axis"], 1.45) * Vector3.UP * float(f["h"]) * 0.6
 				Effects.burst(get_tree(), tip, Vector3.UP, f["leaf"], Color(f["leaf"], 0.0), 26, 5.0, 0.4, 1.4, 0.6, false, 120)
 				_dust(nd.global_position + (tip - nd.global_position) * 0.5, 3.0, Color(0.66, 0.6, 0.5, 0.7))
-				Sfx.play_at(get_tree(), Sfx.wood_break(), tip, -3.0)
+				Audio.play_at("collapse_small", tip, -4.0)
 		nd.global_transform.basis = Basis(f["axis"], ang)
 		if t > dur + 6.0:
 			nd.global_position.y -= dt * 0.8
@@ -620,7 +627,8 @@ func fell_tree(i: int, from: Vector3) -> void:
 	var axis := Vector3.UP.cross(away.normalized()).normalized()
 	var h := (meshes[0] as Mesh).get_aabb().end.y * xf.basis.get_scale().y
 	_falling.append({"node": pivot, "t": 0.0, "axis": axis, "dur": randf_range(1.2, 1.8), "landed": false, "h": h, "leaf": leaf})
-	Sfx.play_at(get_tree(), Sfx.wood_break(), xf.origin + Vector3.UP, -4.0)
+	Audio.play_at("break_wood", xf.origin + Vector3.UP, -2.0)
+	Audio.play_at("creak_structure", xf.origin + Vector3.UP * 3.0, 0.0)
 
 
 func _add_stump(xf: Transform3D) -> void:
@@ -679,6 +687,20 @@ func _scorch(pos: Vector3, radius: float) -> void:
 	dc.rotation.y = randf() * TAU
 
 
+## 材ごとの壊れる音（木・漆喰/土壁・石/煉瓦・鉄）
+static func break_key(mat: String) -> String:
+	match mat:
+		"wood":
+			return "break_wood"
+		"plaster":
+			return "break_plaster"
+		"stone", "brick":
+			return "break_stone"
+		"metal":
+			return "break_metal"
+	return "break_wood"
+
+
 # ================================================================ 火災
 func start_fire(u: Destructible) -> void:
 	if u.burning or _fires.size() >= MAX_FIRES:
@@ -688,6 +710,7 @@ func start_fire(u: Destructible) -> void:
 	stats["fires"] = int(stats["fires"]) + 1
 	var fx := _make_fire_fx(u, _fire_light_count() < MAX_FIRE_LIGHTS)
 	_fires.append({"u": u, "fx": fx, "after": 0.0})
+	Audio.play_at("fire_ignite", u.center(), 0.0)
 	push_state(u)
 	var cnt: int = int(_fire_spread.get(lm, 0)) + 1
 	_fire_spread[lm] = cnt
@@ -859,10 +882,9 @@ func _make_fire_fx(u: Destructible, with_light: bool) -> Node3D:
 		l.omni_attenuation = 1.6
 		l.position = Vector3(0, 2.0, 0)
 		root.add_child(l)
-	var snd := Sfx.loop_player(root, Sfx.fire_loop(), -8.0)
-	if snd:
-		snd.max_distance = 70.0
-		snd.play()
+	var snd := Audio.loop_at(root, "fire_loop", clampf(ext.length() * 0.3 - 4.0, -6.0, 4.0), {"unit": 7.0, "max_dist": 110.0})
+	if snd and Audio.enabled:
+		snd.play(randf() * 5.0)
 	return root
 
 

@@ -68,6 +68,7 @@ func is_enemy() -> bool:
 
 func _ready() -> void:
 	add_to_group("figure")
+	Footsteps.attach(self, "npc")
 	# 敵の弾（COLLISION_CIVILIAN を見る）にも、車（COLLISION_ENEMY を見る）にも当たるように両方の層に置く
 	collision_layer = Game.COLLISION_ENEMY | Game.COLLISION_CIVILIAN
 	collision_mask = Game.COLLISION_WORLD | Game.COLLISION_PROP | Game.COLLISION_VEHICLE
@@ -222,7 +223,7 @@ func _die() -> void:
 	_ring.visible = false
 	if _rig.has_method("die"):
 		_rig.call("die")
-	Sfx.play_at(get_tree(), Sfx.hit(), global_position, -2.0)
+	Audio.play_at("body_fall", global_position, 0.0)
 	Effects.burst(get_tree(), global_position + Vector3.UP, Vector3.UP, Color(1, 0.8, 0.35), Effects.CYAN, 36, 5.0, 0.3, 1.0, -0.2, true, 160)
 	Wanted.report(global_position, 1.2)
 	_alert_guards()

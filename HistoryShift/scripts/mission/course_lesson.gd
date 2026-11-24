@@ -136,7 +136,7 @@ func _process(dt: float) -> void:
 		var r := 12.0 if vehicle_kind == "plane" else 6.0
 		if vp.distance_to(points[_i]) < r:
 			_i += 1
-			Sfx.play(get_tree(), Sfx.pickup(), -4.0)
+			Audio.play("ui_confirm", -4.0)
 			_refresh()
 			if _i >= points.size():
 				var time_k := clampf(1.0 - maxf(0.0, _t - _par) / (_limit - _par), 0.5, 1.0)
