@@ -3,18 +3,34 @@ extends RefCounted
 
 
 static func open(parent: Control, on_close: Callable = Callable()) -> Control:
-	var r := JSUI.modal(parent, 960, "設定")
+	var r := JSUI.modal(parent, 820, "設定")
 	var overlay: Control = r[0]
-	var v: VBoxContainer = r[1]
+	var outer: VBoxContainer = r[1]
 	var vals := GameSettings.values
+	# 項目はスクロールする枠の中に入れる（画面の高さの約 6 割まで。閉じるボタンは枠の外で常に見える）
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	var vh := 1080.0
+	if parent.is_inside_tree():
+		vh = parent.get_viewport_rect().size.y
+	scroll.custom_minimum_size = Vector2(0, clampf(vh * 0.6, 360.0, 640.0))
+	outer.add_child(scroll)
+	var pad := MarginContainer.new()
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pad.add_theme_constant_override("margin_right", 16)   # スクロールバーと重ならないように
+	scroll.add_child(pad)
+	var v := JSUI.vbox(10)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pad.add_child(v)
 
 	# 画質
 	var q := OptionButton.new()
 	for i in GameSettings.QUALITY_NAMES.size():
 		q.add_item(GameSettings.QUALITY_NAMES[i], i)
 	q.selected = int(vals["quality"])
-	q.custom_minimum_size = Vector2(280, 56)
-	q.add_theme_font_size_override("font_size", 24)
+	q.custom_minimum_size = Vector2(200, 44)
+	q.add_theme_font_size_override("font_size", 20)
 	q.item_selected.connect(func(i: int): UISfx.play("click"); GameSettings.set_value("quality", i))
 	v.add_child(_row("画質", "影・描画距離・植生の密度（次の時空跳躍から反映）", q))
 
@@ -36,12 +52,12 @@ static func open(parent: Control, on_close: Callable = Callable()) -> Control:
 	for spec in [["volume", "全体"], ["vol_music", "BGM"], ["vol_sfx", "効果音"], ["vol_ambience", "環境音"], ["vol_voice", "声"]]:
 		var key := String(spec[0])
 		var cell := JSUI.hbox(10)
-		var lb := JSUI.label(String(spec[1]), 22, Color.WHITE, JSUI.sans_bold())
-		lb.custom_minimum_size = Vector2(90, 0)
+		var lb := JSUI.label(String(spec[1]), 18, Color.WHITE, JSUI.sans_bold())
+		lb.custom_minimum_size = Vector2(70, 0)
 		cell.add_child(lb)
 		var sl := _slider(0.0, 1.0, 0.01, float(vals.get(key, 1.0)), func(x: float): return "%d%%" % roundi(x * 100),
 			func(x: float): GameSettings.set_value(key, x))
-		(sl.get_child(0) as Control).custom_minimum_size = Vector2(150, 36)
+		(sl.get_child(0) as Control).custom_minimum_size = Vector2(120, 30)
 		cell.add_child(sl)
 		grid.add_child(cell)
 	v.add_child(_row("音量", "", grid))
@@ -51,6 +67,12 @@ static func open(parent: Control, on_close: Callable = Callable()) -> Control:
 	fs.text = "オン" if fs.button_pressed else "オフ"
 	fs.toggled.connect(func(on: bool): UISfx.play("click"); fs.text = "オン" if on else "オフ"; GameSettings.set_value("fullscreen", on))
 	v.add_child(_row("フルスクリーン", "", fs))
+
+	var fp := CheckButton.new()
+	fp.button_pressed = bool(vals.get("show_fps", true))
+	fp.text = "オン" if fp.button_pressed else "オフ"
+	fp.toggled.connect(func(on: bool): UISfx.play("click"); fp.text = "オン" if on else "オフ"; GameSettings.set_value("show_fps", on))
+	v.add_child(_row("FPS 表示", "画面右下に1秒あたりの描画回数を出す（緑 50以上・黄 30〜49・赤 30未満）", fp))
 
 	# 技術（弟子入り・稽古が面倒な人向け）
 	var mm := CheckButton.new()
@@ -68,10 +90,10 @@ static func open(parent: Control, on_close: Callable = Callable()) -> Control:
 	if MatureContent.is_unlocked():
 		v.add_child(_civil_harm_row(parent))
 
-	v.add_child(JSUI.gap(6))
+	outer.add_child(JSUI.gap(2))
 	var row := JSUI.hbox()
 	row.alignment = BoxContainer.ALIGNMENT_END
-	var close := JSUI.button("閉じる", "primary", 26, 220)
+	var close := JSUI.button("閉じる", "primary", 22, 180)
 	close.pressed.connect(func():
 		UISfx.play("back")
 		GameSettings.save()
@@ -79,7 +101,7 @@ static func open(parent: Control, on_close: Callable = Callable()) -> Control:
 		if on_close.is_valid():
 			on_close.call())
 	row.add_child(close)
-	v.add_child(row)
+	outer.add_child(row)
 	close.call_deferred("grab_focus")
 	return overlay
 
@@ -102,14 +124,14 @@ static func _civil_harm_row(parent: Control) -> Control:
 			ch.set_pressed_no_signal(true)
 			ch.text = "オン"
 			GameSettings.set_value("civil_harm", true), true))
-	var p := JSUI.panel(JSUI.sb(Color(JSUI.SHU, 0.06), 12, 1, Color(JSUI.SHU, 0.35), 0, 16))
-	var h := JSUI.hbox(20)
+	var p := JSUI.panel(JSUI.sb(Color(JSUI.SHU, 0.06), 10, 1, Color(JSUI.SHU, 0.35), 0, 10))
+	var h := JSUI.hbox(16)
 	p.add_child(h)
 	var tv := JSUI.vbox(4)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tv.add_child(JSUI.label("民間人への危害（成人向け）", 27, Color.WHITE, JSUI.sans_bold()))
-	var warn := JSUI.label(CIVIL_WARNING, 18, JSUI.MUTED, null, true)
-	warn.custom_minimum_size = Vector2(620, 0)
+	tv.add_child(JSUI.label("民間人への危害（成人向け）", 22, Color.WHITE, JSUI.sans_bold()))
+	var warn := JSUI.label(CIVIL_WARNING, 15, JSUI.MUTED, null, true)
+	warn.custom_minimum_size = Vector2(480, 0)
 	tv.add_child(warn)
 	h.add_child(tv)
 	ch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -118,14 +140,16 @@ static func _civil_harm_row(parent: Control) -> Control:
 
 
 static func _row(title: String, desc: String, ctl: Control) -> Control:
-	var p := JSUI.panel(JSUI.sb(Color(1, 1, 1, 0.03), 12, 1, Color(1, 1, 1, 0.05), 0, 16))
-	var h := JSUI.hbox(20)
+	var p := JSUI.panel(JSUI.sb(Color(1, 1, 1, 0.03), 10, 1, Color(1, 1, 1, 0.05), 0, 10))
+	var h := JSUI.hbox(16)
 	p.add_child(h)
 	var tv := JSUI.vbox(0)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tv.add_child(JSUI.label(title, 27, Color.WHITE, JSUI.sans_bold()))
+	tv.add_child(JSUI.label(title, 22, Color.WHITE, JSUI.sans_bold()))
 	if desc != "":
-		tv.add_child(JSUI.label(desc, 19, JSUI.MUTED))
+		var d := JSUI.label(desc, 16, JSUI.MUTED, null, true)
+		d.custom_minimum_size = Vector2(380, 0)
+		tv.add_child(d)
 	h.add_child(tv)
 	ctl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(ctl)
@@ -136,10 +160,10 @@ static func _slider(lo: float, hi: float, step: float, val: float, fmt: Callable
 	var h := JSUI.hbox(14)
 	var s := HSlider.new()
 	s.min_value = lo; s.max_value = hi; s.step = step; s.value = val
-	s.custom_minimum_size = Vector2(300, 36)
+	s.custom_minimum_size = Vector2(220, 32)
 	s.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var l := JSUI.label(fmt.call(val), 24, JSUI.CYAN, JSUI.sans_bold())
-	l.custom_minimum_size = Vector2(90, 0)
+	var l := JSUI.label(fmt.call(val), 20, JSUI.CYAN, JSUI.sans_bold())
+	l.custom_minimum_size = Vector2(76, 0)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	s.value_changed.connect(func(x: float): l.text = fmt.call(x); on_change.call(x))
 	h.add_child(s)

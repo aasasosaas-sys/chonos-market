@@ -18,6 +18,7 @@ static var values := {
 	"vol_ambience": 0.9,        # 環境音（風・鳥・虫・波・町のざわめき）
 	"vol_voice": 1.0,           # 声
 	"fullscreen": true,
+	"show_fps": true,           # 画面右下に FPS を表示（scripts/ui/fps_overlay.gd）
 	"master_mode": false,       # 技術完全習得モード（すべての技能 100・レシピ解禁。scripts/core/player_profile.gd）
 	"start_armed": false,       # 最初から武装（時空銃を貸与。気軽に遊びたい人向け）
 	"civil_harm": false,        # 民間人への危害（成人向け。scripts/core/civil_harm.gd）。教育版・未所有では常にオフ
@@ -49,6 +50,7 @@ static func apply(apply_window := true) -> void:
 		game.set_meta("quality", int(values["quality"]))
 		game.set_meta("sdfgi", bool(values["sdfgi"]))
 		game.set_meta("mouse_sensitivity", float(values["mouse_sensitivity"]))
+		FpsOverlay.set_visible_on(game, bool(values.get("show_fps", true)))
 	_set_era_world_static("quality", int(values["quality"]))
 	_set_era_world_static("sdfgi", bool(values["sdfgi"]))
 	_apply_sdfgi_live(bool(values["sdfgi"]))
